@@ -43,6 +43,8 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		Collection<Artist> artists = artistRepository.findAll();
 
 		System.out.printf("%d artist in  database.\n", artists.size());
+		
+		artists.forEach(artist -> System.out.printf("%s has the score %d.\n", artist.name(), artist.score()));
 
 	}
 }
