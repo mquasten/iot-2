@@ -1,4 +1,4 @@
-package de.mq.iot2.domain.calendar;
+package de.mq.iot2.calendar.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
