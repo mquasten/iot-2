@@ -31,7 +31,7 @@ class DayGroupImplTest {
 	final void create() {
 		final var dayGroup = new DayGroupImpl(ID, GROUP_NAME, false);
 		assertEquals(GROUP_NAME, dayGroup.name());
-		assertFalse(dayGroup.isReadOnly());
+		assertFalse(dayGroup.readOnly());
 		assertEquals(0, dayGroup.days().size());
 		assertEquals(new UUID(ID, ID).toString(), ReflectionTestUtils.getField(dayGroup, "id"));
 	}
@@ -40,7 +40,7 @@ class DayGroupImplTest {
 	final void createReadOnly() {
 		final var dayGroup = newDayGroup();
 		assertEquals(GROUP_NAME, dayGroup.name());
-		assertTrue(dayGroup.isReadOnly());
+		assertTrue(dayGroup.readOnly());
 		assertEquals(0, dayGroup.days().size());
 	}
 
@@ -48,7 +48,7 @@ class DayGroupImplTest {
 	final void createRandomId() {
 		final var dayGroup = new DayGroupImpl(GROUP_NAME, false);
 		assertEquals(GROUP_NAME, dayGroup.name());
-		assertFalse(dayGroup.isReadOnly());
+		assertFalse(dayGroup.readOnly());
 		assertEquals(0, dayGroup.days().size());
 		final var id = ReflectionTestUtils.getField(dayGroup, "id");
 		assertNotEquals(new UUID(ID, ID), id);
@@ -59,7 +59,7 @@ class DayGroupImplTest {
 	final void createRandomIdReadOnly() {
 		final var dayGroup = new DayGroupImpl(GROUP_NAME, true);
 		assertEquals(GROUP_NAME, dayGroup.name());
-		assertTrue(dayGroup.isReadOnly());
+		assertTrue(dayGroup.readOnly());
 		assertEquals(0, dayGroup.days().size());
 		final var id = ReflectionTestUtils.getField(dayGroup, "id");
 		assertNotEquals(new UUID(ID, ID), id);

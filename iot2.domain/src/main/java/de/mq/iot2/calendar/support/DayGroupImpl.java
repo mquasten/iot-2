@@ -76,7 +76,7 @@ class DayGroupImpl implements DayGroup {
 	}
 
 	@Override
-	public  boolean isReadOnly() {
+	public  final boolean readOnly() {
 		return readOnly;
 	}
 
