@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 
 import org.springframework.util.Assert;
 
+import de.mq.iot2.calendar.DayGroup;
+
 @Entity(name = DayOfMonthImpl.ENTITY_NAME)
 @DiscriminatorValue(DayOfMonthImpl.ENTITY_NAME )
 class DayOfMonthImpl extends AbstractDay<MonthDay> {
@@ -15,15 +17,15 @@ class DayOfMonthImpl extends AbstractDay<MonthDay> {
 
 	@SuppressWarnings("unused")
 	private DayOfMonthImpl() {
-		this(MonthDay.now());
+		super();
 	}
 
-	DayOfMonthImpl(final MonthDay monthDay) {
-		this(monthDay, null);
+	DayOfMonthImpl(final DayGroup dayGroup, final MonthDay monthDay) {
+		this(dayGroup, monthDay, null);
 	}
 
-	DayOfMonthImpl(final MonthDay monthDay, final String description) {
-		super(toArray(monthDay), new int[] { 2, 2 }, ENTITY_NAME.hashCode(), description);
+	DayOfMonthImpl(final DayGroup dayGroup,final MonthDay monthDay, final String description) {
+		super(dayGroup, toArray(monthDay), new int[] { 2, 2 }, ENTITY_NAME.hashCode(), description);
 
 	}
 
@@ -34,8 +36,8 @@ class DayOfMonthImpl extends AbstractDay<MonthDay> {
 
 	@Override
 	public boolean matches(final LocalDate date) {
-		// TODO Auto-generated method stub
-		return false;
+		Assert.notNull(date, VALUE_REQUIRED_MESSAGE);
+		return MonthDay.of(date.getMonth(), date.getDayOfMonth()).equals(value());
 	}
 
 	@Override

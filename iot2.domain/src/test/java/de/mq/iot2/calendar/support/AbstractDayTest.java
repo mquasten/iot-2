@@ -1,9 +1,11 @@
 package de.mq.iot2.calendar.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.MonthDay;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,27 +19,41 @@ import org.mockito.Mockito;
 import org.springframework.beans.BeanUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import de.mq.iot2.calendar.DayGroup;
+
 class AbstractDayTest {
 
 	private static final String VALUE_FIELD_NAME = "value";
 	private static final String DESCRIPTION = "description";
 	private static final int TYPE = 4711;
+	
+	private final DayGroup dayGroup = Mockito.mock(DayGroup.class);
 
 	@SuppressWarnings("unchecked")
-	AbstractDay<Integer> newAbstractDay(int[] values, int[] digits) {
+	AbstractDay<Integer> newAbstractDay(DayGroup dayGroup,int[] values, int[] digits) {
 		try {
-			return BeanUtils.instantiateClass(((AbstractDay<Integer>) Mockito.mock(AbstractDay.class)).getClass().getDeclaredConstructor(int[].class, int[].class, int.class, String.class), values,
+			return BeanUtils.instantiateClass(((AbstractDay<Integer>) Mockito.mock(AbstractDay.class)).getClass().getDeclaredConstructor(DayGroup.class,int[].class, int[].class, int.class, String.class), dayGroup, values,
 					digits, TYPE, DESCRIPTION);
 		} catch (final Exception exception) {
 			throw runtimeExceptionn(exception);
 		}
 	}
-
+	
+	AbstractDay<Integer> newAbstractDay(int[] values, int[] digits) {
+		return newAbstractDay(dayGroup, values, digits);
+	}
 	private RuntimeException runtimeExceptionn(final Exception exception) {
 		if (exception.getCause() instanceof RuntimeException) {
 			return (RuntimeException) exception.getCause();
 		}
 		return new IllegalStateException("Unable to create exception AbstractDay", exception);
+	}
+	
+	@Test
+	void defaultConstructon() throws NoSuchMethodException, SecurityException {
+	 
+	 assertTrue(BeanUtils.instantiateClass(Mockito.mock(AbstractDay.class).getClass().getDeclaredConstructor()) instanceof AbstractDay<?>);
+	
 	}
 
 	@Test
@@ -48,6 +64,12 @@ class AbstractDayTest {
 		final var expectedValue = 19680528;
 		assertEquals(expectedValue, ReflectionTestUtils.getField(day, VALUE_FIELD_NAME));
 		assertEquals(new UUID(TYPE, expectedValue).toString(), ReflectionTestUtils.getField(day, "id"));
+		assertEquals(dayGroup, day.dayGroup());
+	}
+	
+	@Test
+	void createMissingDayGroup() {
+		assertThrows(IllegalArgumentException.class , () -> newAbstractDay(null, new int[] { 1968, 5, 28 }, new int[] { 4, 2, 2 }));
 	}
 
 	@ParameterizedTest
@@ -63,8 +85,7 @@ class AbstractDayTest {
 	}
 
 	private static Collection<Entry<int[], int[]>> invalidConstructorArgs() {
-		return Map.of(new int[] {}, new int[] { 1 }, new int[] { 1 }, new int[] {}, new int[] { 1, 1 }, new int[] { 1 }, new int[] { 1 }, new int[] { 0 }, new int[] { -1 }, new int[] { 1 })
-				.entrySet();
+		return Map.of(new int[] {}, new int[] { 1 }, new int[] { 1 }, new int[] {}, new int[] { 1, 1 }, new int[] { 1 }, new int[] { 1 }, new int[] { 0 }).entrySet();
 	}
 
 	@Test
@@ -113,12 +134,40 @@ class AbstractDayTest {
 	}
 
 	@Test
-	void splitValueNegative() {
+	void hash() {
+		// Achtung das final muss for der Methode stehen, sonst wird hashcode nicht
+		// aufgerufen, sch... Mockito.
+		// Überschreiben können soll man die Methode aber hier auch nicht.
+		final var day = newAbstractDayWeihnachten();
+		assertEquals(day.getClass().hashCode() + Integer.valueOf(1225).hashCode(), day.hashCode());
+
+		ReflectionTestUtils.setField(day, VALUE_FIELD_NAME, null);
+		assertEquals(System.identityHashCode(day), day.hashCode());
+	}
+
+	private AbstractDay<Integer> newAbstractDayWeihnachten() {
+		return newAbstractDay(new int[] { 12, 25 }, new int[] { 2, 2 });
+	}
+
+	@SuppressWarnings("unlikely-arg-type")
+	@Test
+	void equals() {
+		// Achtung das final muss for der Methode stehen, sonst wird equals nicht
+		// aufgerufen, sch... Mockito
+		// Überschreiben können soll man die Methode aber hier auch nicht.
+		assertTrue(newAbstractDayWeihnachten().equals(newAbstractDayWeihnachten()));
+		assertFalse(newAbstractDayWeihnachten().equals(newAbstractDay()));
+		assertFalse(newAbstractDayWeihnachten().equals(DESCRIPTION));
+		assertFalse(newAbstractDayWeihnachten().equals(new DayOfMonthImpl(dayGroup,MonthDay.of(12, 25))));
+
 		final var day = newAbstractDay();
+		ReflectionTestUtils.setField(day, VALUE_FIELD_NAME, null);
+		final var otherDay = newAbstractDay();
+		assertFalse(day.equals(otherDay));
+		assertFalse(otherDay.equals(day));
+		assertTrue(day.equals(day));
+		assertTrue(otherDay.equals(otherDay));
 
-		ReflectionTestUtils.setField(day, VALUE_FIELD_NAME, Integer.MIN_VALUE);
-
-		assertThrows(IllegalArgumentException.class, () -> day.split(1));
 	}
 
 }
