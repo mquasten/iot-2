@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.springframework.util.Assert;
@@ -22,7 +23,7 @@ import de.mq.iot2.calendar.DayGroup;
 @Entity(name = "Day")
 @Table(name = "SPECIAL_DAY")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "TYPE", length = 15)
+@DiscriminatorColumn(name = "DAY_TYPE", length = 15)
 abstract class AbstractDay<T> implements Day<T> {
 
 	private static final String ARRAYS_DIFFERENT_SIZE_MESSAGE = "Arrays should have the same size.";
@@ -34,17 +35,17 @@ abstract class AbstractDay<T> implements Day<T> {
 	@Column(name = "ID", length = 36)
 	private String id;
 
-	@Column(name = "VALUE")
+	@Column(name = "DAY_VALUE")
 	private Integer value;
 
 	@Column(name = "DESCRIPTION", length = 25)
 	private String description;
 	
-	@JoinColumn(name = "DAY_GROUP" ,referencedColumnName = "ID" ,nullable = false)
+	@ManyToOne(targetEntity = DayGroupImpl.class)
+	@JoinColumn(name = "DAY_GROUP_ID" ,nullable = false)
 	private DayGroup dayGroup;
 	
 	
-	 
 	AbstractDay() {
 		
 	}

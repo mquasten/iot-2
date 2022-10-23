@@ -3,6 +3,8 @@ package de.mq.iot2.calendar.support;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Random;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -36,17 +38,35 @@ class DayGroupImpl implements DayGroup {
 
 	}
 
+	DayGroupImpl(final long id,final String name) {
+		this(id, name, true);
+	}
+
+	DayGroupImpl(final long id, final String name, boolean readolny) {
+		Assert.notNull(name, "Name is required.");
+		this.name = name;
+		this.readOnly = readolny;
+		this.id=new UUID(id, id).toString();
+	}
+	
+	
 	DayGroupImpl(final String name) {
 		this(name, true);
 	}
-
 	DayGroupImpl(final String name, boolean readolny) {
 		Assert.notNull(name, "Name is required.");
 		this.name = name;
 		this.readOnly = readolny;
+		randomPositivLong();
+		this.id=new UUID(randomPositivLong(), System.currentTimeMillis()).toString();
 	}
 
-	@OneToMany(mappedBy = "dayGroup", targetEntity = AbstractDay.class, cascade = { CascadeType.REMOVE })
+	private long randomPositivLong() {
+		final var random = new Random();
+		return  random.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
+	}
+
+	@OneToMany(mappedBy = "dayGroup", targetEntity = AbstractDay.class, cascade = { CascadeType.ALL } )
 	private Collection<Day<?>> days = new HashSet<>();
 
 	@Override
@@ -56,7 +76,7 @@ class DayGroupImpl implements DayGroup {
 	}
 
 	@Override
-	public final boolean isReadOnly() {
+	public  boolean isReadOnly() {
 		return readOnly;
 	}
 

@@ -2,10 +2,13 @@ package de.mq.iot2.calendar.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,6 +19,8 @@ import de.mq.iot2.calendar.Day;
 
 class DayGroupImplTest {
 
+	private static final Long ID = 1L;
+
 	private static final String DAYS_FIELD_NAME = "days";
 
 	private static final String GROUP_NAME = "Feiertage";
@@ -24,10 +29,11 @@ class DayGroupImplTest {
 
 	@Test
 	final void create() {
-		final var dayGroup = new DayGroupImpl(GROUP_NAME, false);
+		final var dayGroup = new DayGroupImpl(ID, GROUP_NAME, false);
 		assertEquals(GROUP_NAME, dayGroup.name());
 		assertFalse(dayGroup.isReadOnly());
 		assertEquals(0, dayGroup.days().size());
+		assertEquals(new UUID(ID, ID).toString(), ReflectionTestUtils.getField(dayGroup, "id"));
 	}
 
 	@Test
@@ -36,6 +42,28 @@ class DayGroupImplTest {
 		assertEquals(GROUP_NAME, dayGroup.name());
 		assertTrue(dayGroup.isReadOnly());
 		assertEquals(0, dayGroup.days().size());
+	}
+
+	@Test
+	final void createRandomId() {
+		final var dayGroup = new DayGroupImpl(GROUP_NAME, false);
+		assertEquals(GROUP_NAME, dayGroup.name());
+		assertFalse(dayGroup.isReadOnly());
+		assertEquals(0, dayGroup.days().size());
+		final var id = ReflectionTestUtils.getField(dayGroup, "id");
+		assertNotEquals(new UUID(ID, ID), id);
+		assertNotNull(id);
+	}
+
+	@Test
+	final void createRandomIdReadOnly() {
+		final var dayGroup = new DayGroupImpl(GROUP_NAME, true);
+		assertEquals(GROUP_NAME, dayGroup.name());
+		assertTrue(dayGroup.isReadOnly());
+		assertEquals(0, dayGroup.days().size());
+		final var id = ReflectionTestUtils.getField(dayGroup, "id");
+		assertNotEquals(new UUID(ID, ID), id);
+		assertNotNull(id);
 	}
 
 	@Test
@@ -51,7 +79,7 @@ class DayGroupImplTest {
 	}
 
 	@Test
-	final void remave() {
+	final void remove() {
 		final var dayGroup = newDayGroup();
 		assignDays(dayGroup);
 		assertEquals(1, dayGroup.days().size());
@@ -62,7 +90,7 @@ class DayGroupImplTest {
 	}
 
 	private DayGroupImpl newDayGroup() {
-		return new DayGroupImpl(GROUP_NAME);
+		return new DayGroupImpl(ID, GROUP_NAME);
 	}
 
 	private void assignDays(final DayGroupImpl dayGroup) {
@@ -95,8 +123,8 @@ class DayGroupImplTest {
 	@Test
 	final void equals() {
 		assertTrue(newDayGroup().equals(newDayGroup()));
-		assertTrue(newDayGroup().equals(new DayGroupImpl(GROUP_NAME.toUpperCase())));
-		assertFalse(newDayGroup().equals(new DayGroupImpl("x")));
+		assertTrue(newDayGroup().equals(new DayGroupImpl(ID, GROUP_NAME.toUpperCase())));
+		assertFalse(newDayGroup().equals(new DayGroupImpl(ID, "x")));
 		assertFalse(newDayGroup().equals(GROUP_NAME));
 
 		final var dayGroup = newDayGroup();
