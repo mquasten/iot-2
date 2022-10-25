@@ -50,8 +50,7 @@ abstract class AbstractDay<T> implements Day<T> {
 
 	}
 
-	AbstractDay(final DayGroup dayGroup, final int[] values, final int[] digits, final int signum, final int typ,
-			final String description) {
+	AbstractDay(final DayGroup dayGroup, final int[] values, final int[] digits, final int signum, final int typ, final String description) {
 		Assert.notNull(dayGroup, VALUE_REQUIRED_MESSAGE);
 		arrayGuard(values);
 		arrayMemberMinVauleGuard(values, 0);

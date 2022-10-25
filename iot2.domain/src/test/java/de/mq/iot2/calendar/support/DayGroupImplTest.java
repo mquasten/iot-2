@@ -42,7 +42,10 @@ class DayGroupImplTest {
 		assertEquals(GROUP_NAME, dayGroup.name());
 		assertTrue(dayGroup.readOnly());
 		assertEquals(0, dayGroup.days().size());
-		dayGroup.name();
+		assertEquals(GROUP_NAME, dayGroup.name());
+		final var id = ReflectionTestUtils.getField(dayGroup, "id");
+		assertNotEquals(new UUID(ID, ID), id);
+		assertNotNull(id);
 	}
 
 	@Test

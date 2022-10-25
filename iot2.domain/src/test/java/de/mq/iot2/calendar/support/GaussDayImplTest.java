@@ -47,10 +47,10 @@ class GaussDayImplTest {
 		assertEquals(OFFSET_KARFREITAG, ReflectionTestUtils.getField(day, VALUE_FIELD));
 		assertEquals(new UUID(GaussDayImpl.ENTITY_NAME.hashCode(), OFFSET_KARFREITAG).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
 	}
-	
+
 	@Test
 	void createInvaildValue() {
-		assertThrows(IllegalArgumentException.class, ()-> new GaussDayImpl(dayGroup, 400, DESCRIPTION));
+		assertThrows(IllegalArgumentException.class, () -> new GaussDayImpl(dayGroup, 400, DESCRIPTION));
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class GaussDayImplTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(ints = { -300,  400, Integer.MAX_VALUE })
+	@ValueSource(ints = { -300, 400, Integer.MAX_VALUE })
 	void createInvalidOffset(final int offset) {
 		assertThrows(IllegalArgumentException.class, () -> new GaussDayImpl(dayGroup, offset));
 	}
@@ -103,8 +103,6 @@ class GaussDayImplTest {
 		assertFalse(day.matches(esterdate));
 	}
 
-
-	
 	@Test
 	void yearSupplier() {
 		final var day = new GaussDayImpl(dayGroup, OFFSET_KARFREITAG);

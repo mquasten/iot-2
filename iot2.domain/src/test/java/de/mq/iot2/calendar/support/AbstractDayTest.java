@@ -37,13 +37,11 @@ class AbstractDayTest {
 	}
 
 	@SuppressWarnings("unchecked")
-	AbstractDay<Integer> newAbstractDay(final DayGroup dayGroup, final int[] values, final int[] digits,
-			final int signum) {
+	AbstractDay<Integer> newAbstractDay(final DayGroup dayGroup, final int[] values, final int[] digits, final int signum) {
 		try {
 			return BeanUtils.instantiateClass(
-					((AbstractDay<Integer>) Mockito.mock(AbstractDay.class)).getClass().getDeclaredConstructor(
-							DayGroup.class, int[].class, int[].class, int.class, int.class, String.class),
-					dayGroup, values, digits, signum, TYPE, DESCRIPTION);
+					((AbstractDay<Integer>) Mockito.mock(AbstractDay.class)).getClass().getDeclaredConstructor(DayGroup.class, int[].class, int[].class, int.class, int.class, String.class), dayGroup,
+					values, digits, signum, TYPE, DESCRIPTION);
 		} catch (final Exception exception) {
 			throw runtimeExceptionn(exception);
 		}
@@ -63,8 +61,7 @@ class AbstractDayTest {
 	@Test
 	void defaultConstructon() throws NoSuchMethodException, SecurityException {
 
-		assertTrue(BeanUtils.instantiateClass(
-				Mockito.mock(AbstractDay.class).getClass().getDeclaredConstructor()) instanceof AbstractDay<?>);
+		assertTrue(BeanUtils.instantiateClass(Mockito.mock(AbstractDay.class).getClass().getDeclaredConstructor()) instanceof AbstractDay<?>);
 
 	}
 
@@ -93,8 +90,7 @@ class AbstractDayTest {
 
 	@Test
 	void createMissingDayGroup() {
-		assertThrows(IllegalArgumentException.class,
-				() -> newAbstractDay(null, new int[] { 1968, 5, 28 }, new int[] { 4, 2, 2 }));
+		assertThrows(IllegalArgumentException.class, () -> newAbstractDay(null, new int[] { 1968, 5, 28 }, new int[] { 4, 2, 2 }));
 	}
 
 	@ParameterizedTest
@@ -115,8 +111,7 @@ class AbstractDayTest {
 	}
 
 	private static Collection<Entry<int[], int[]>> invalidConstructorArgs() {
-		return Map.of(new int[] {}, new int[] { 1 }, new int[] { 1 }, new int[] {}, new int[] { 1, 1 }, new int[] { 1 },
-				new int[] { 1 }, new int[] { 0 }).entrySet();
+		return Map.of(new int[] {}, new int[] { 1 }, new int[] { 1 }, new int[] {}, new int[] { 1, 1 }, new int[] { 1 }, new int[] { 1 }, new int[] { 0 }).entrySet();
 	}
 
 	@Test
@@ -125,8 +120,7 @@ class AbstractDayTest {
 		final var expectedYear = 2022;
 		final var expectedMonth = 10;
 		final var expectedDay = 21;
-		final var value = Integer
-				.parseInt(String.format("%d%2d%2d", expectedYear, expectedMonth, expectedDay).replace(' ', '0'));
+		final var value = Integer.parseInt(String.format("%d%2d%2d", expectedYear, expectedMonth, expectedDay).replace(' ', '0'));
 
 		ReflectionTestUtils.setField(day, VALUE_FIELD_NAME, value);
 
@@ -168,8 +162,7 @@ class AbstractDayTest {
 	@ParameterizedTest
 	@ValueSource(ints = { -1, 1, -123, 123 })
 	void signum(final int signum) {
-		assertEquals(BigInteger.valueOf(signum).signum(),
-				newAbstractDay(dayGroup, new int[] { 4711 }, new int[] { 1 }, signum).signum());
+		assertEquals(BigInteger.valueOf(signum).signum(), newAbstractDay(dayGroup, new int[] { 4711 }, new int[] { 1 }, signum).signum());
 	}
 
 	@Test

@@ -38,7 +38,7 @@ class DayGroupImpl implements DayGroup {
 
 	}
 
-	DayGroupImpl(final long id,final String name) {
+	DayGroupImpl(final long id, final String name) {
 		this(id, name, true);
 	}
 
@@ -46,27 +46,26 @@ class DayGroupImpl implements DayGroup {
 		Assert.notNull(name, "Name is required.");
 		this.name = name;
 		this.readOnly = readolny;
-		this.id=new UUID(id, id).toString();
+		this.id = new UUID(id, id).toString();
 	}
-	
-	
+
 	DayGroupImpl(final String name) {
 		this(name, true);
 	}
+
 	DayGroupImpl(final String name, boolean readolny) {
 		Assert.notNull(name, "Name is required.");
 		this.name = name;
 		this.readOnly = readolny;
-		randomPositivLong();
-		this.id=new UUID(randomPositivLong(), System.currentTimeMillis()).toString();
+		this.id = new UUID(randomPositivLong(), System.currentTimeMillis()).toString();
 	}
 
 	private long randomPositivLong() {
 		final var random = new Random();
-		return  random.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
+		return random.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
 	}
 
-	@OneToMany(mappedBy = "dayGroup", targetEntity = AbstractDay.class, cascade = { CascadeType.ALL } )
+	@OneToMany(mappedBy = "dayGroup", targetEntity = AbstractDay.class, cascade = { CascadeType.ALL })
 	private Collection<Day<?>> days = new HashSet<>();
 
 	@Override
@@ -76,7 +75,7 @@ class DayGroupImpl implements DayGroup {
 	}
 
 	@Override
-	public  final boolean readOnly() {
+	public final boolean readOnly() {
 		return readOnly;
 	}
 

@@ -21,11 +21,10 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 
 	private static Logger LOG = LoggerFactory.getLogger(SpringBootConsoleApplication.class);
 
-	
 	private final CalendarService calendarService;
 
 	SpringBootConsoleApplication(final CalendarService calendarService) {
-		this.calendarService=calendarService;
+		this.calendarService = calendarService;
 	}
 
 	public static void main(String[] args) {
@@ -42,6 +41,5 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		calendarService.createDefaultGroupsAndDays();
 
 	}
-
 
 }

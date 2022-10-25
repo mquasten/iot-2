@@ -41,8 +41,7 @@ class DayOfMonthImplTest {
 		assertEquals(DESCRIPTION, day.description().get());
 		final var expectedValue = dayMonthToValue(monthDay);
 		assertEquals(expectedValue, ReflectionTestUtils.getField(day, VALUE_FIELD));
-		assertEquals(new UUID(DayOfMonthImpl.ENTITY_NAME.hashCode(), expectedValue).toString(),
-				ReflectionTestUtils.getField(day, ID_FIELD));
+		assertEquals(new UUID(DayOfMonthImpl.ENTITY_NAME.hashCode(), expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
 	}
 
 	@ParameterizedTest
@@ -54,8 +53,7 @@ class DayOfMonthImplTest {
 		assertFalse(day.description().isPresent());
 		final var expectedValue = dayMonthToValue(monthDay);
 		assertEquals(expectedValue, ReflectionTestUtils.getField(day, VALUE_FIELD));
-		assertEquals(new UUID(DayOfMonthImpl.ENTITY_NAME.hashCode(), expectedValue).toString(),
-				ReflectionTestUtils.getField(day, ID_FIELD));
+		assertEquals(new UUID(DayOfMonthImpl.ENTITY_NAME.hashCode(), expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
 	}
 
 	private int dayMonthToValue(MonthDay monthDay) {
@@ -98,12 +96,9 @@ class DayOfMonthImplTest {
 		var monthDay = MonthDay.of(10, 23);
 		final var day = new DayOfMonthImpl(dayGroup, monthDay);
 
-		assertTrue(
-				day.matches(LocalDate.of(Year.now().getValue(), monthDay.getMonthValue(), monthDay.getDayOfMonth())));
-		assertFalse(day
-				.matches(LocalDate.of(Year.now().getValue(), monthDay.getMonthValue() + 1, monthDay.getDayOfMonth())));
-		assertFalse(day
-				.matches(LocalDate.of(Year.now().getValue(), monthDay.getMonthValue(), monthDay.getDayOfMonth() + 1)));
+		assertTrue(day.matches(LocalDate.of(Year.now().getValue(), monthDay.getMonthValue(), monthDay.getDayOfMonth())));
+		assertFalse(day.matches(LocalDate.of(Year.now().getValue(), monthDay.getMonthValue() + 1, monthDay.getDayOfMonth())));
+		assertFalse(day.matches(LocalDate.of(Year.now().getValue(), monthDay.getMonthValue(), monthDay.getDayOfMonth() + 1)));
 	}
 
 	@Test

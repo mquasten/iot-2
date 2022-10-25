@@ -30,8 +30,7 @@ class GaussDayImpl extends AbstractDay<LocalDate> {
 	}
 
 	GaussDayImpl(final DayGroup dayGroup, final int offset, final String description) {
-		super(dayGroup, new int[] { BigInteger.valueOf(offset).abs().intValueExact() }, new int[] { 1 }, offset,
-				ENTITY_NAME.hashCode(), description);
+		super(dayGroup, new int[] { BigInteger.valueOf(offset).abs().intValueExact() }, new int[] { 1 }, offset, ENTITY_NAME.hashCode(), description);
 		value();
 	}
 

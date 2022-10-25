@@ -8,9 +8,9 @@ import de.mq.iot2.calendar.DayGroup;
 
 @RepositoryDefinition(domainClass = DayGroupImpl.class, idClass = Long.class)
 public interface DayGroupRepository {
-	
-	DayGroup save(final DayGroup dayGroup); 
-	
+
+	DayGroup save(final DayGroup dayGroup);
+
 	Optional<DayGroup> findById(final String id);
 
 }
