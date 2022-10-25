@@ -31,6 +31,7 @@ abstract class AbstractDay<T> implements Day<T> {
 	static final String ARRAY_INVALID_MESSAGE = "Alt least one value is required.";
 	static final String INVALID_VALUE_MESSAGE = "Invalid value.";
 
+	static final int SIGNUM_POSITIV_INT = 1;
 	@Id
 	@Column(name = "ID", length = 36)
 	private String id;
@@ -40,19 +41,20 @@ abstract class AbstractDay<T> implements Day<T> {
 
 	@Column(name = "DESCRIPTION", length = 25)
 	private String description;
-	
+
 	@ManyToOne(targetEntity = DayGroupImpl.class)
-	@JoinColumn(name = "DAY_GROUP_ID" ,nullable = false)
+	@JoinColumn(name = "DAY_GROUP_ID", nullable = false)
 	private DayGroup dayGroup;
-	
-	
+
 	AbstractDay() {
-		
+
 	}
 
-	AbstractDay(final DayGroup dayGroup, final int[] values, final int[] digits, int typ, final String description) {
+	AbstractDay(final DayGroup dayGroup, final int[] values, final int[] digits, final int signum, final int typ,
+			final String description) {
 		Assert.notNull(dayGroup, VALUE_REQUIRED_MESSAGE);
 		arrayGuard(values);
+		arrayMemberMinVauleGuard(values, 0);
 		arrayGuard(digits);
 		arrayMemberMinVauleGuard(digits, 1);
 		Assert.isTrue(values.length == digits.length, ARRAYS_DIFFERENT_SIZE_MESSAGE);
@@ -61,16 +63,19 @@ abstract class AbstractDay<T> implements Day<T> {
 			String format = String.format("%" + digits[i] + "d", values[i]).replace(' ', '0');
 			stringBuilder.append(format);
 		});
-		value = Integer.parseInt(stringBuilder.toString());
+
+		value = BigInteger.valueOf(signum).signum() * Integer.parseInt(stringBuilder.toString());
 		id = new UUID(typ, value).toString();
 		this.description = description;
-		this.dayGroup=dayGroup;
+		this.dayGroup = dayGroup;
 	}
 
 	final int[] split(final int... exp) {
 		Assert.notNull(value, VALUE_REQUIRED_MESSAGE);
 		arrayGuard(exp);
 		arrayMemberMinVauleGuard(exp, 0);
+		final int value = BigInteger.valueOf(this.value).abs().intValueExact();
+
 		if (BigInteger.valueOf(10).pow(IntStream.of(exp).sum()).intValueExact() > value) {
 			return new int[] { value };
 		}
@@ -104,35 +109,37 @@ abstract class AbstractDay<T> implements Day<T> {
 		return Optional.ofNullable(description);
 	}
 
+	int signum() {
+		return BigInteger.valueOf(value).signum();
+	}
 
 	@Override
-	public final  int hashCode() {
-		if(value==null) {
+	public final int hashCode() {
+		if (value == null) {
 			return System.identityHashCode(this);
 		}
 		return getClass().hashCode() + value.hashCode();
-	} 
+	}
 
 	@Override
 	public final boolean equals(final Object object) {
-		
-		if  (!(object instanceof AbstractDay)) {
+
+		if (!(object instanceof AbstractDay)) {
 			return super.equals(object);
-			
+
 		}
-		final var other=(AbstractDay<?>) object;
-		
-		if((value==null)||(other.value == null)) {
+		final var other = (AbstractDay<?>) object;
+
+		if ((value == null) || (other.value == null)) {
 			return super.equals(object);
 		}
 
-		return other.getClass().equals(getClass()) &&  other.value.intValue()==value.intValue();
+		return other.getClass().equals(getClass()) && other.value.intValue() == value.intValue();
 	}
-	
-	
+
 	@Override
 	public DayGroup dayGroup() {
 		return dayGroup;
-		
+
 	}
 }

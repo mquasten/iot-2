@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
@@ -46,6 +47,11 @@ class GaussDayImplTest {
 		assertEquals(OFFSET_KARFREITAG, ReflectionTestUtils.getField(day, VALUE_FIELD));
 		assertEquals(new UUID(GaussDayImpl.ENTITY_NAME.hashCode(), OFFSET_KARFREITAG).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
 	}
+	
+	@Test
+	void createInvaildValue() {
+		assertThrows(IllegalArgumentException.class, ()-> new GaussDayImpl(dayGroup, 400, DESCRIPTION));
+	}
 
 	@Test
 	void createWithoutDescription() {
@@ -58,7 +64,7 @@ class GaussDayImplTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(ints = { -100, Integer.MIN_VALUE, 100, Integer.MAX_VALUE })
+	@ValueSource(ints = { -300,  400, Integer.MAX_VALUE })
 	void createInvalidOffset(final int offset) {
 		assertThrows(IllegalArgumentException.class, () -> new GaussDayImpl(dayGroup, offset));
 	}
@@ -97,24 +103,8 @@ class GaussDayImplTest {
 		assertFalse(day.matches(esterdate));
 	}
 
-	@Test
-	void matchesWrongArraySize() {
-		final var day = new GaussDayImpl(dayGroup, OFFSET_KARFREITAG);
-		ReflectionTestUtils.setField(day, VALUE_FIELD, Integer.MAX_VALUE);
 
-		assertThrows(IllegalArgumentException.class, () -> day.value());
-	}
-
-	@Test
-	void matchesMoreThan2Digits() {
-		final var day = new GaussDayImpl(dayGroup, OFFSET_KARFREITAG);
-
-		ReflectionTestUtils.setField(day, VALUE_FIELD, Integer.MIN_VALUE);
-
-		assertThrows(IllegalArgumentException.class, () -> day.value());
-
-	}
-
+	
 	@Test
 	void yearSupplier() {
 		final var day = new GaussDayImpl(dayGroup, OFFSET_KARFREITAG);

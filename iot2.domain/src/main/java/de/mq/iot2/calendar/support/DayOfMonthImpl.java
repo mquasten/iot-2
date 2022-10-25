@@ -11,7 +11,7 @@ import org.springframework.util.Assert;
 import de.mq.iot2.calendar.DayGroup;
 
 @Entity(name = DayOfMonthImpl.ENTITY_NAME)
-@DiscriminatorValue(DayOfMonthImpl.ENTITY_NAME )
+@DiscriminatorValue(DayOfMonthImpl.ENTITY_NAME)
 class DayOfMonthImpl extends AbstractDay<MonthDay> {
 	static final String ENTITY_NAME = "DayOfMonth";
 
@@ -24,8 +24,8 @@ class DayOfMonthImpl extends AbstractDay<MonthDay> {
 		this(dayGroup, monthDay, null);
 	}
 
-	DayOfMonthImpl(final DayGroup dayGroup,final MonthDay monthDay, final String description) {
-		super(dayGroup, toArray(monthDay), new int[] { 2, 2 }, ENTITY_NAME.hashCode(), description);
+	DayOfMonthImpl(final DayGroup dayGroup, final MonthDay monthDay, final String description) {
+		super(dayGroup, toArray(monthDay), new int[] { 2, 2 }, SIGNUM_POSITIV_INT, ENTITY_NAME.hashCode(), description);
 
 	}
 

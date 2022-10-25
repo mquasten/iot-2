@@ -1,5 +1,6 @@
 package de.mq.iot2.calendar.support;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.function.Supplier;
@@ -29,12 +30,9 @@ class GaussDayImpl extends AbstractDay<LocalDate> {
 	}
 
 	GaussDayImpl(final DayGroup dayGroup, final int offset, final String description) {
-		super(dayGroup, toArray(offset), new int[] { 1 }, ENTITY_NAME.hashCode(), description);
-	}
-
-	private static int[] toArray(final int offset) {
-		valueGuard(offset);
-		return new int[] { offset };
+		super(dayGroup, new int[] { BigInteger.valueOf(offset).abs().intValueExact() }, new int[] { 1 }, offset,
+				ENTITY_NAME.hashCode(), description);
+		value();
 	}
 
 	private LocalDate easterdate(final Year year) {
@@ -59,14 +57,12 @@ class GaussDayImpl extends AbstractDay<LocalDate> {
 
 	@Override
 	public LocalDate value() {
-		final var values = split(2);
+		final var values = split(3);
 		Assert.isTrue(values.length == 1, INVALID_VALUE_MESSAGE);
-		valueGuard(values[0]);
-		return easterdate(yearSupplier.get()).plusDays(values[0]);
-	}
+		final var date = easterdate(yearSupplier.get()).plusDays(signum() * values[0]);
+		Assert.isTrue(yearSupplier.get().getValue() == date.getYear(), INVALID_VALUE_MESSAGE);
 
-	private static void valueGuard(final double value) {
-		Assert.isTrue(Math.abs(value) <= 99, INVALID_VALUE_MESSAGE);
+		return date;
 	}
 
 }

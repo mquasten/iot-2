@@ -37,11 +37,12 @@ class DayGroupImplTest {
 	}
 
 	@Test
-	final void createReadOnly() {
+	final void createReadOnlyWithRandomId() {
 		final var dayGroup = newDayGroup();
 		assertEquals(GROUP_NAME, dayGroup.name());
 		assertTrue(dayGroup.readOnly());
 		assertEquals(0, dayGroup.days().size());
+		dayGroup.name();
 	}
 
 	@Test
@@ -90,7 +91,7 @@ class DayGroupImplTest {
 	}
 
 	private DayGroupImpl newDayGroup() {
-		return new DayGroupImpl(ID, GROUP_NAME);
+		return new DayGroupImpl(GROUP_NAME);
 	}
 
 	private void assignDays(final DayGroupImpl dayGroup) {
