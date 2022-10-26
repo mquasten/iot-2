@@ -6,7 +6,7 @@ import org.springframework.data.repository.RepositoryDefinition;
 
 import de.mq.iot2.calendar.DayGroup;
 
-@RepositoryDefinition(domainClass = DayGroupImpl.class, idClass = Long.class)
+@RepositoryDefinition(domainClass = DayGroupImpl.class, idClass = String.class)
 public interface DayGroupRepository {
 
 	DayGroup save(final DayGroup dayGroup);

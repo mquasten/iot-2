@@ -33,7 +33,7 @@ class CalendarServiceImp implements CalendarService {
 		final var locale = Locale.GERMAN;
 		final var textStyle = TextStyle.FULL;
 		weekendGroup.assign(new DayOfWeekDayImpl(weekendGroup, DayOfWeek.SATURDAY, DayOfWeek.SATURDAY.getDisplayName(textStyle, locale)));
-		weekendGroup.assign(new DayOfWeekDayImpl(weekendGroup, DayOfWeek.SUNDAY, DayOfWeek.SATURDAY.getDisplayName(textStyle, locale)));
+		weekendGroup.assign(new DayOfWeekDayImpl(weekendGroup, DayOfWeek.SUNDAY, DayOfWeek.SUNDAY.getDisplayName(textStyle, locale)));
 		dayGroupRepository.save(weekendGroup);
 	}
 
