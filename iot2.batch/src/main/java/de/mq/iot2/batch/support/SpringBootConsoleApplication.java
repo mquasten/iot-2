@@ -1,76 +1,60 @@
 package de.mq.iot2.batch.support;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-
 import org.springframework.util.StringUtils;
 
-import de.mq.iot2.calendar.CalendarService;
 
-@SpringBootApplication
-@EnableJpaRepositories("de.mq.iot2")
-@EntityScan(basePackages = "de.mq.iot2")
-@ComponentScan(basePackages = "de.mq.iot2")
-@EnableTransactionManagement()
-public class SpringBootConsoleApplication implements CommandLineRunner {
+public class SpringBootConsoleApplication  {
 
-	private static Logger LOG = LoggerFactory.getLogger(SpringBootConsoleApplication.class);
-
-	private final CalendarService calendarService;
-
-	SpringBootConsoleApplication(final CalendarService calendarService) {
-		this.calendarService = calendarService;
-	}
+	
+	
+	private final  static Map<String,Class<? extends CommandLineRunner>> commands = Map.of("setup", SetupDatabaseImpl.class);
 
 	public static void main(String[] args) {
-		final Collection<String> commands = Arrays.asList("setup");
-		Options options = new Options();
-		options.addOption("c", true, StringUtils.collectionToDelimitedString(commands, " "));
-		CommandLineParser parser = new DefaultParser();
+		
+		final var options = new Options();
+		options.addOption("c", "command", true, String.format("arg: %s" , StringUtils.collectionToDelimitedString(commands.keySet(), " ")));
+		final var parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();
 		try {
 
-			CommandLine cmd = parser.parse(options, args);
-			if (!commands.contains(cmd.getOptionValue("c"))) {
-				formatter.printHelp("iot", options);
-				System.exit(1);
-			}
-			SpringApplication.run(SpringBootConsoleApplication.class, args);
+			final var  cmd = parser.parse(options, args);
+		
+			commandExistsGuard(commands.keySet(), cmd);
+			
+			SpringApplication.run(commands.get(cmd.getOptionValue("c")));
+			
 
 		} catch (final ParseException parseException) {
 
-			formatter.printHelp("ant", options);
+			//parseException.printStackTrace();
+			formatter.printHelp("java -jar <file> ", options);
 			System.exit(1);
 		}
 
-		LOG.info("STARTING THE APPLICATION");
-
-		LOG.info("APPLICATION FINISHED");
+		
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
+	private static void commandExistsGuard(final Collection<String> commands, final CommandLine cmd)
+			throws ParseException {
+		if (!cmd.hasOption("c")) {
+			throw new ParseException( String.format("Command missing.")); 
+		}
+		if (!commands.contains(cmd.getOptionValue("c"))) {
 
-		LOG.info("EXECUTING : command line runner");
-
-		calendarService.createDefaultGroupsAndDays();
-
+			throw new ParseException( String.format("Command undefined.")); 
+		}
 	}
+
+	
 
 }
