@@ -14,16 +14,16 @@ import org.springframework.web.client.RestOperations;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { BatchConfiguration.class })
 @Disabled
-class GetThePartyStarted {
+class RestTemplateTest {
 
-	final String url ="http://httpstat.us/200";
+	final String url ="http://httpstat.us/200?sleep={sleep}";
 	
 	@Autowired
 	private RestOperations restOperations;
 
 	@Test
 	void restTemplate() {
-		assertTrue(restOperations.getForObject(url, String.class, Map.of("sleep", 0)).contains("\"description\":\"OK\""));
+		assertTrue(restOperations.getForObject(url, String.class, Map.of("sleep", 100)).contains("\"description\":\"OK\""));
 	}
 
 }
