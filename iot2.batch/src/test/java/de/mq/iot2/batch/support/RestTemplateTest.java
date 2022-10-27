@@ -11,19 +11,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestOperations;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { BatchConfiguration.class })
 @Disabled
 class RestTemplateTest {
 
-	final String url ="http://httpstat.us/200?sleep={sleep}";
-	
+	final String url = "http://{host}:{port}/addons/xmlapi/{resource}";
+
 	@Autowired
 	private RestOperations restOperations;
 
 	@Test
 	void restTemplate() {
-		assertTrue(restOperations.getForObject(url, String.class, Map.of("sleep", 100)).contains("\"description\":\"OK\""));
+		final var result = restOperations.getForObject(url, String.class, Map.of("host", "homematic-ccu2", "port", "80", "resource" , "version.cgi"));
+		assertTrue(result.contains("<version>1.20</version>") );
+				
 	}
+
+	
 
 }
