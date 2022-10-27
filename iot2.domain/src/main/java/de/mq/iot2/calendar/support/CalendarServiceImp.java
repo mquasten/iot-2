@@ -26,6 +26,12 @@ class CalendarServiceImp implements CalendarService {
 	public void createDefaultGroupsAndDays() {
 		createOrUpdatePublicHolidays();
 		createOrUpdateWeekend();
+		createOrUpdateVacation();
+	}
+
+	private void createOrUpdateVacation() {
+		final var vacationGroup = new DayGroupImpl(3L, "Urlaub", false);
+		dayGroupRepository.save(vacationGroup);
 	}
 
 	private void createOrUpdateWeekend() {

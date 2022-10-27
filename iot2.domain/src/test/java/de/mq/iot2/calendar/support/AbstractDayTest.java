@@ -26,6 +26,7 @@ import de.mq.iot2.calendar.DayGroup;
 
 class AbstractDayTest {
 
+	private static final String ID_FIELD_NAME = "id";
 	private static final String VALUE_FIELD_NAME = "value";
 	private static final String DESCRIPTION = "description";
 	private static final int TYPE = 4711;
@@ -72,7 +73,7 @@ class AbstractDayTest {
 		assertEquals(Optional.of(DESCRIPTION), day.description());
 		final var expectedValue = 19680528;
 		assertEquals(expectedValue, ReflectionTestUtils.getField(day, VALUE_FIELD_NAME));
-		assertEquals(new UUID(TYPE, expectedValue).toString(), ReflectionTestUtils.getField(day, "id"));
+		assertEquals(new UUID(TYPE, expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
 		assertEquals(dayGroup, day.dayGroup());
 	}
 
@@ -84,7 +85,7 @@ class AbstractDayTest {
 		assertEquals(Optional.of(DESCRIPTION), day.description());
 		final var expectedValue = 19680528;
 		assertEquals(signum * expectedValue, ReflectionTestUtils.getField(day, VALUE_FIELD_NAME));
-		assertEquals(new UUID(TYPE, signum * expectedValue).toString(), ReflectionTestUtils.getField(day, "id"));
+		assertEquals(new UUID(TYPE, signum * expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
 		assertEquals(dayGroup, day.dayGroup());
 	}
 
