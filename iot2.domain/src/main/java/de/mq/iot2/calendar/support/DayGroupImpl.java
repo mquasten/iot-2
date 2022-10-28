@@ -1,22 +1,16 @@
 package de.mq.iot2.calendar.support;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
 
 @Entity(name = "DayGroup")
@@ -65,8 +59,6 @@ class DayGroupImpl implements DayGroup {
 		return random.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
 	}
 
-	@OneToMany(mappedBy = "dayGroup", targetEntity = AbstractDay.class, cascade = { CascadeType.ALL })
-	private Collection<Day<?>> days = new HashSet<>();
 
 	@Override
 	public final String name() {
@@ -77,21 +69,6 @@ class DayGroupImpl implements DayGroup {
 	@Override
 	public final boolean readOnly() {
 		return readOnly;
-	}
-
-	@Override
-	public final void assign(final Day<?> day) {
-		days.add(day);
-	}
-
-	@Override
-	public final void remove(final Day<?> day) {
-		days.remove(day);
-	}
-
-	@Override
-	public final Collection<Day<?>> days() {
-		return Collections.unmodifiableCollection(days);
 	}
 
 	@Override

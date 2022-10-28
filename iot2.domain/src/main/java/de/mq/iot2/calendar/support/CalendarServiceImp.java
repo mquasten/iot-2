@@ -3,22 +3,43 @@ package de.mq.iot2.calendar.support;
 import java.time.DayOfWeek;
 import java.time.MonthDay;
 import java.time.format.TextStyle;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Collection;
 import java.util.Locale;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.mq.iot2.calendar.CalendarService;
+import de.mq.iot2.calendar.DayGroup;
 
 @Service
 class CalendarServiceImp implements CalendarService {
 
 	private final DayGroupRepository dayGroupRepository;
+	private final DayRepository dayRepository;
+
+	private final Collection<DayOfWeek> weekendDays = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+	private final Collection<Entry<Integer, String>> gaussDays = Set.of(new SimpleImmutableEntry<>(-2, "Karfreitag"),
+			new SimpleImmutableEntry<>(0, "Ostersonntag"), new SimpleImmutableEntry<>(1, "Ostermontag"),
+			new SimpleImmutableEntry<>(39, "Christi Himmelfahrt"), new SimpleImmutableEntry<>(49, "Pfingstsonntag"),
+			new SimpleImmutableEntry<>(50, "Pfingstmontag"), new SimpleImmutableEntry<>(60, "Fronleichnam"));
+	private final Collection<Entry<MonthDay, String>> publicHolidays = Set.of(
+			new SimpleImmutableEntry<>(MonthDay.of(1, 1), "Neujahr"),
+			new SimpleImmutableEntry<>(MonthDay.of(5, 1), "Tag der Arbeit"),
+			new SimpleImmutableEntry<>(MonthDay.of(10, 3), "Tag der Deutschen Einheit"),
+			new SimpleImmutableEntry<>(MonthDay.of(11, 1), "Allerheiligen"),
+			new SimpleImmutableEntry<>(MonthDay.of(12, 25), "1. Weihnachtsfeiertag"),
+			new SimpleImmutableEntry<>(MonthDay.of(12, 26), "2. Weihnachtsfeiertag"));
 
 	@Autowired
-	CalendarServiceImp(final DayGroupRepository dayGroupRepository) {
+	CalendarServiceImp(final DayGroupRepository dayGroupRepository, final DayRepository dayRepository) {
 		this.dayGroupRepository = dayGroupRepository;
+		this.dayRepository = dayRepository;
 	}
 
 	@Override
@@ -30,38 +51,36 @@ class CalendarServiceImp implements CalendarService {
 	}
 
 	private void createOrUpdateVacation() {
-		final var vacationGroup = new DayGroupImpl(3L, "Urlaub", false);
-		dayGroupRepository.save(vacationGroup);
+		dayGroupRepository.save(new DayGroupImpl(3L, "Urlaub", false));
 	}
 
 	private void createOrUpdateWeekend() {
-		final var weekendGroup = new DayGroupImpl(2L, "Wochenende");
+		final var weekendGroup = dayGroupRepository.save(new DayGroupImpl(2L, "Wochenende"));
+		deleteDaysFromDayGroup(weekendGroup);
+		
 		final var locale = Locale.GERMAN;
 		final var textStyle = TextStyle.FULL;
-		weekendGroup.assign(new DayOfWeekDayImpl(weekendGroup, DayOfWeek.SATURDAY, DayOfWeek.SATURDAY.getDisplayName(textStyle, locale)));
-		weekendGroup.assign(new DayOfWeekDayImpl(weekendGroup, DayOfWeek.SUNDAY, DayOfWeek.SUNDAY.getDisplayName(textStyle, locale)));
-		dayGroupRepository.save(weekendGroup);
+
+		weekendDays.stream().map(
+				dayOfWeek -> new DayOfWeekDayImpl(weekendGroup, dayOfWeek, dayOfWeek.getDisplayName(textStyle, locale)))
+				.forEach(dayRepository::save);
 	}
 
 	private void createOrUpdatePublicHolidays() {
-		final var publicHolidayGroup = new DayGroupImpl(1L, "Feiertage");
+		final var publicHolidayGroup = dayGroupRepository.save(new DayGroupImpl(1L, "Feiertage"));
 
-		publicHolidayGroup.assign(new DayOfMonthImpl(publicHolidayGroup, MonthDay.of(1, 1), "Neujahr"));
-		publicHolidayGroup.assign(new DayOfMonthImpl(publicHolidayGroup, MonthDay.of(5, 1), "Tag der Arbeit"));
-		publicHolidayGroup.assign(new DayOfMonthImpl(publicHolidayGroup, MonthDay.of(10, 3), "Tag der Deutschen Einheit"));
-		publicHolidayGroup.assign(new DayOfMonthImpl(publicHolidayGroup, MonthDay.of(11, 1), "Allerheiligen"));
-		publicHolidayGroup.assign(new DayOfMonthImpl(publicHolidayGroup, MonthDay.of(12, 25), "1. Weihnachtsfeiertag"));
-		publicHolidayGroup.assign(new DayOfMonthImpl(publicHolidayGroup, MonthDay.of(12, 26), "2. Weihnachtsfeiertag"));
+		deleteDaysFromDayGroup(publicHolidayGroup);
 
-		publicHolidayGroup.assign(new GaussDayImpl(publicHolidayGroup, -2, "Karfreitag"));
-		publicHolidayGroup.assign(new GaussDayImpl(publicHolidayGroup, 0, "Ostersonntag"));
-		publicHolidayGroup.assign(new GaussDayImpl(publicHolidayGroup, 1, "Ostermontag"));
-		publicHolidayGroup.assign(new GaussDayImpl(publicHolidayGroup, 39, "Christi Himmelfahrt"));
-		publicHolidayGroup.assign(new GaussDayImpl(publicHolidayGroup, 49, "Pfingstsonntag"));
-		publicHolidayGroup.assign(new GaussDayImpl(publicHolidayGroup, 50, "Pfingstmontag"));
-		publicHolidayGroup.assign(new GaussDayImpl(publicHolidayGroup, 60, "Fronleichnam"));
+		Stream.concat(
+				gaussDays.stream().map(entry -> new GaussDayImpl(publicHolidayGroup, entry.getKey(), entry.getValue())),
+				publicHolidays.stream()
+						.map(entry -> new DayOfMonthImpl(publicHolidayGroup, entry.getKey(), entry.getValue())))
+				.forEach(dayRepository::save);
+		
+	}
 
-		dayGroupRepository.save(publicHolidayGroup);
+	private void deleteDaysFromDayGroup(final DayGroup publicHolidayGroup) {
+		dayRepository.findByDayGroup(publicHolidayGroup).forEach(dayRepository::delete);
 	}
 
 }
