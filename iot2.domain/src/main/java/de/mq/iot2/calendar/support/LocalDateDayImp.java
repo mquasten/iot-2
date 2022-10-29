@@ -19,7 +19,7 @@ class LocalDateDayImp extends AbstractDay<LocalDate> {
 	}
 
 	LocalDateDayImp(final DayGroup dayGroup, final LocalDate date, final String description) {
-		super(dayGroup, toArray(date), new int[] { 4, 2, 2 }, date.getYear(), ENTITY_NAME.hashCode(), description);
+		super(dayGroup, toArray(date), new int[] { 4, 2, 2 }, date.getYear(), ENTITY_NAME, description);
 	}
 
 	LocalDateDayImp(final DayGroup dayGroup, final LocalDate date) {

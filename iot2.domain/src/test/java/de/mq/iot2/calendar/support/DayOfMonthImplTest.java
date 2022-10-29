@@ -21,6 +21,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
+import de.mq.iot2.support.IdUtil;
 
 class DayOfMonthImplTest {
 
@@ -41,7 +42,7 @@ class DayOfMonthImplTest {
 		assertEquals(DESCRIPTION, day.description().get());
 		final var expectedValue = dayMonthToValue(monthDay);
 		assertEquals(expectedValue, ReflectionTestUtils.getField(day, VALUE_FIELD));
-		assertEquals(new UUID(DayOfMonthImpl.ENTITY_NAME.hashCode(), expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
+		assertEquals(new UUID(IdUtil.string2Long(DayOfMonthImpl.ENTITY_NAME), expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
 	}
 
 	@ParameterizedTest
@@ -53,7 +54,7 @@ class DayOfMonthImplTest {
 		assertFalse(day.description().isPresent());
 		final var expectedValue = dayMonthToValue(monthDay);
 		assertEquals(expectedValue, ReflectionTestUtils.getField(day, VALUE_FIELD));
-		assertEquals(new UUID(DayOfMonthImpl.ENTITY_NAME.hashCode(), expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
+		assertEquals(new UUID(IdUtil.string2Long(DayOfMonthImpl.ENTITY_NAME), expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
 	}
 
 	private int dayMonthToValue(MonthDay monthDay) {

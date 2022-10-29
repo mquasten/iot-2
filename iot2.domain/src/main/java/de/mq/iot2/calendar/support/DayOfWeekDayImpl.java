@@ -24,7 +24,7 @@ class DayOfWeekDayImpl extends AbstractDay<DayOfWeek> {
 	}
 
 	DayOfWeekDayImpl(final DayGroup dayGroup, final DayOfWeek dayOfWeek, final String description) {
-		super(dayGroup, toArray(dayOfWeek), new int[] { 1 }, SIGNUM_POSITIV_INT, ENTITY_NAME.hashCode(), description);
+		super(dayGroup, toArray(dayOfWeek), new int[] { 1 }, SIGNUM_POSITIV_INT, ENTITY_NAME, description);
 	}
 
 	private static int[] toArray(final DayOfWeek dayOfWeek) {

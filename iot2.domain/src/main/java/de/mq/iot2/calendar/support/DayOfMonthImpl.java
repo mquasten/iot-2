@@ -25,7 +25,7 @@ class DayOfMonthImpl extends AbstractDay<MonthDay> {
 	}
 
 	DayOfMonthImpl(final DayGroup dayGroup, final MonthDay monthDay, final String description) {
-		super(dayGroup, toArray(monthDay), new int[] { 2, 2 }, SIGNUM_POSITIV_INT, ENTITY_NAME.hashCode(), description);
+		super(dayGroup, toArray(monthDay), new int[] { 2, 2 }, SIGNUM_POSITIV_INT, ENTITY_NAME, description);
 
 	}
 

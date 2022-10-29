@@ -23,6 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
+import de.mq.iot2.support.IdUtil;
 
 class GaussDayImplTest {
 
@@ -45,7 +46,7 @@ class GaussDayImplTest {
 		assertEquals(DESCRIPTION, day.description().get());
 		assertEquals(dayGroup, day.dayGroup());
 		assertEquals(OFFSET_KARFREITAG, ReflectionTestUtils.getField(day, VALUE_FIELD));
-		assertEquals(new UUID(GaussDayImpl.ENTITY_NAME.hashCode(), OFFSET_KARFREITAG).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
+		assertEquals(new UUID(IdUtil.string2Long(GaussDayImpl.ENTITY_NAME), OFFSET_KARFREITAG).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
 	}
 
 	@Test
@@ -60,7 +61,7 @@ class GaussDayImplTest {
 		assertFalse(day.description().isPresent());
 		assertEquals(dayGroup, day.dayGroup());
 		assertEquals(OFFSET_KARFREITAG, ReflectionTestUtils.getField(day, VALUE_FIELD));
-		assertEquals(new UUID(GaussDayImpl.ENTITY_NAME.hashCode(), OFFSET_KARFREITAG).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
+		assertEquals(new UUID(IdUtil.string2Long(GaussDayImpl.ENTITY_NAME), OFFSET_KARFREITAG).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
 	}
 
 	@ParameterizedTest

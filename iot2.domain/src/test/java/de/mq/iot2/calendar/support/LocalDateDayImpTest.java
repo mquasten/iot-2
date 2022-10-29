@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.calendar.DayGroup;
+import de.mq.iot2.support.IdUtil;
 
 class LocalDateDayImpTest {
 
@@ -36,7 +37,7 @@ class LocalDateDayImpTest {
 		assertEquals(Optional.of(DESCRIPTION), day.description());
 		assertEquals(dateToInteger(MAXWELL_BIRTHDATE), ReflectionTestUtils.getField(day, VALUE_FIELD_NAME));
 		assertEquals(1, day.signum());
-		assertEquals(new UUID(LocalDateDayImp.ENTITY_NAME.hashCode(), dateToInteger(MAXWELL_BIRTHDATE)).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
+		assertEquals(new UUID(IdUtil.string2Long(LocalDateDayImp.ENTITY_NAME), dateToInteger(MAXWELL_BIRTHDATE)).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
 	}
 
 	@Test
@@ -47,7 +48,7 @@ class LocalDateDayImpTest {
 		assertEquals(Optional.of(DESCRIPTION), day.description());
 		assertEquals(dateToInteger(DATE_NEGATIVE_YEAR), ReflectionTestUtils.getField(day, VALUE_FIELD_NAME));
 		assertEquals(-1, day.signum());
-		assertEquals(new UUID(LocalDateDayImp.ENTITY_NAME.hashCode(), dateToInteger(DATE_NEGATIVE_YEAR)).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
+		assertEquals(new UUID(IdUtil.string2Long(LocalDateDayImp.ENTITY_NAME), dateToInteger(DATE_NEGATIVE_YEAR)).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
 	}
 
 	@Test
@@ -58,7 +59,7 @@ class LocalDateDayImpTest {
 		assertEquals(Optional.empty(), day.description());
 		assertEquals(dateToInteger(MAXWELL_BIRTHDATE), ReflectionTestUtils.getField(day, VALUE_FIELD_NAME));
 		assertEquals(1, day.signum());
-		assertEquals(new UUID(LocalDateDayImp.ENTITY_NAME.hashCode(), dateToInteger(MAXWELL_BIRTHDATE)).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
+		assertEquals(new UUID(IdUtil.string2Long(LocalDateDayImp.ENTITY_NAME), dateToInteger(MAXWELL_BIRTHDATE)).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
 	}
 
 	@Test

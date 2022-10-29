@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.calendar.DayGroup;
+import de.mq.iot2.support.IdUtil;
 
 class DayOfWeekDayImplTest {
 
@@ -36,7 +37,7 @@ class DayOfWeekDayImplTest {
 		assertEquals(DESCRIPTION, day.description().get());
 		assertEquals(dayGroup, day.dayGroup());
 		assertEquals(dayOfWeek.getValue(), ReflectionTestUtils.getField(day, VALUE_FIELD));
-		assertEquals(new UUID(DayOfWeekDayImpl.ENTITY_NAME.hashCode(), dayOfWeek.getValue()).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
+		assertEquals(new UUID(IdUtil.string2Long(DayOfWeekDayImpl.ENTITY_NAME), dayOfWeek.getValue()).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
 	}
 
 	@Test
@@ -47,7 +48,7 @@ class DayOfWeekDayImplTest {
 		assertFalse(day.description().isPresent());
 		assertEquals(dayGroup, day.dayGroup());
 		assertEquals(dayOfWeek.getValue(), ReflectionTestUtils.getField(day, VALUE_FIELD));
-		assertEquals(new UUID(DayOfWeekDayImpl.ENTITY_NAME.hashCode(), dayOfWeek.getValue()).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
+		assertEquals(new UUID(IdUtil.string2Long(DayOfWeekDayImpl.ENTITY_NAME), dayOfWeek.getValue()).toString(), ReflectionTestUtils.getField(day, ID_FIELD));
 	}
 
 	@ParameterizedTest

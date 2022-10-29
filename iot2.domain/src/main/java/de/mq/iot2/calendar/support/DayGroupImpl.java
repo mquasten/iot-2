@@ -1,8 +1,5 @@
 package de.mq.iot2.calendar.support;
 
-import java.util.Random;
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,6 +9,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import de.mq.iot2.calendar.DayGroup;
+import de.mq.iot2.support.IdUtil;
 
 @Entity(name = "DayGroup")
 @Table(name = "DAY_GROUP")
@@ -40,7 +38,7 @@ class DayGroupImpl implements DayGroup {
 		Assert.notNull(name, "Name is required.");
 		this.name = name;
 		this.readOnly = readolny;
-		this.id = new UUID(id, id).toString();
+		this.id = IdUtil.id(id);
 	}
 
 	DayGroupImpl(final String name) {
@@ -51,14 +49,9 @@ class DayGroupImpl implements DayGroup {
 		Assert.notNull(name, "Name is required.");
 		this.name = name;
 		this.readOnly = readolny;
-		this.id = new UUID(randomPositivLong(), System.currentTimeMillis()).toString();
-	}
+		this.id = IdUtil.id();
 
-	private long randomPositivLong() {
-		final var random = new Random();
-		return random.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
 	}
-
 
 	@Override
 	public final String name() {

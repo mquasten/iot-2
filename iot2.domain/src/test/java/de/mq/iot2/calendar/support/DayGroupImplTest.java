@@ -19,7 +19,6 @@ class DayGroupImplTest {
 	private static final Long ID = 1L;
 
 	private static final String GROUP_NAME = "Feiertage";
-	
 
 	@Test
 	final void create() {
@@ -60,12 +59,9 @@ class DayGroupImplTest {
 		assertNotNull(id);
 	}
 
-	
-	
 	private DayGroupImpl newDayGroup() {
 		return new DayGroupImpl(GROUP_NAME);
 	}
-
 
 	@Test
 	final void hash() {

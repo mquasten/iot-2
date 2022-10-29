@@ -23,13 +23,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.calendar.DayGroup;
+import de.mq.iot2.support.IdUtil;
 
 class AbstractDayTest {
 
 	private static final String ID_FIELD_NAME = "id";
 	private static final String VALUE_FIELD_NAME = "value";
 	private static final String DESCRIPTION = "description";
-	private static final int TYPE = 4711;
 
 	private final DayGroup dayGroup = Mockito.mock(DayGroup.class);
 
@@ -41,8 +41,8 @@ class AbstractDayTest {
 	AbstractDay<Integer> newAbstractDay(final DayGroup dayGroup, final int[] values, final int[] digits, final int signum) {
 		try {
 			return BeanUtils.instantiateClass(
-					((AbstractDay<Integer>) Mockito.mock(AbstractDay.class)).getClass().getDeclaredConstructor(DayGroup.class, int[].class, int[].class, int.class, int.class, String.class), dayGroup,
-					values, digits, signum, TYPE, DESCRIPTION);
+					((AbstractDay<Integer>) Mockito.mock(AbstractDay.class)).getClass().getDeclaredConstructor(DayGroup.class, int[].class, int[].class, int.class, String.class, String.class),
+					dayGroup, values, digits, signum, AbstractDay.ENTITY_NAME, DESCRIPTION);
 		} catch (final Exception exception) {
 			throw runtimeExceptionn(exception);
 		}
@@ -73,7 +73,7 @@ class AbstractDayTest {
 		assertEquals(Optional.of(DESCRIPTION), day.description());
 		final var expectedValue = 19680528;
 		assertEquals(expectedValue, ReflectionTestUtils.getField(day, VALUE_FIELD_NAME));
-		assertEquals(new UUID(TYPE, expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
+		assertEquals(new UUID(entityName2long(), expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
 		assertEquals(dayGroup, day.dayGroup());
 	}
 
@@ -85,8 +85,12 @@ class AbstractDayTest {
 		assertEquals(Optional.of(DESCRIPTION), day.description());
 		final var expectedValue = 19680528;
 		assertEquals(signum * expectedValue, ReflectionTestUtils.getField(day, VALUE_FIELD_NAME));
-		assertEquals(new UUID(TYPE, signum * expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
+		assertEquals(new UUID(entityName2long(), signum * expectedValue).toString(), ReflectionTestUtils.getField(day, ID_FIELD_NAME));
 		assertEquals(dayGroup, day.dayGroup());
+	}
+
+	private long entityName2long() {
+		return IdUtil.string2Long(AbstractDay.ENTITY_NAME);
 	}
 
 	@Test

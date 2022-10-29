@@ -2,7 +2,6 @@ package de.mq.iot2.calendar.support;
 
 import java.math.BigInteger;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.IntStream;
 
 import javax.persistence.Column;
@@ -19,8 +18,9 @@ import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
+import de.mq.iot2.support.IdUtil;
 
-@Entity(name = "Day")
+@Entity(name = AbstractDay.ENTITY_NAME)
 @Table(name = "SPECIAL_DAY")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DAY_TYPE", length = 15)
@@ -31,6 +31,7 @@ abstract class AbstractDay<T> implements Day<T> {
 	static final String ARRAY_INVALID_MESSAGE = "Alt least one value is required.";
 	static final String INVALID_VALUE_MESSAGE = "Invalid value.";
 
+	static final String ENTITY_NAME = "Day";
 	static final int SIGNUM_POSITIV_INT = 1;
 	@Id
 	@Column(name = "ID", length = 36)
@@ -50,7 +51,7 @@ abstract class AbstractDay<T> implements Day<T> {
 
 	}
 
-	AbstractDay(final DayGroup dayGroup, final int[] values, final int[] digits, final int signum, final int typ, final String description) {
+	AbstractDay(final DayGroup dayGroup, final int[] values, final int[] digits, final int signum, final String typ, final String description) {
 		Assert.notNull(dayGroup, VALUE_REQUIRED_MESSAGE);
 		arrayGuard(values);
 		arrayMemberMinVauleGuard(values, 0);
@@ -64,7 +65,7 @@ abstract class AbstractDay<T> implements Day<T> {
 		});
 
 		value = BigInteger.valueOf(signum).signum() * Integer.parseInt(stringBuilder.toString());
-		id = new UUID(typ, value).toString();
+		id = IdUtil.id(value, typ);
 		this.description = description;
 		this.dayGroup = dayGroup;
 	}
