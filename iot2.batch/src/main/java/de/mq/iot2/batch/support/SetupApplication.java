@@ -16,22 +16,21 @@ import de.mq.iot2.calendar.CalendarService;
 @EntityScan(basePackages = "de.mq.iot2")
 @ComponentScan(basePackages = "de.mq.iot2")
 @EnableTransactionManagement()
-class SetupDatabaseImpl implements CommandLineRunner{
+class SetupDatabaseImpl implements CommandLineRunner {
 
 	private static Logger LOG = LoggerFactory.getLogger(SpringBootConsoleApplication.class);
-	
+
 	private final CalendarService calendarService;
-	SetupDatabaseImpl(CalendarService calendarService) {
+
+	SetupDatabaseImpl(final CalendarService calendarService) {
 		this.calendarService = calendarService;
 	}
+
 	@Override
-	public void run(String... args) throws Exception {
+	public final void run(final String... args) throws Exception {
 		LOG.info("Setup database DayGroups and Days.");
 		calendarService.createDefaultCyclesGroupsAndDays();
-		
-	}
-	
 
-	
+	}
 
 }
