@@ -39,7 +39,8 @@ class IdUtilTest {
 	private String compareableDigitsFromTimestamp(final String uuid) {
 		final var values = uuid.split("[-]");
 		final var last = values[values.length - 1];
-		return last.substring(0, last.length() - 2);
+		return values[values.length - 2] +"-"+ last.substring(0, last.length() - 2);
 	}
+
 
 }

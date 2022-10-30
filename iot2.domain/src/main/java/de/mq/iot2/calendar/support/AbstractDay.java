@@ -34,10 +34,10 @@ abstract class AbstractDay<T> implements Day<T> {
 	static final String ENTITY_NAME = "Day";
 	static final int SIGNUM_POSITIV_INT = 1;
 	@Id
-	@Column(name = "ID", length = 36)
+	@Column(name = "ID", length = 36, nullable = false)
 	private String id;
 
-	@Column(name = "DAY_VALUE")
+	@Column(name = "DAY_VALUE", nullable = false)
 	private Integer value;
 
 	@Column(name = "DESCRIPTION", length = 25)

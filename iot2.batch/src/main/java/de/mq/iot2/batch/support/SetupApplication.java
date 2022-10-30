@@ -27,7 +27,7 @@ class SetupDatabaseImpl implements CommandLineRunner{
 	@Override
 	public void run(String... args) throws Exception {
 		LOG.info("Setup database DayGroups and Days.");
-		calendarService.createDefaultGroupsAndDays();
+		calendarService.createDefaultCyclesGroupsAndDays();
 		
 	}
 	
