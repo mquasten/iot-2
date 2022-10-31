@@ -5,10 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +23,7 @@ import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
+import de.mq.iot2.support.RandomTestUtil;
 
 class CalendarServiceImpTest {
 	private static final String VALUE_FIELD_NAME = "value";
@@ -94,6 +98,40 @@ class CalendarServiceImpTest {
 		assertFalse(nonWorkingDayCycle.isDeaultCycle());
 
 		savedCyles.values().stream().filter(c -> !c.equals(nonWorkingDayCycle)).forEach(c -> assertTrue(c.isDeaultCycle()));
+	}
+
+	@Test
+	void cycle() {
+		final var date = LocalDate.now();
+		final var winner = new CycleImpl(RandomTestUtil.randomString(), 1);
+		final var days = List.of(day(date, new CycleImpl(RandomTestUtil.randomString(), 0), false), day(date, new CycleImpl(RandomTestUtil.randomString(), 2), true),
+				day(date, new CycleImpl(RandomTestUtil.randomString(), 3), true), day(date, winner, true), day(date, new CycleImpl(RandomTestUtil.randomString(), 0), false));
+		Mockito.when(cycleRepository.findByDefaultCycle(true)).thenReturn(Collections.singleton(new CycleImpl(RandomTestUtil.randomString(), 4711)));
+		Mockito.when(dayRepository.findAll()).thenReturn(days);
+
+		assertEquals(winner, calendarService.cycle(date));
+	}
+
+	private Day<?> day(LocalDate date, final Cycle cycle, boolean matching) {
+		final var day = Mockito.mock(Day.class);
+		Mockito.when(day.matches(date)).thenReturn(matching);
+		DayGroup dayGroup = Mockito.mock(DayGroup.class);
+		Mockito.when(day.dayGroup()).thenReturn(dayGroup);
+		Mockito.when(dayGroup.cycle()).thenReturn(cycle);
+		return day;
+	}
+
+	@Test
+	void cycleDefaultCycle() {
+		final var date = LocalDate.now();
+		final var days = List.of(day(date, new CycleImpl(RandomTestUtil.randomString(), 0), false), day(date, new CycleImpl(RandomTestUtil.randomString(), 2), true),
+				day(date, new CycleImpl(RandomTestUtil.randomString(), 3), true), day(date, new CycleImpl(RandomTestUtil.randomString(), 1), true),
+				day(date, new CycleImpl(RandomTestUtil.randomString(), 0), false));
+		final var defaultCycle = new CycleImpl(RandomTestUtil.randomString(), 4711);
+		Mockito.when(cycleRepository.findByDefaultCycle(true)).thenReturn(Collections.singleton(defaultCycle));
+		Mockito.when(dayRepository.findAll()).thenReturn(days);
+
+		assertEquals(defaultCycle, calendarService.cycle(LocalDate.now().plusDays(1)));
 	}
 
 }

@@ -1,4 +1,4 @@
-package de.mq.iot2.batch.support;
+package de.mq.iot2.main.support;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,11 +24,9 @@ class RestTemplateTest {
 
 	@Test
 	void restTemplate() {
-		final var result = restOperations.getForObject(url, String.class, Map.of("host", "homematic-ccu2", "port", "80", "resource" , "version.cgi"));
-		assertTrue(result.contains("<version>1.20</version>") );
-				
-	}
+		final var result = restOperations.getForObject(url, String.class, Map.of("host", "homematic-ccu2", "port", "80", "resource", "version.cgi"));
+		assertTrue(result.contains("<version>1.20</version>"));
 
-	
+	}
 
 }

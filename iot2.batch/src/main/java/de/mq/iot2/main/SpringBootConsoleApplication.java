@@ -1,4 +1,4 @@
-package de.mq.iot2.batch.support;
+package de.mq.iot2.main;
 
 import java.util.AbstractMap;
 import java.util.Collection;
@@ -16,23 +16,19 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.util.StringUtils;
 
+import de.mq.iot2.main.support.EndOfDayBatch;
+import de.mq.iot2.main.support.SetupDatabaseImpl;
+
 public class SpringBootConsoleApplication {
-	
 
-
-	private final static Predicate<CommandLine> setupArgsValid =SetupDatabaseImpl::isValid;
+	private final static Predicate<CommandLine> setupArgsValid = SetupDatabaseImpl::isValid;
 
 	private final static Predicate<CommandLine> endOfDayArgsValid = EndOfDayBatch::isValid;
 
-	
-	
-	
+	private final static Map<String, Entry<Class<? extends CommandLineRunner>, Predicate<CommandLine>>> commands = Map.of("setup",
+			new AbstractMap.SimpleImmutableEntry<>(SetupDatabaseImpl.class, setupArgsValid),
 
-	private final static Map<String, Entry<Class<? extends CommandLineRunner>, Predicate<CommandLine>>> commands = Map.of(
-			"setup", new AbstractMap.SimpleImmutableEntry<>(SetupDatabaseImpl.class, setupArgsValid),
-			
-			"endOfDay" , new AbstractMap.SimpleImmutableEntry<>(EndOfDayBatch.class, endOfDayArgsValid)
-			);
+			"endOfDay", new AbstractMap.SimpleImmutableEntry<>(EndOfDayBatch.class, endOfDayArgsValid));
 
 	private final static BiConsumer<Class<? extends CommandLineRunner>, String[]> consumer = (command, args) -> SpringApplication.run(command, args);
 
@@ -47,22 +43,17 @@ public class SpringBootConsoleApplication {
 			final var cmd = parser.parse(options, args);
 
 			commandExistsGuard(commands.keySet(), cmd);
-			if ( commands.get(cmd.getOptionValue("c")).getValue().test(cmd)) {
-				consumer.accept(commands.get(cmd.getOptionValue("c")).getKey(), cmd.getArgs());	
+			if (commands.get(cmd.getOptionValue("c")).getValue().test(cmd)) {
+				consumer.accept(commands.get(cmd.getOptionValue("c")).getKey(), cmd.getArgs());
 			} else {
 				throw new ParseException(String.format("Illegal number of Arguments."));
 			}
-			
-
-			
 
 		} catch (final ParseException parseException) {
 			formatter.printHelp("java -jar <file> ", options);
 			// System.exit(1);
 		}
 	}
-
-	
 
 	private static void commandExistsGuard(final Collection<String> commands, final CommandLine cmd) throws ParseException {
 		if (!cmd.hasOption("c")) {

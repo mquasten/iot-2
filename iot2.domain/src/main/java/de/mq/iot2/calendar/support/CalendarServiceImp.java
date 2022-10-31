@@ -1,16 +1,19 @@
 package de.mq.iot2.calendar.support;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.format.TextStyle;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,12 +35,10 @@ class CalendarServiceImp implements CalendarService {
 	private final Collection<Entry<MonthDay, String>> publicHolidays = Set.of(new SimpleImmutableEntry<>(MonthDay.of(1, 1), "Neujahr"), new SimpleImmutableEntry<>(MonthDay.of(5, 1), "Tag der Arbeit"),
 			new SimpleImmutableEntry<>(MonthDay.of(10, 3), "Tag der Deutschen Einheit"), new SimpleImmutableEntry<>(MonthDay.of(11, 1), "Allerheiligen"),
 			new SimpleImmutableEntry<>(MonthDay.of(12, 25), "1. Weihnachtsfeiertag"), new SimpleImmutableEntry<>(MonthDay.of(12, 26), "2. Weihnachtsfeiertag"));
-	
-	
 
 	@Autowired
 	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository) {
-		this.cycleRepository=cycleRepository;
+		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
 	}
@@ -45,7 +46,7 @@ class CalendarServiceImp implements CalendarService {
 	@Override
 	@Transactional
 	public void createDefaultCyclesGroupsAndDays() {
-		
+
 		final var cycle = cycleRepository.save(new CycleImpl(1L, "Freizeit", 101));
 		cycleRepository.save(new CycleImpl(2L, "Arbeitstage", 102, true));
 		createOrUpdatePublicHolidays(cycle);
@@ -58,7 +59,7 @@ class CalendarServiceImp implements CalendarService {
 	}
 
 	private void createOrUpdateWeekend(final Cycle cycle) {
-		final var weekendGroup = dayGroupRepository.save(new DayGroupImpl(cycle,2L , "Wochenende" ));
+		final var weekendGroup = dayGroupRepository.save(new DayGroupImpl(cycle, 2L, "Wochenende"));
 		deleteDaysFromDayGroup(weekendGroup);
 
 		final var locale = Locale.GERMAN;
@@ -79,6 +80,14 @@ class CalendarServiceImp implements CalendarService {
 
 	private void deleteDaysFromDayGroup(final DayGroup publicHolidayGroup) {
 		dayRepository.findByDayGroup(publicHolidayGroup).forEach(dayRepository::delete);
+	}
+
+	@Override
+	public Cycle cycle(final LocalDate date) {
+		final var defaultCycle = DataAccessUtils.requiredSingleResult(cycleRepository.findByDefaultCycle(true));
+
+		return dayRepository.findAll().stream().filter(day -> day.matches(date)).map(day -> day.dayGroup().cycle())
+				.sorted((Comparator<Cycle>) (c1, c2) -> Integer.signum(c1.priority() - c2.priority())).findFirst().orElse(defaultCycle);
 	}
 
 }
