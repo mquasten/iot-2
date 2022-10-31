@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -16,15 +17,29 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.util.StringUtils;
 
 public class SpringBootConsoleApplication {
+	
 
-	private final static Map<String, Entry<Class<? extends CommandLineRunner>, Integer>> commands = Map.of("setup", new AbstractMap.SimpleImmutableEntry<>(SetupDatabaseImpl.class, 0));
+
+	private final static Predicate<CommandLine> setupArgsValid =SetupDatabaseImpl::isValid;
+
+	private final static Predicate<CommandLine> endOfDayArgsValid = EndOfDayBatch::isValid;
+
+	
+	
+	
+
+	private final static Map<String, Entry<Class<? extends CommandLineRunner>, Predicate<CommandLine>>> commands = Map.of(
+			"setup", new AbstractMap.SimpleImmutableEntry<>(SetupDatabaseImpl.class, setupArgsValid),
+			
+			"endOfDay" , new AbstractMap.SimpleImmutableEntry<>(EndOfDayBatch.class, endOfDayArgsValid)
+			);
 
 	private final static BiConsumer<Class<? extends CommandLineRunner>, String[]> consumer = (command, args) -> SpringApplication.run(command, args);
 
 	public static final void main(final String[] args) {
 
 		final var options = new Options();
-		options.addOption("c", "command", true, String.format("arg: %s", StringUtils.collectionToDelimitedString(commands.keySet(), " ")));
+		options.addOption("c", true, String.format("arg: %s", StringUtils.collectionToDelimitedString(commands.keySet(), " ")));
 		final var parser = new DefaultParser();
 		final HelpFormatter formatter = new HelpFormatter();
 		try {
@@ -32,9 +47,14 @@ public class SpringBootConsoleApplication {
 			final var cmd = parser.parse(options, args);
 
 			commandExistsGuard(commands.keySet(), cmd);
-			numberOfArgumentsGuard(cmd);
+			if ( commands.get(cmd.getOptionValue("c")).getValue().test(cmd)) {
+				consumer.accept(commands.get(cmd.getOptionValue("c")).getKey(), cmd.getArgs());	
+			} else {
+				throw new ParseException(String.format("Illegal number of Arguments."));
+			}
+			
 
-			consumer.accept(commands.get(cmd.getOptionValue("c")).getKey(), cmd.getArgs());
+			
 
 		} catch (final ParseException parseException) {
 			formatter.printHelp("java -jar <file> ", options);
@@ -42,11 +62,7 @@ public class SpringBootConsoleApplication {
 		}
 	}
 
-	private static void numberOfArgumentsGuard(final CommandLine cmd) throws ParseException {
-		if (cmd.getArgs().length != commands.get(cmd.getOptionValue("c")).getValue()) {
-			throw new ParseException(String.format("Invalid number of Arguments."));
-		}
-	}
+	
 
 	private static void commandExistsGuard(final Collection<String> commands, final CommandLine cmd) throws ParseException {
 		if (!cmd.hasOption("c")) {

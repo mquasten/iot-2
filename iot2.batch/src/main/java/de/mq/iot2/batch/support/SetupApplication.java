@@ -1,5 +1,6 @@
 package de.mq.iot2.batch.support;
 
+import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -31,6 +32,10 @@ class SetupDatabaseImpl implements CommandLineRunner {
 		LOG.info("Setup database DayGroups and Days.");
 		calendarService.createDefaultCyclesGroupsAndDays();
 
+	}
+	
+	final static boolean isValid(final CommandLine cmd) {
+		return cmd.getArgs().length==0;
 	}
 
 }
