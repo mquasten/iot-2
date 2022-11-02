@@ -1,6 +1,5 @@
 package de.mq.iot2.main.support;
 
-import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,7 @@ import de.mq.iot2.main.SpringBootConsoleApplication;
 
 
 @Service
-public class SetupDatabase  {
+class SetupDatabase implements Batch {
 
 	private static Logger LOG = LoggerFactory.getLogger(SpringBootConsoleApplication.class);
 
@@ -23,15 +22,15 @@ public class SetupDatabase  {
 		this.configurationService = configurationService;
 	}
 
-	public final void execute()  {
+	@BatchMethod("setup")
+	final void execute()  {
 		LOG.info("Setup database DayGroups and Days.");
 		calendarService.createDefaultCyclesGroupsAndDays();
 		configurationService.createDefaultConfigurationsAndParameters();
 
 	}
 
-	final public static boolean isValid(final CommandLine cmd) {
-		return cmd.getArgs().length == 0;
-	}
+	
 
+	
 }
