@@ -1,11 +1,12 @@
 package de.mq.iot2.main;
 
-import java.util.AbstractMap;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -14,54 +15,113 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.util.Base64Utils;
+import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 
 import de.mq.iot2.main.support.EndOfDayBatch;
-import de.mq.iot2.main.support.SetupDatabaseImpl;
+import de.mq.iot2.main.support.SetupDatabase;
 
-public class SpringBootConsoleApplication {
 
-	private final static Predicate<CommandLine> setupArgsValid = SetupDatabaseImpl::isValid;
 
-	private final static Predicate<CommandLine> endOfDayArgsValid = EndOfDayBatch::isValid;
 
-	private final static Map<String, Entry<Class<? extends CommandLineRunner>, Predicate<CommandLine>>> commands = Map.of("setup",
-			new AbstractMap.SimpleImmutableEntry<>(SetupDatabaseImpl.class, setupArgsValid),
+@SpringBootApplication
+@EnableJpaRepositories("de.mq.iot2")
+@EntityScan(basePackages = "de.mq.iot2")
+@ComponentScan(basePackages = "de.mq.iot2")
+@EnableTransactionManagement()
+public class SpringBootConsoleApplication implements CommandLineRunner {
+	
+	public enum Commands  {
+		Setup,
+		EndOfDay;
+	}
 
-			"endOfDay", new AbstractMap.SimpleImmutableEntry<>(EndOfDayBatch.class, endOfDayArgsValid));
+	private final EndOfDayBatch endOfDayBatch;
+	private final SetupDatabase setupDatabase;
+	public SpringBootConsoleApplication(final EndOfDayBatch endOfDayBatch, final SetupDatabase setupDatabase) {
+		this.endOfDayBatch = endOfDayBatch;
+		this.setupDatabase = setupDatabase;
+	}
 
-	private final static BiConsumer<Class<? extends CommandLineRunner>, String[]> consumer = (command, args) -> SpringApplication.run(command, args);
+	
 
-	public static final void main(final String[] args) {
-
+	public static final void main(final String[] args) throws Exception {
 		final var options = new Options();
-		options.addOption("c", true, String.format("arg: %s", StringUtils.collectionToDelimitedString(commands.keySet(), " ")));
-		final var parser = new DefaultParser();
-		final HelpFormatter formatter = new HelpFormatter();
 		try {
 
-			final var cmd = parser.parse(options, args);
+			final var cmd = parser(options, args);
 
-			commandExistsGuard(commands.keySet(), cmd);
-			if (commands.get(cmd.getOptionValue("c")).getValue().test(cmd)) {
-				consumer.accept(commands.get(cmd.getOptionValue("c")).getKey(), cmd.getArgs());
-			} else {
-				throw new ParseException(String.format("Illegal number of Arguments."));
+			final var commandAsString= Base64Utils.encodeToString(SerializationUtils.serialize(command(cmd)));
+			final var argsAsString = Base64Utils.encodeToString(SerializationUtils.serialize(cmd.getArgList()));
+			
+			SpringApplication.run(SpringBootConsoleApplication.class, commandAsString, argsAsString);
+
+		} catch (final Exception  exception) {
+			
+			if ((exception instanceof ParseException) || (exception.getCause() instanceof ParseException )) {
+				final HelpFormatter formatter = new HelpFormatter();
+				formatter.printHelp("java -jar <file> ", options);
+				return;
+				
 			}
-
-		} catch (final ParseException parseException) {
-			formatter.printHelp("java -jar <file> ", options);
-			// System.exit(1);
+	
+			throw exception;
 		}
 	}
 
-	private static void commandExistsGuard(final Collection<String> commands, final CommandLine cmd) throws ParseException {
+	private static CommandLine parser(final Options options, final String[] args) throws ParseException {
+
+		options.addOption("c", true, String.format("arg: %s", StringUtils.collectionToDelimitedString(Arrays.asList(Commands.values()), " ")));
+		final var parser = new DefaultParser();
+
+		return parser.parse(options, args);
+	}
+
+	private static Commands command(final CommandLine cmd)
+			throws ParseException {
 		if (!cmd.hasOption("c")) {
-			throw new ParseException(String.format("Command missing."));
+			throw new ParseException("Command missing.");
 		}
-		if (!commands.contains(cmd.getOptionValue("c"))) {
-			throw new ParseException(String.format("Command undefined."));
+		try {
+			
+		return Commands.valueOf(cmd.getOptionValue("c"));
+		} catch(IllegalArgumentException ex) {
+			throw new ParseException("Command undefined.");
 		}
+		
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		final Commands command = (Commands) SerializationUtils.deserialize(Base64Utils.decodeFromString(args[0]));
+		@SuppressWarnings("unchecked")
+		final List<String> argList =  (List<String>)  SerializationUtils.deserialize(Base64Utils.decodeFromString(args[1]));
+		System.out.println("***" + command+ ", Argumente: " + argList.size() + "****");
+		
+		switch (command) {
+		case Setup: {
+			setupDatabase.execute();
+			
+		}
+		case EndOfDay: {
+			endOfDayBatch.execute(argList.isEmpty() ? Optional.empty() :  Optional.of(localDate(argList.get(0))) );
+		}
+		
+		
+		
+
+	}
+		
+	}
+	
+	private  LocalDate localDate(final String dateString) {
+		return LocalDate.parse(dateString, DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.GERMAN));
 	}
 
 }
