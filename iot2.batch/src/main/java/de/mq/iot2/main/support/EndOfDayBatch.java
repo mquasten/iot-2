@@ -1,6 +1,7 @@
 package de.mq.iot2.main.support;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -16,17 +17,15 @@ public class EndOfDayBatch  {
 	}
 
 	@BatchMethod(value="end-of-day", converterClass = OneOrNoneLocalDateArgumentConverter.class)
-	final void execute(final LocalDate date) {
-		System.out.println("Use date:" + date);
+	final void execute(final Optional<LocalDate> date) {
+		
+		final var runDate = date.orElse(LocalDate.now().plusDays(1));
+		System.out.println("Use date:" + runDate);
 
-		final var cycle = calendarService.cycle(date);
+		final var cycle = calendarService.cycle(runDate);
 
 		System.out.println(cycle);
 
-	}
-	
-	final void execute() {
-		execute(LocalDate.now());
 	}
 
 	

@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.support.DataAccessUtils;
@@ -18,11 +19,11 @@ public class OneOrNoneLocalDateArgumentConverter implements Converter<List<Strin
 		Assert.isTrue(objects.size() <= 1, "EndOfDayBatch has 1 optional Parameter.");
 		final String value = DataAccessUtils.singleResult(objects);
 
-		if (value == null) {
-			return new Object[] {};
+		if (value == null ) {
+			return new Object[] {Optional.empty()};
 		}
 
-		return new Object[] { localDate(value) };
+		return new Object[] {Optional.of(localDate(value)) };
 	}
 
 	private LocalDate localDate(final String dateString) {
