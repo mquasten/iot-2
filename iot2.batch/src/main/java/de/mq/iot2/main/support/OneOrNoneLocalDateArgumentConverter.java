@@ -3,18 +3,15 @@ package de.mq.iot2.main.support;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.util.Assert;
 
-public class OneOptionalLocalDateArgumentConverter implements Converter<List<String>, Object[]> {
+public class OneOrNoneLocalDateArgumentConverter implements Converter<List<String>, Object[]> {
 
-	
 	@Override
 	public Object[] convert(final List<String> objects) {
 
@@ -22,10 +19,10 @@ public class OneOptionalLocalDateArgumentConverter implements Converter<List<Str
 		final String value = DataAccessUtils.singleResult(objects);
 
 		if (value == null) {
-			return new Object[] { Optional.empty() };
+			return new Object[] {};
 		}
 
-		return new Object[] { Optional.of(localDate(value)) };
+		return new Object[] { localDate(value) };
 	}
 
 	private LocalDate localDate(final String dateString) {
@@ -33,5 +30,4 @@ public class OneOptionalLocalDateArgumentConverter implements Converter<List<Str
 				DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.GERMAN));
 	}
 
-	
 }

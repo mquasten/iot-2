@@ -10,17 +10,13 @@ import java.util.List;
 
 import org.springframework.core.convert.converter.Converter;
 
-public interface Batch  {
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Target(ElementType.METHOD)
+@Inherited
+public @interface BatchMethod {
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@Documented
-	@Target(ElementType.METHOD)
-	@Inherited
-	public @interface BatchMethod {
-		String value();
-		Class<? extends Converter<List<String>,Object[]>> converterClass() default NoArgumentConverter.class ;
-	}
-
-	
+	String value();
+	Class<? extends Converter<List<String>, Object[]>> converterClass() default NoArgumentConverter.class;
 
 }

@@ -3,8 +3,6 @@ package de.mq.iot2.main;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
@@ -17,8 +15,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.Base64Utils;
@@ -26,42 +24,38 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 
-import de.mq.iot2.main.support.Batch;
-import de.mq.iot2.main.support.Batch.BatchMethod;
+import de.mq.iot2.main.support.BatchMethod;
+import de.mq.iot2.main.support.ScanUtil;
+
 
 
 @SpringBootApplication
 @EnableJpaRepositories("de.mq.iot2")
 @EntityScan(basePackages = "de.mq.iot2")
-@ComponentScan(basePackages = "de.mq.iot2")
+@ComponentScan(basePackages = SpringBootConsoleApplication.COMPONENT_SCAN_BASE_PACKAGE)
 @EnableTransactionManagement()
 public class SpringBootConsoleApplication implements CommandLineRunner {
 
-	
-	private final Map<String, Batch> batches = new HashMap<>();
-	private final Map<String, Class<? extends Converter<List<String>, Object[]>>> converters = new HashMap<>();
-	private static final Collection<String>commands = List.of("setup" , "end-of-day");
-
-	public SpringBootConsoleApplication(final Collection<Batch> beans) {
-		
-		beans.forEach(batch -> ReflectionUtils.doWithMethods(batch.getClass(), method ->  {
-			final String batchname = method.getDeclaredAnnotation(BatchMethod.class).value();;
-			batches.put(batchname, batch);
-			converters.put(batchname,  method.getDeclaredAnnotation(BatchMethod.class).converterClass());
-		}, method -> method.isAnnotationPresent(BatchMethod.class)));
-		
-		
+	static final String COMPONENT_SCAN_BASE_PACKAGE = "de.mq.iot2";
+	private final ApplicationContext applicationContext;
+	SpringBootConsoleApplication(ApplicationContext applicationContext){
+		this.applicationContext=applicationContext;
 	}
 
 	public static final void main(final String[] args) throws Exception {
+		final Map<String, Method> methods = ScanUtil.findBatchMethods(COMPONENT_SCAN_BASE_PACKAGE);
 		final var options = new Options();
 		try {
 
-			final var cmd = parser(options, args);
+			final var cmd = parser(options, args, methods.keySet());
 
-			final var commandAsString = command(cmd);
-			final var argsAsString = Base64Utils.encodeToString(SerializationUtils.serialize(cmd.getArgList()));
+			final var commandAsString = command(cmd, methods.keySet());
+			//final var argsAsString = Base64Utils.encodeToString(SerializationUtils.serialize(cmd.getArgList()));
 
+			final var converter = BeanUtils.instantiateClass(methods.get(commandAsString).getDeclaredAnnotation(BatchMethod.class).converterClass());
+			final Object[] convertedArgs = converter.convert(cmd.getArgList());
+			final var argsAsString = Base64Utils.encodeToString(SerializationUtils.serialize(convertedArgs));
+			
 			SpringApplication.run(SpringBootConsoleApplication.class, commandAsString, argsAsString);
 
 		} catch (final ParseException exception) {
@@ -74,7 +68,7 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		}
 	}
 
-	private static CommandLine parser(final Options options, final String[] args) throws ParseException {
+	private static CommandLine parser(final Options options, final String[] args, Collection<String> commands) throws ParseException {
 
 		options.addOption("c", true, String.format("arg: %s",
 				StringUtils.collectionToDelimitedString(commands, " ")));
@@ -83,7 +77,7 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		return parser.parse(options, args);
 	}
 
-	private static final String command(final CommandLine cmd) throws ParseException {
+	private static final String command(final CommandLine cmd, Collection<String> commands) throws ParseException {
 		if (!cmd.hasOption("c")) {
 			throw new ParseException("Command missing.");
 		}
@@ -99,26 +93,29 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 
 	@Override
 	public void run(final String... args) throws Exception {
+		final Map<String, Method> methods = ScanUtil.findBatchMethods(COMPONENT_SCAN_BASE_PACKAGE);
 		final  String  command = args[0];
-		@SuppressWarnings("unchecked")
-		final List<String> argList = (List<String>) SerializationUtils
+	
+		final Object[]  argList = (Object[]) SerializationUtils
 				.deserialize(Base64Utils.decodeFromString(args[1]));
-		if (!batches.containsKey(command)) {
+		if (!methods.containsKey(command)) {
 			throw new ParseException("No Bean found for command: " + command);
 		}
 		
-		final Batch batch = batches.get(command);
-		final Object[] objects = BeanUtils.instantiateClass(converters.get(command)).convert(argList);
-		ReflectionUtils.doWithMethods(batch.getClass(), method -> executeMethod(objects, batch, method));
+		final Method method = methods.get(command);
+		
+		
+		executeMethod(argList, applicationContext.getBean(method.getDeclaringClass()), method);
+		
 
 	}
 
-	private void executeMethod(final Object[] argList, final Batch batch, Method method)
+	private void executeMethod(final Object[] argList, final Object bean, Method method)
 			throws IllegalAccessException {
 		try {
 			if (method.isAnnotationPresent(BatchMethod.class)) {
 				method.setAccessible(true);
-				method.invoke(batch, argList);
+				method.invoke(bean, argList);
 			}
 
 		} catch (InvocationTargetException e) {

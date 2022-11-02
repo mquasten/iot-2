@@ -8,9 +8,8 @@ import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.main.SpringBootConsoleApplication;
 
-
 @Service
-class SetupDatabase implements Batch {
+class SetupDatabase {
 
 	private static Logger LOG = LoggerFactory.getLogger(SpringBootConsoleApplication.class);
 
@@ -23,14 +22,11 @@ class SetupDatabase implements Batch {
 	}
 
 	@BatchMethod("setup")
-	final void execute()  {
+	final void execute() {
 		LOG.info("Setup database DayGroups and Days.");
 		calendarService.createDefaultCyclesGroupsAndDays();
 		configurationService.createDefaultConfigurationsAndParameters();
 
 	}
 
-	
-
-	
 }
