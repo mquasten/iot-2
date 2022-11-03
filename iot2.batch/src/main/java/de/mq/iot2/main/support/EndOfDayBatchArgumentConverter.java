@@ -5,13 +5,12 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.util.Assert;
 
-public class OneOrNoneLocalDateArgumentConverter implements Converter<List<String>, Object[]> {
+public class EndOfDayBatchArgumentConverter implements Converter<List<String>, Object[]> {
 
 	@Override
 	public Object[] convert(final List<String> objects) {
@@ -20,10 +19,10 @@ public class OneOrNoneLocalDateArgumentConverter implements Converter<List<Strin
 		final String value = DataAccessUtils.singleResult(objects);
 
 		if (value == null ) {
-			return new Object[] {Optional.empty()};
+			return new Object[] {LocalDate.now().plusDays(1)};
 		}
 
-		return new Object[] {Optional.of(localDate(value)) };
+		return new Object[] {localDate(value) };
 	}
 
 	private LocalDate localDate(final String dateString) {

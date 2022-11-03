@@ -422,7 +422,7 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="1145" ColName="RULE_KEY" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(15)" Width="-1" Prec="-1" PrimaryKey="1" NotNull="1" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<COLUMN ID="1145" ColName="RULE_KEY" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(15)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
@@ -435,13 +435,12 @@
 </COLUMNS>
 <RELATIONS_START>
 <RELATION_START ID="1163" />
-<RELATION_START ID="1176" />
+<RELATION_START ID="1215" />
 </RELATIONS_START>
 <INDICES>
 <INDEX ID="1144" IndexName="PRIMARY" IndexKind="0" FKRefDef_Obj_id="-1">
 <INDEXCOLUMNS>
 <INDEXCOLUMN idColumn="1143" LengthParam="0" />
-<INDEXCOLUMN idColumn="1145" LengthParam="0" />
 </INDEXCOLUMNS>
 </INDEX>
 <INDEX ID="1198" IndexName="CONFIGURATION_RULE_KEY" IndexKind="2" FKRefDef_Obj_id="-1">
@@ -458,11 +457,6 @@
 </TABLE>
 <TABLE ID="1147" Tablename="CYCLE_PARAMETER" PrevTableName="Table_05" XPos="557" YPos="740" TableType="0" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="8" >
 <COLUMNS>
-<COLUMN ID="1200" ColName="CONFIGURATION_RULE_KEY" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(15)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="1" DefaultValue="" Comments="">
-<OPTIONSELECTED>
-<OPTIONSELECT Value="0" />
-</OPTIONSELECTED>
-</COLUMN>
 <COLUMN ID="1151" ColName="PARAMETER_KEY" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(15)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 <OPTIONSELECT Value="0" />
@@ -499,7 +493,6 @@
 <INDEX ID="1165" IndexName="FK_CYCLE_PARAMETER_CONFIGURATION_ID" IndexKind="1" FKRefDef_Obj_id="1163">
 <INDEXCOLUMNS>
 <INDEXCOLUMN idColumn="1164" LengthParam="0" />
-<INDEXCOLUMN idColumn="1200" LengthParam="0" />
 </INDEXCOLUMNS>
 </INDEX>
 <INDEX ID="1171" IndexName="FK_CYCLE_PARAMETER_CYCLE" IndexKind="1" FKRefDef_Obj_id="1169">
@@ -511,12 +504,7 @@
 </TABLE>
 <TABLE ID="1174" Tablename="PARAMETER" PrevTableName="Table_06" XPos="595" YPos="460" TableType="0" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="11" >
 <COLUMNS>
-<COLUMN ID="1201" ColName="CONFIGURATION_RULE_KEY" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(15)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="1" DefaultValue="" Comments="">
-<OPTIONSELECTED>
-<OPTIONSELECT Value="0" />
-</OPTIONSELECTED>
-</COLUMN>
-<COLUMN ID="1177" ColName="CONFIGURATION_ID" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(36)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="1" DefaultValue="" Comments="">
+<COLUMN ID="1216" ColName="CONFIGURATION_ID" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(36)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="1" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
@@ -531,26 +519,19 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="1191" ColName="PARAMETER_TYPE" PrevColName="" Pos="3" idDatatype="20" DatatypeParams="(15)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
-<OPTIONSELECTED>
-<OPTIONSELECT Value="0" />
-</OPTIONSELECTED>
-</COLUMN>
 </COLUMNS>
 <RELATIONS_END>
-<RELATION_END ID="1176" />
+<RELATION_END ID="1215" />
 </RELATIONS_END>
 <INDICES>
-<INDEX ID="1178" IndexName="FK_PARAMETER_CONFIGURATION" IndexKind="1" FKRefDef_Obj_id="1176">
-<INDEXCOLUMNS>
-<INDEXCOLUMN idColumn="1177" LengthParam="0" />
-<INDEXCOLUMN idColumn="1201" LengthParam="0" />
-</INDEXCOLUMNS>
-</INDEX>
 <INDEX ID="1185" IndexName="PARAMETER_CONFIGURATION_ID_KEY" IndexKind="2" FKRefDef_Obj_id="-1">
 <INDEXCOLUMNS>
 <INDEXCOLUMN idColumn="1183" LengthParam="0" />
-<INDEXCOLUMN idColumn="1177" LengthParam="0" />
+</INDEXCOLUMNS>
+</INDEX>
+<INDEX ID="1217" IndexName="FK_PARAMETER_CONFIGURATION_ID" IndexKind="1" FKRefDef_Obj_id="1215">
+<INDEXCOLUMNS>
+<INDEXCOLUMN idColumn="1216" LengthParam="0" />
 </INDEXCOLUMNS>
 </INDEX>
 </INDICES>
@@ -559,9 +540,9 @@
 <RELATIONS>
 <RELATION ID="1046" RelationName="DayGroup2SpecialDay" Kind="2" SrcTable="1000" DestTable="1009" FKFields="ID=DAY_GROUP_ID\n" FKFieldsComments="\n" relDirection="4" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="1" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1139" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="4" />
 <RELATION ID="1125" RelationName="Timer2DayGroup" Kind="2" SrcTable="1096" DestTable="1000" FKFields="ID=CYCLE_ID\n" FKFieldsComments="\n" relDirection="4" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1140" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="6" />
-<RELATION ID="1163" RelationName="Configuration2CycleParameter" Kind="2" SrcTable="1141" DestTable="1147" FKFields="ID=CONFIGURATION_ID\nRULE_KEY=CONFIGURATION_RULE_KEY\n" FKFieldsComments="\n\n" relDirection="2" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1165" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="9" />
+<RELATION ID="1163" RelationName="Configuration2CycleParameter" Kind="2" SrcTable="1141" DestTable="1147" FKFields="ID=CONFIGURATION_ID\n" FKFieldsComments="\n" relDirection="2" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1165" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="9" />
 <RELATION ID="1169" RelationName="Cycle2CycleParameter" Kind="2" SrcTable="1096" DestTable="1147" FKFields="ID=CYCLE_ID\n" FKFieldsComments="\n" relDirection="4" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1171" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="10" />
-<RELATION ID="1176" RelationName="Configuration2Parameter" Kind="2" SrcTable="1141" DestTable="1174" FKFields="ID=CONFIGURATION_ID\nRULE_KEY=CONFIGURATION_RULE_KEY\n" FKFieldsComments="\n\n" relDirection="2" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1178" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="12" />
+<RELATION ID="1215" RelationName="Rel_07" Kind="2" SrcTable="1141" DestTable="1174" FKFields="ID=CONFIGURATION_ID\n" FKFieldsComments="\n" relDirection="2" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1217" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="14" />
 </RELATIONS>
 <NOTES>
 <NOTE ID="1193" NoteName="Note_01" XPos="64" YPos="380" NoteText="SingleTable\n" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="13" />

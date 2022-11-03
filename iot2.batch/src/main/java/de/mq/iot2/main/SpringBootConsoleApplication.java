@@ -2,7 +2,6 @@ package de.mq.iot2.main;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
@@ -20,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.util.Assert;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.SerializationUtils;
@@ -46,21 +46,19 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		final Map<String, Method> methods = ScanUtil.findBatchMethods(COMPONENT_SCAN_BASE_PACKAGE);
 		final var options = new Options();
 		try {
-
 			final var cmd = parser(options, args, methods.keySet());
-
 			final var commandAsString = command(cmd, methods.keySet());
 			final Method method = methods.get(commandAsString);
 			final BatchMethod declaredAnnotation = method.getDeclaredAnnotation(BatchMethod.class);
 
 			final Object[] convertedArgs = BeanUtils.instantiateClass(declaredAnnotation.converterClass()).convert(cmd.getArgList());
-	
+		
 			if (method.getParameterCount() != convertedArgs.length) {
 				throw new ParseException(
 						String.format("Number of Parameters in %s and returned number of Aruments from Concerter %s are different.", method.getName(), declaredAnnotation.converterClass()));
 			}
-			SpringApplication.run(SpringBootConsoleApplication.class, commandAsString, Base64Utils.encodeToString(SerializationUtils.serialize(cmd.getArgList())));
-
+			
+			SpringApplication.run(SpringBootConsoleApplication.class, Base64Utils.encodeToString(SerializationUtils.serialize(new ReflectionCommandLineRunnerArguments(method, convertedArgs))));
 		} catch (final ParseException exception) {
 			final HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("java -jar <file> [OPTION]... [ARGUMENT]...", options);
@@ -89,21 +87,13 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 
 	@Override
 	public void run(final String... args) throws Exception {
-		final Map<String, Method> methods = ScanUtil.findBatchMethods(COMPONENT_SCAN_BASE_PACKAGE);
-		final String command = args[0];
-
-		@SuppressWarnings("unchecked")
-		final List<String> argList = (List<String>) SerializationUtils.deserialize(Base64Utils.decodeFromString(args[1]));
-		if (!methods.containsKey(command)) {
-			throw new ParseException("No Bean found for command: " + command);
-		}
-
-		final var method = methods.get(command);
-		final var declaredAnnotation = method.getDeclaredAnnotation(BatchMethod.class);
-		final var convertedArgs = BeanUtils.instantiateClass(declaredAnnotation.converterClass()).convert(argList);
+		var arguments= 	(ReflectionCommandLineRunnerArguments) SerializationUtils.deserialize(Base64Utils.decodeFromString(args[0]));
+	
+		final var bean = applicationContext.getBean(arguments.getExecutedBean());
+		final Method method = ReflectionUtils.findMethod(arguments.getExecutedBean(), arguments.getMethodName(), arguments.getParameterTypes());
+		Assert.notNull(method, "Method not found.");
 		method.setAccessible(true);
-		ReflectionUtils.invokeMethod(method, applicationContext.getBean(method.getDeclaringClass()), convertedArgs);
-
+		ReflectionUtils.invokeMethod(method,bean, arguments.getParameterValues());
 	}
 
 }
