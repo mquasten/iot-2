@@ -32,7 +32,7 @@ class ParameterImpl implements Parameter {
 	
 	@Column(name = "PARAMETER_KEY", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private ParameterKey key;
+	private Key key;
 	@Column(name = "PARAMETER_VALUE", nullable = false)
 	private String value;
 	
@@ -47,7 +47,7 @@ class ParameterImpl implements Parameter {
 		
 	}
 	
-	ParameterImpl(final Configuration configuration,  final ParameterKey key, final String value) {
+	ParameterImpl(final Configuration configuration,  final Key key, final String value) {
 		configurationRequiredGuard(configuration);
 		keyRequiredGuard(key);
 		valueRequiredGuard(value);
@@ -61,7 +61,7 @@ class ParameterImpl implements Parameter {
 		Assert.hasText(value, "Value is required.");
 	}
 
-	private void keyRequiredGuard(final ParameterKey key) {
+	private void keyRequiredGuard(final Key key) {
 		Assert.notNull(key, "Key is required.");
 	}
 
@@ -70,7 +70,7 @@ class ParameterImpl implements Parameter {
 	}
 	
 	@Override
-	public ParameterKey key() {
+	public Key key() {
 		keyRequiredGuard(key);
 		return key;
 	}

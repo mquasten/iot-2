@@ -1,10 +1,17 @@
 package de.mq.iot2.configuration;
 
-import de.mq.iot2.configuration.support.ParameterKey;
-
 public interface Parameter {
+	
+	public enum Key {
+		
+		UpTime,
+		MinSunDownTime,
+		MaxSunUpTime,
+		
+		DaysBack;
+	}
 
-	ParameterKey key();
+	Key key();
 
 	String value();
 
