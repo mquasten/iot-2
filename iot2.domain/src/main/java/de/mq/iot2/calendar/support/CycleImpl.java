@@ -10,7 +10,7 @@ import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.support.IdUtil;
 
 @Entity(name = "Cycle")
-class CycleImpl implements Cycle {
+public class CycleImpl implements Cycle {
 	private static final String NAME_IS_REQUIRED_MESSAGE = "Name is required.";
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)

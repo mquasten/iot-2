@@ -1,7 +1,9 @@
 package de.mq.iot2.configuration.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -44,6 +46,37 @@ class CycleParameterImplTest {
 
 		ReflectionTestUtils.setField(cycleParameter, CYCLE_FIELD_NAME, cycle);
 		assertEquals(cycle, cycleParameter.cycle());
+	}
+	
+	@Test
+	void hash() {
+		final var key = Key.DaysBack;
+		final var cycleParameter = new CycleParameterImpl(configuration,key, VALUE, cycle);
+		assertEquals(CycleParameterImpl.class.hashCode() + key.hashCode() + configuration.hashCode() + cycle.hashCode(), cycleParameter.hashCode());
+		
+		ReflectionTestUtils.setField(cycleParameter, CYCLE_FIELD_NAME, null);
+		
+		assertEquals(CycleParameterImpl.class.hashCode() + key.hashCode() + configuration.hashCode(), cycleParameter.hashCode());
+	}
+	
+	@SuppressWarnings("unlikely-arg-type")
+	@Test
+	void  equals() {
+		final var key = Key.MaxSunUpTime;
+		final var cycleParameter = new CycleParameterImpl(configuration,key, VALUE, cycle);
+		
+		assertFalse(cycleParameter.equals(VALUE));
+		
+		assertTrue(cycleParameter.equals(new CycleParameterImpl(configuration,key, VALUE, cycle)));
+		assertFalse(cycleParameter.equals(new CycleParameterImpl(configuration,key, VALUE, Mockito.mock(Cycle.class))));
+		assertFalse(cycleParameter.equals(new CycleParameterImpl(configuration,Key.DaysBack, VALUE, cycle)));
+		
+		final var otherParameter = new CycleParameterImpl(configuration,key, VALUE, cycle);
+		
+		ReflectionTestUtils.setField(otherParameter, CYCLE_FIELD_NAME, null);
+		
+		assertFalse(otherParameter.equals(cycleParameter));
+		assertFalse(cycleParameter.equals(otherParameter));
 	}
 
 }

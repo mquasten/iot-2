@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.function.Supplier;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 
@@ -13,6 +14,7 @@ import org.springframework.util.Assert;
 import de.mq.iot2.calendar.DayGroup;
 
 @Entity(name = GaussDayImpl.ENTITY_NAME)
+@DiscriminatorValue(GaussDayImpl.ENTITY_NAME)
 class GaussDayImpl extends AbstractDay<LocalDate> {
 
 	static final String ENTITY_NAME = "GaussDay";

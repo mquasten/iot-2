@@ -1,28 +1,72 @@
 package de.mq.iot2.configuration.support;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Configuration.RuleKey;
+import de.mq.iot2.calendar.Cycle;
+import de.mq.iot2.calendar.support.CycleRepository;
 import de.mq.iot2.configuration.ConfigurationService;
+import de.mq.iot2.configuration.Parameter.Key;
+import de.mq.iot2.support.IdUtil;
 
 @Service
 class ConfigurationServiceImpl implements ConfigurationService {
 
+	private static final long WORKING_DAY_CYCLE_ID = 2L;
+	private static final long NON_WORKING_DAY_CYCLE_ID = 1L;
 	private final ConfigurationRepository configurationRepository;
+	private final ParameterRepository parameterRepository;
+	private final CycleRepository cycleRepository;
 
-	ConfigurationServiceImpl(ConfigurationRepository configurationRepository) {
+	ConfigurationServiceImpl(ConfigurationRepository configurationRepository, final ParameterRepository parameterRepository, final CycleRepository cycleRepository) {
 		this.configurationRepository = configurationRepository;
+		this.parameterRepository = parameterRepository;
+		this.cycleRepository = cycleRepository;
 	}
 
 	@Override
 	@Transactional
 	public void createDefaultConfigurationsAndParameters() {
+		//parameterRepository.deleteAll();
+		final var  nonWorkingDayCycle = cycleRepository.findById(IdUtil.id(NON_WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException("Non Workingday Cycle not found."));	
+     	final var workingDayCycle = cycleRepository.findById(IdUtil.id(WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException("Workingday Cycle not found."));
+     	saveEndOfDayConfiguration(nonWorkingDayCycle, workingDayCycle);
+     	saveCleanUpConfiguration();
+	}
 
-		final var configuration = new ConfigurationImpl(1L, RuleKey.EndOfDay, "EndofDayBatch");
-		configurationRepository.save(configuration);
+	private void saveCleanUpConfiguration() {
+		final var cleanUpConfiguration =  configurationRepository.save(new ConfigurationImpl(2L, RuleKey.CleanUp, "CleanUpBatch"));
+		parameterRepository.deleteAll(cleanUpConfiguration);
+		parameterRepository.save(new ParameterImpl(cleanUpConfiguration, Key.DaysBack, "30"));
+		System.out.println("6");
+	}
 
+	private void saveEndOfDayConfiguration(final Cycle nonWorkingDayCycle, final Cycle workingDyCycle) {
+		final var endOfBayConfiguration =  configurationRepository.save(new ConfigurationImpl(1L, RuleKey.EndOfDay, "EndofDayBatch"));
+		
+		parameterRepository.deleteAll(endOfBayConfiguration);
+		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MaxSunUpTime, "00:01"));
+		System.out.println("1");
+		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MinSunDownTime, "17:15"));
+		System.out.println("2");
+		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.UpTime, "07:15"));
+		System.out.println("3");
+		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "07:15", nonWorkingDayCycle));
+		System.out.println("4");
+		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "05:30", workingDyCycle)); 
+		System.out.println("5"); 
+	}
+
+	
+	void deleteParameter(final Configuration configuration) {
+		parameterRepository.findByConfiguration(configuration).forEach(x ->{
+			parameterRepository.delete( x) ;
+			System.out.print("*********************");
+			});
 	}
 
 }

@@ -1,6 +1,7 @@
 package de.mq.iot2.calendar.support;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.data.repository.RepositoryDefinition;
 
@@ -11,5 +12,7 @@ public interface CycleRepository {
 	
 	Collection<Cycle>findByDefaultCycle(final boolean defaultCycle);
 	Cycle save(final Cycle cycle);
+	
+	Optional<Cycle> findById(final String id);
 
 }

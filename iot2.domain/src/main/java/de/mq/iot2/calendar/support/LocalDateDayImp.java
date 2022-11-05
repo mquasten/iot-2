@@ -3,6 +3,7 @@ package de.mq.iot2.calendar.support;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import org.springframework.util.Assert;
@@ -10,6 +11,7 @@ import org.springframework.util.Assert;
 import de.mq.iot2.calendar.DayGroup;
 
 @Entity(name = LocalDateDayImp.ENTITY_NAME)
+@DiscriminatorValue(LocalDateDayImp.ENTITY_NAME)
 class LocalDateDayImp extends AbstractDay<LocalDate> {
 	static final String ENTITY_NAME = "LocaldateDay";
 

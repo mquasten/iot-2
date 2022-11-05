@@ -42,7 +42,7 @@ class CalendarServiceImp implements CalendarService {
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
 	}
-
+ 
 	@Override
 	@Transactional
 	public void createDefaultCyclesGroupsAndDays() {

@@ -3,6 +3,7 @@ package de.mq.iot2.calendar.support;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import org.springframework.util.Assert;
@@ -10,6 +11,7 @@ import org.springframework.util.Assert;
 import de.mq.iot2.calendar.DayGroup;
 
 @Entity(name = DayOfWeekDayImpl.ENTITY_NAME)
+@DiscriminatorValue(DayOfWeekDayImpl.ENTITY_NAME)
 class DayOfWeekDayImpl extends AbstractDay<DayOfWeek> {
 
 	static final String ENTITY_NAME = "DayOfWeekDay";
