@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import org.springframework.util.Assert;
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Parameter;
+import de.mq.iot2.support.IdUtil;
 
 @Entity(name = "Parameter")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -38,11 +39,11 @@ abstract class AbstractParameter implements Parameter {
 
 	}
 
-	AbstractParameter(final String id, final Configuration configuration, final Key key, final String value) {
+	AbstractParameter(final Configuration configuration, final Key key, final String value) {
 		configurationRequiredGuard(configuration);
 		keyRequiredGuard(key);
 		valueRequiredGuard(value);
-		this.id = id;
+		this.id = IdUtil.id();
 		this.configuration = configuration;
 		this.key = key;
 		this.value = value;

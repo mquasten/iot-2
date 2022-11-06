@@ -14,7 +14,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Configuration.RuleKey;
-import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.RandomTestUtil;
 
 class ConfigurationImplTest {
@@ -31,7 +30,7 @@ class ConfigurationImplTest {
 
 		assertEquals(RuleKey.EndOfDay, configuration.key());
 		assertEquals(name, configuration.name());
-		assertEquals(new UUID(id, id), configuration.id());
+		assertEquals(new UUID(id, id).toString(), ReflectionTestUtils.getField(configuration, ID_FIELD_NAME));
 	}
 
 	@Test
@@ -46,8 +45,8 @@ class ConfigurationImplTest {
 
 		assertEquals(RuleKey.EndOfDay, configuration.key());
 		assertEquals(name, configuration.name());
-		assertNotNull(configuration.id());
-		assertNotEquals(new UUID(id, id), configuration.id());
+		assertNotNull(ReflectionTestUtils.getField(configuration, ID_FIELD_NAME));
+		assertNotEquals(new UUID(id, id).toString(), ReflectionTestUtils.getField(configuration, ID_FIELD_NAME));
 	}
 
 	@Test
@@ -72,16 +71,6 @@ class ConfigurationImplTest {
 
 		ReflectionTestUtils.setField(configuration, NAME_FIELD_NAME, name);
 		assertEquals(name, configuration.name());
-	}
-
-	@Test
-	void id() {
-		final var configuration = BeanUtils.instantiateClass(ConfigurationImpl.class);
-		assertThrows(IllegalArgumentException.class, configuration::id);
-
-		final var id = IdUtil.id();
-		ReflectionTestUtils.setField(configuration, ID_FIELD_NAME, id);
-		assertEquals(UUID.fromString(id), configuration.id());
 	}
 
 	@Test

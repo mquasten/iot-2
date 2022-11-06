@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-class IdUtilTest {
+class IdUtilTest { 
 
 	private static final Long LONG = Long.valueOf(18310613);
 	private static final String STRING = "James Clerk Maxwell";

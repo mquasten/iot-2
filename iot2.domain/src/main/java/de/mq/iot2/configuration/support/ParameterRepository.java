@@ -2,6 +2,8 @@ package de.mq.iot2.configuration.support;
 
 import java.util.Collection;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
 
 import de.mq.iot2.configuration.Configuration;
@@ -13,5 +15,7 @@ public interface ParameterRepository {
 
 	Parameter save(final Parameter parameter);
 
-	void delete(final Parameter parameter);
+	@Modifying
+	@Query("delete from Parameter p where configuration= ?1")
+	void deleteByConfiguration(final Configuration configuration);
 }

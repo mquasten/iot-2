@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -17,7 +15,7 @@ import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.RandomTestUtil;
 
-class AbstractParameterTest {
+class AbstractParameterTest { 
 
 	private static final String CONFIGURATION_FIELD_NAME = "configuration";
 	private static final String VALUE_FIELD_NAME = "value";
@@ -25,16 +23,23 @@ class AbstractParameterTest {
 	private static final String ID_FIELD_NAME = "id";
 	private static final String VALUE = RandomTestUtil.randomString();
 	private final Configuration configuration = Mockito.mock(Configuration.class);
-	private final String ID = IdUtil.id();
 
-	@ParameterizedTest
-	@EnumSource(Key.class)
-	void create(final Key key) {
+
+	
+	@Test
+	void create() {
+		final Key key= Key.MaxSunUpTime;
 		final var parameter = newParameter(configuration, key, VALUE);
 		assertEquals(VALUE, parameter.value());
 		assertEquals(key, parameter.key());
 		assertEquals(configuration, parameter.configuration());
-		assertEquals(ID, ReflectionTestUtils.getField(parameter, ID_FIELD_NAME));
+		assertEquals(compareableDigitsFromTimestamp(IdUtil.id()), compareableDigitsFromTimestamp((String) ReflectionTestUtils.getField(parameter, ID_FIELD_NAME)));
+	}
+	
+	private String compareableDigitsFromTimestamp(final String uuid) {
+		final var values = uuid.split("[-]");
+		final var last = values[values.length - 1];
+		return values[values.length - 2] +"-"+ last.substring(0, last.length() - 2);
 	}
 
 	@Test
@@ -121,7 +126,7 @@ class AbstractParameterTest {
 		assertFalse(otherParameter.equals(parameter));
 
 		ReflectionTestUtils.setField(parameter, CONFIGURATION_FIELD_NAME, configuration);
-		final var parameterOtherClass = new AbstractParameter(ID, configuration, Key.UpTime, VALUE) {
+		final var parameterOtherClass = new AbstractParameter(configuration, Key.UpTime, VALUE) {
 		};
 
 		assertFalse(parameterOtherClass.equals(parameter));
@@ -129,7 +134,7 @@ class AbstractParameterTest {
 
 	private Parameter newParameter(final Configuration configuration, final Key key, final String value) {
 
-		return new AbstractParameter(ID, configuration, key, value) {
+		return new AbstractParameter(configuration, key, value) {
 		};
 	}
 

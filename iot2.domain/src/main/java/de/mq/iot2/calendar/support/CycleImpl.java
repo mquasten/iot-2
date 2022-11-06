@@ -1,7 +1,5 @@
 package de.mq.iot2.calendar.support;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,7 +13,6 @@ import de.mq.iot2.support.IdUtil;
 public class CycleImpl implements Cycle {
 	private static final String NAME_IS_REQUIRED_MESSAGE = "Name is required.";
 
-	private static final String ID_IS_REQUIRED_MESSAGE = "Id is required.";
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
 	private String id;
@@ -77,11 +74,6 @@ public class CycleImpl implements Cycle {
 		return defaultCycle;
 	}
 
-	@Override
-	public UUID id() {
-		Assert.notNull(id, ID_IS_REQUIRED_MESSAGE);
-		return UUID.fromString(id);
-	}
 
 	@Override
 	public int hashCode() {

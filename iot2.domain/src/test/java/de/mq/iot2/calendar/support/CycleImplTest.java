@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
@@ -35,7 +33,7 @@ class CycleImplTest {
 
 		assertEquals(name, cycle.name());
 		assertEquals(priority, cycle.priority());
-		assertEquals(IdUtil.id(id), cycle.id().toString());
+		assertEquals(IdUtil.id(id), ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
 		assertFalse(cycle.isDeaultCycle());
 	}
 
@@ -45,7 +43,7 @@ class CycleImplTest {
 
 		assertEquals(name, cycle.name());
 		assertEquals(priority, cycle.priority());
-		assertEquals(IdUtil.id(id), cycle.id().toString());
+		assertEquals(IdUtil.id(id), ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
 		assertTrue(cycle.isDeaultCycle());
 	}
 
@@ -55,8 +53,8 @@ class CycleImplTest {
 
 		assertEquals(name, cycle.name());
 		assertEquals(priority, cycle.priority());
-		assertNotNull(cycle.id());
-		assertNotEquals(IdUtil.id(id), cycle.id().toString());
+		assertNotNull(ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
+		assertNotEquals(IdUtil.id(id), ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
 		assertFalse(cycle.isDeaultCycle());
 	}
 
@@ -66,8 +64,8 @@ class CycleImplTest {
 
 		assertEquals(name, cycle.name());
 		assertEquals(priority, cycle.priority());
-		assertNotNull(cycle.id());
-		assertNotEquals(IdUtil.id(id), cycle.id().toString());
+		assertNotNull(ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
+		assertNotEquals(IdUtil.id(id), ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
 		assertTrue(cycle.isDeaultCycle());
 	}
 
@@ -97,17 +95,6 @@ class CycleImplTest {
 
 		ReflectionTestUtils.setField(cycle, PRIORITY_FIELD_NAME, priority);
 		assertEquals(priority, cycle.priority());
-	}
-
-	@Test
-	void id() {
-		final var cycle = newWithDefaultConstructor();
-
-		assertThrows(IllegalArgumentException.class, cycle::id);
-
-		final var id = IdUtil.id();
-		ReflectionTestUtils.setField(cycle, ID_FIELD_NAME, id);
-		assertEquals(UUID.fromString(id), cycle.id());
 	}
 
 	@Test

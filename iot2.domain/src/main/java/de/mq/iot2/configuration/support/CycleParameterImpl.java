@@ -12,7 +12,6 @@ import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.support.CycleImpl;
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.CycleParameter;
-import de.mq.iot2.support.IdUtil;
 
 @Entity(name = "CycleParameter")
 @Table(name = "CYCLE_PARAMETER")
@@ -29,18 +28,12 @@ class CycleParameterImpl extends AbstractParameter implements CycleParameter {
 	}
 
 	CycleParameterImpl(final Configuration configuration, final Key key, final String value, final Cycle cycle) {
-		super(id(configuration, cycle, key), configuration, key, value);
+		super(configuration, key, value);
 		cycleRequiredGuard(cycle);
 		this.cycle = cycle;
 	}
 
-	private static String id(final Configuration configuration, Cycle cycle, final Key key) {
-		Assert.notNull(configuration, "Configuration is required.");
-		Assert.notNull(cycle, "Cycle is required.");
-		final var configurationId = configuration.id();
-		final var cycleId = cycle.id();
-		return IdUtil.id(configurationId.getLeastSignificantBits() + configurationId.getMostSignificantBits() + cycleId.getLeastSignificantBits() + cycleId.getMostSignificantBits(), key.name());
-	}
+	
 
 	private void cycleRequiredGuard(final Cycle cycle) {
 		Assert.notNull(cycle, "Cycle required.");

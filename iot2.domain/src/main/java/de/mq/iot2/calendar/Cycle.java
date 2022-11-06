@@ -1,6 +1,5 @@
 package de.mq.iot2.calendar;
 
-import java.util.UUID;
 
 public interface Cycle {
 	
@@ -10,6 +9,5 @@ public interface Cycle {
 
 	boolean isDeaultCycle();
 
-	UUID id();
 
 }

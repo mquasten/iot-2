@@ -5,10 +5,9 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.mq.iot2.configuration.Configuration;
-import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.support.CycleRepository;
+import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.support.IdUtil;
@@ -40,14 +39,13 @@ class ConfigurationServiceImpl implements ConfigurationService {
 
 	private void saveCleanUpConfiguration() {
 		final var cleanUpConfiguration = configurationRepository.save(new ConfigurationImpl(2L, RuleKey.CleanUp, "CleanUpBatch"));
-		deleteParameter(cleanUpConfiguration);
+		parameterRepository.deleteByConfiguration(cleanUpConfiguration);
 		parameterRepository.save(new ParameterImpl(cleanUpConfiguration, Key.DaysBack, "30"));
 	}
 
 	private void saveEndOfDayConfiguration(final Cycle nonWorkingDayCycle, final Cycle workingDyCycle) {
 		final var endOfBayConfiguration = configurationRepository.save(new ConfigurationImpl(1L, RuleKey.EndOfDay, "EndofDayBatch"));
-
-		deleteParameter(endOfBayConfiguration);
+		parameterRepository.deleteByConfiguration(endOfBayConfiguration);
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MaxSunUpTime, "00:01"));
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MinSunDownTime, "17:15"));
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.UpTime, "07:15"));
@@ -55,8 +53,6 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "05:30", workingDyCycle));
 	}
 
-	void deleteParameter(final Configuration configuration) {
-		parameterRepository.findByConfiguration(configuration).forEach(parameterRepository::delete);
-	}
+	
 
 }
