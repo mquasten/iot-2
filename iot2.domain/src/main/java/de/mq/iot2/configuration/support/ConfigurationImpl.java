@@ -1,5 +1,7 @@
 package de.mq.iot2.configuration.support;
 
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -59,6 +61,16 @@ class ConfigurationImpl implements Configuration {
 	public RuleKey key() {
 		keyRequiredGuard(key);
 		return key;
+	}
+
+	@Override
+	public UUID id() {
+		idRequiredGuard();
+		return UUID.fromString(id);
+	}
+
+	private void idRequiredGuard() {
+		Assert.notNull(id, "Id is required.");
 	}
 
 	@Override

@@ -25,6 +25,7 @@ class AbstractParameterTest {
 	private static final String ID_FIELD_NAME = "id";
 	private static final String VALUE = RandomTestUtil.randomString();
 	private final Configuration configuration = Mockito.mock(Configuration.class);
+	private final String ID = IdUtil.id();
 
 	@ParameterizedTest
 	@EnumSource(Key.class)
@@ -33,13 +34,7 @@ class AbstractParameterTest {
 		assertEquals(VALUE, parameter.value());
 		assertEquals(key, parameter.key());
 		assertEquals(configuration, parameter.configuration());
-		assertEquals(compareableDigitsFromTimestamp(IdUtil.id()), compareableDigitsFromTimestamp((String) ReflectionTestUtils.getField(parameter, ID_FIELD_NAME)));
-	}
-
-	private String compareableDigitsFromTimestamp(final String uuid) {
-		final var values = uuid.split("[-]");
-		final var last = values[values.length - 1];
-		return values[values.length - 2] + "-" + last.substring(0, last.length() - 2);
+		assertEquals(ID, ReflectionTestUtils.getField(parameter, ID_FIELD_NAME));
 	}
 
 	@Test
@@ -52,7 +47,7 @@ class AbstractParameterTest {
 	@Test
 	void key() {
 		final var parameter = newParameter();
-		
+
 		assertThrows(IllegalArgumentException.class, () -> parameter.key());
 
 		final var key = Key.DaysBack;
@@ -96,7 +91,7 @@ class AbstractParameterTest {
 	}
 
 	@Test
-	void equals()  {
+	void equals() {
 		final var parameter = newParameter();
 		final var otherParameter = newParameter();
 		assertFalse(parameter.equals(VALUE));
@@ -126,21 +121,22 @@ class AbstractParameterTest {
 		assertFalse(otherParameter.equals(parameter));
 
 		ReflectionTestUtils.setField(parameter, CONFIGURATION_FIELD_NAME, configuration);
-		final var parameterOtherClass =  new AbstractParameter(configuration, Key.UpTime, VALUE) {};
+		final var parameterOtherClass = new AbstractParameter(ID, configuration, Key.UpTime, VALUE) {
+		};
 
 		assertFalse(parameterOtherClass.equals(parameter));
 	}
 
-	private Parameter newParameter(final Configuration configuration, final Key key, final String value)   {
-		
-		return new AbstractParameter(configuration,key,value) {};
+	private Parameter newParameter(final Configuration configuration, final Key key, final String value) {
+
+		return new AbstractParameter(ID, configuration, key, value) {
+		};
 	}
-	
+
 	private Parameter newParameter() {
-		 return new AbstractParameter() {};
-		
+		return new AbstractParameter() {
+		};
+
 	}
-	
-	
 
 }

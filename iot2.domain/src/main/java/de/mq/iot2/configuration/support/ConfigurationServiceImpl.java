@@ -31,42 +31,32 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	@Transactional
 	public void createDefaultConfigurationsAndParameters() {
-		//parameterRepository.deleteAll();
-		final var  nonWorkingDayCycle = cycleRepository.findById(IdUtil.id(NON_WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException("Non Workingday Cycle not found."));	
-     	final var workingDayCycle = cycleRepository.findById(IdUtil.id(WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException("Workingday Cycle not found."));
-     	saveEndOfDayConfiguration(nonWorkingDayCycle, workingDayCycle);
-     	saveCleanUpConfiguration();
+
+		final var nonWorkingDayCycle = cycleRepository.findById(IdUtil.id(NON_WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException("Non Workingday Cycle not found."));
+		final var workingDayCycle = cycleRepository.findById(IdUtil.id(WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException("Workingday Cycle not found."));
+		saveEndOfDayConfiguration(nonWorkingDayCycle, workingDayCycle);
+		saveCleanUpConfiguration();
 	}
 
 	private void saveCleanUpConfiguration() {
-		final var cleanUpConfiguration =  configurationRepository.save(new ConfigurationImpl(2L, RuleKey.CleanUp, "CleanUpBatch"));
-		parameterRepository.deleteAll(cleanUpConfiguration);
+		final var cleanUpConfiguration = configurationRepository.save(new ConfigurationImpl(2L, RuleKey.CleanUp, "CleanUpBatch"));
+		deleteParameter(cleanUpConfiguration);
 		parameterRepository.save(new ParameterImpl(cleanUpConfiguration, Key.DaysBack, "30"));
-		System.out.println("6");
 	}
 
 	private void saveEndOfDayConfiguration(final Cycle nonWorkingDayCycle, final Cycle workingDyCycle) {
-		final var endOfBayConfiguration =  configurationRepository.save(new ConfigurationImpl(1L, RuleKey.EndOfDay, "EndofDayBatch"));
-		
-		parameterRepository.deleteAll(endOfBayConfiguration);
+		final var endOfBayConfiguration = configurationRepository.save(new ConfigurationImpl(1L, RuleKey.EndOfDay, "EndofDayBatch"));
+
+		deleteParameter(endOfBayConfiguration);
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MaxSunUpTime, "00:01"));
-		System.out.println("1");
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MinSunDownTime, "17:15"));
-		System.out.println("2");
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.UpTime, "07:15"));
-		System.out.println("3");
 		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "07:15", nonWorkingDayCycle));
-		System.out.println("4");
-		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "05:30", workingDyCycle)); 
-		System.out.println("5"); 
+		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "05:30", workingDyCycle));
 	}
 
-	
 	void deleteParameter(final Configuration configuration) {
-		parameterRepository.findByConfiguration(configuration).forEach(x ->{
-			parameterRepository.delete( x) ;
-			System.out.print("*********************");
-			});
+		parameterRepository.findByConfiguration(configuration).forEach(parameterRepository::delete);
 	}
 
 }

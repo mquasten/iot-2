@@ -10,17 +10,13 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 import org.springframework.util.Assert;
-
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Parameter;
-import de.mq.iot2.support.IdUtil;
 
-@Entity(name="Parameter")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-@Table(name="JPA_IS_FUCK")
+@Entity(name = "Parameter")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "PARAMETER_TYPE", length = 15)
 abstract class AbstractParameter implements Parameter {
 
@@ -35,18 +31,18 @@ abstract class AbstractParameter implements Parameter {
 	private String value;
 
 	@ManyToOne(targetEntity = ConfigurationImpl.class)
-	@JoinColumn(name = "CONFIGURATION_ID",nullable = false)
+	@JoinColumn(name = "CONFIGURATION_ID", nullable = false)
 	private Configuration configuration;
 
 	AbstractParameter() {
 
 	}
 
-	AbstractParameter(final Configuration configuration, final Key key, final String value) {
+	AbstractParameter(final String id, final Configuration configuration, final Key key, final String value) {
 		configurationRequiredGuard(configuration);
 		keyRequiredGuard(key);
 		valueRequiredGuard(value);
-		id = IdUtil.id();
+		this.id = id;
 		this.configuration = configuration;
 		this.key = key;
 		this.value = value;
@@ -93,10 +89,9 @@ abstract class AbstractParameter implements Parameter {
 	private boolean missingKeyFields(final AbstractParameter parameter) {
 		return (parameter.key == null) || (parameter.configuration == null);
 	}
-	
 
 	@Override
-	public  boolean equals(final Object object) {
+	public boolean equals(final Object object) {
 
 		if (!(object instanceof AbstractParameter)) {
 			return super.equals(object);
@@ -110,6 +105,5 @@ abstract class AbstractParameter implements Parameter {
 
 		return other.getClass().equals(getClass()) && other.key == key && other.configuration.equals(configuration);
 	}
-	
 
 }

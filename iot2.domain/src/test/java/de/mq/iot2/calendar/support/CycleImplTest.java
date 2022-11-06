@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
@@ -33,17 +35,17 @@ class CycleImplTest {
 
 		assertEquals(name, cycle.name());
 		assertEquals(priority, cycle.priority());
-		assertEquals(IdUtil.id(id), ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
+		assertEquals(IdUtil.id(id), cycle.id().toString());
 		assertFalse(cycle.isDeaultCycle());
 	}
-	
+
 	@Test
 	void createWithDefaultCycle() {
-		final var cycle = new CycleImpl(id, name, priority,true);
+		final var cycle = new CycleImpl(id, name, priority, true);
 
 		assertEquals(name, cycle.name());
 		assertEquals(priority, cycle.priority());
-		assertEquals(IdUtil.id(id), ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
+		assertEquals(IdUtil.id(id), cycle.id().toString());
 		assertTrue(cycle.isDeaultCycle());
 	}
 
@@ -53,19 +55,19 @@ class CycleImplTest {
 
 		assertEquals(name, cycle.name());
 		assertEquals(priority, cycle.priority());
-		assertNotNull(ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
-		assertNotEquals(IdUtil.id(id), ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
+		assertNotNull(cycle.id());
+		assertNotEquals(IdUtil.id(id), cycle.id().toString());
 		assertFalse(cycle.isDeaultCycle());
 	}
-	
+
 	@Test
 	void createRandomIdithDefaultCycle() {
-		final var cycle = new CycleImpl(name, priority,true);
+		final var cycle = new CycleImpl(name, priority, true);
 
 		assertEquals(name, cycle.name());
 		assertEquals(priority, cycle.priority());
-		assertNotNull(ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
-		assertNotEquals(IdUtil.id(id), ReflectionTestUtils.getField(cycle, ID_FIELD_NAME));
+		assertNotNull(cycle.id());
+		assertNotEquals(IdUtil.id(id), cycle.id().toString());
 		assertTrue(cycle.isDeaultCycle());
 	}
 
@@ -76,25 +78,36 @@ class CycleImplTest {
 	void createNameEmpty(final String value) {
 		assertThrows(IllegalArgumentException.class, () -> new CycleImpl(value, priority));
 	}
-	
+
 	@Test
 	void name() {
 		final var cycle = newWithDefaultConstructor();
-		
+
 		assertTrue(cycle.name().isEmpty());
-		
+
 		ReflectionTestUtils.setField(cycle, NAME_FIELD_NAME, name);
 		assertEquals(name, cycle.name());
 	}
-	
+
 	@Test
 	void priority() {
 		final var cycle = newWithDefaultConstructor();
-		
-		assertEquals(Integer.MAX_VALUE,cycle.priority());
-		
+
+		assertEquals(Integer.MAX_VALUE, cycle.priority());
+
 		ReflectionTestUtils.setField(cycle, PRIORITY_FIELD_NAME, priority);
 		assertEquals(priority, cycle.priority());
+	}
+
+	@Test
+	void id() {
+		final var cycle = newWithDefaultConstructor();
+
+		assertThrows(IllegalArgumentException.class, cycle::id);
+
+		final var id = IdUtil.id();
+		ReflectionTestUtils.setField(cycle, ID_FIELD_NAME, id);
+		assertEquals(UUID.fromString(id), cycle.id());
 	}
 
 	@Test
@@ -120,7 +133,7 @@ class CycleImplTest {
 
 		assertTrue(cycle.equals(cycle));
 		assertFalse(cycle.equals(other));
-		assertFalse(cycle.equals(ID_FIELD_NAME));
+		assertFalse(cycle.equals(NAME_FIELD_NAME));
 
 		ReflectionTestUtils.setField(cycle, NAME_FIELD_NAME, name);
 		assertFalse(cycle.equals(other));

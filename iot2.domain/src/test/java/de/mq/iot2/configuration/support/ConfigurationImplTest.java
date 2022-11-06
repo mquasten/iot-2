@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -15,13 +14,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Configuration.RuleKey;
+import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.RandomTestUtil;
 
 class ConfigurationImplTest {
 
+	private static final String ID_FIELD_NAME = "id";
 	private static final String NAME_FIELD_NAME = "name";
 	private static final String KEY_FIELD_NAME = "key";
-	private static final String ID_FIELD_NAME = "id";
 	private final long id = RandomTestUtil.randomLong();
 	private final String name = RandomTestUtil.randomString();
 
@@ -31,7 +31,7 @@ class ConfigurationImplTest {
 
 		assertEquals(RuleKey.EndOfDay, configuration.key());
 		assertEquals(name, configuration.name());
-		assertEquals(new UUID(id, id).toString(), ReflectionTestUtils.getField(configuration, ID_FIELD_NAME));
+		assertEquals(new UUID(id, id), configuration.id());
 	}
 
 	@Test
@@ -46,9 +46,8 @@ class ConfigurationImplTest {
 
 		assertEquals(RuleKey.EndOfDay, configuration.key());
 		assertEquals(name, configuration.name());
-		final var uuid = ReflectionTestUtils.getField(configuration, ID_FIELD_NAME);
-		assertNotNull(uuid);
-		assertNotEquals(new UUID(id, id).toString(), uuid);
+		assertNotNull(configuration.id());
+		assertNotEquals(new UUID(id, id), configuration.id());
 	}
 
 	@Test
@@ -59,7 +58,7 @@ class ConfigurationImplTest {
 
 	@Test
 	void key() {
-		final Configuration configuration = BeanUtils.instantiateClass(ConfigurationImpl.class);
+		final var configuration = BeanUtils.instantiateClass(ConfigurationImpl.class);
 		assertThrows(IllegalArgumentException.class, () -> configuration.key());
 
 		ReflectionTestUtils.setField(configuration, KEY_FIELD_NAME, RuleKey.EndOfDay);
@@ -68,11 +67,21 @@ class ConfigurationImplTest {
 
 	@Test
 	void name() {
-		final Configuration configuration = BeanUtils.instantiateClass(ConfigurationImpl.class);
+		final var configuration = BeanUtils.instantiateClass(ConfigurationImpl.class);
 		assertTrue(configuration.name().isEmpty());
 
 		ReflectionTestUtils.setField(configuration, NAME_FIELD_NAME, name);
 		assertEquals(name, configuration.name());
+	}
+
+	@Test
+	void id() {
+		final var configuration = BeanUtils.instantiateClass(ConfigurationImpl.class);
+		assertThrows(IllegalArgumentException.class, configuration::id);
+
+		final var id = IdUtil.id();
+		ReflectionTestUtils.setField(configuration, ID_FIELD_NAME, id);
+		assertEquals(UUID.fromString(id), configuration.id());
 	}
 
 	@Test

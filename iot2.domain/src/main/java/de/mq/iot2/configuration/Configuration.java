@@ -1,5 +1,7 @@
 package de.mq.iot2.configuration;
 
+import java.util.UUID;
+
 public interface Configuration {
 	
 	public enum RuleKey {
@@ -10,5 +12,7 @@ public interface Configuration {
 	RuleKey key();
 
 	String name();
+
+	UUID id();
 
 }
