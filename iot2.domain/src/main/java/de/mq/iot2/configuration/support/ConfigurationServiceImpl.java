@@ -15,8 +15,11 @@ import de.mq.iot2.support.IdUtil;
 @Service
 class ConfigurationServiceImpl implements ConfigurationService {
 
-	private static final long WORKING_DAY_CYCLE_ID = 2L;
-	private static final long NON_WORKING_DAY_CYCLE_ID = 1L;
+	static final String NON_WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE = "Non Workingday Cycle not found.";
+	static final String WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE = "Workingday Cycle not found.";
+	private static final long CLEAN_UP_CONFIGURATION_ID = 2L;
+	static final long WORKING_DAY_CYCLE_ID = 2L;
+	static final long NON_WORKING_DAY_CYCLE_ID = 1L;
 	private final ConfigurationRepository configurationRepository;
 	private final ParameterRepository parameterRepository;
 	private final CycleRepository cycleRepository;
@@ -31,14 +34,14 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	@Transactional
 	public void createDefaultConfigurationsAndParameters() {
 
-		final var nonWorkingDayCycle = cycleRepository.findById(IdUtil.id(NON_WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException("Non Workingday Cycle not found."));
-		final var workingDayCycle = cycleRepository.findById(IdUtil.id(WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException("Workingday Cycle not found."));
+		final var nonWorkingDayCycle = cycleRepository.findById(IdUtil.id(NON_WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException(NON_WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE));
+		final var workingDayCycle = cycleRepository.findById(IdUtil.id(WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException(WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE));
 		saveEndOfDayConfiguration(nonWorkingDayCycle, workingDayCycle);
 		saveCleanUpConfiguration();
 	}
 
 	private void saveCleanUpConfiguration() {
-		final var cleanUpConfiguration = configurationRepository.save(new ConfigurationImpl(2L, RuleKey.CleanUp, "CleanUpBatch"));
+		final var cleanUpConfiguration = configurationRepository.save(new ConfigurationImpl(CLEAN_UP_CONFIGURATION_ID, RuleKey.CleanUp, "CleanUpBatch"));
 		parameterRepository.deleteByConfiguration(cleanUpConfiguration);
 		parameterRepository.save(new ParameterImpl(cleanUpConfiguration, Key.DaysBack, "30"));
 	}
