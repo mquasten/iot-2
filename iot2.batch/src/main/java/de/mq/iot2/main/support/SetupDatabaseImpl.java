@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.configuration.ConfigurationService;
-import de.mq.iot2.main.SpringBootConsoleApplication;
+import de.mq.iot2.main.AbstractSpringBootConsoleApplication;
 
 @Service
 class SetupDatabaseImpl {
 
-	private static Logger LOG = LoggerFactory.getLogger(SpringBootConsoleApplication.class);
+	private static Logger LOG = LoggerFactory.getLogger(AbstractSpringBootConsoleApplication.class);
 
 	private final CalendarService calendarService;
 	private final ConfigurationService configurationService;

@@ -31,10 +31,9 @@ public class SimpleReflectionCommandLineRunner implements CommandLineRunner {
 	@Override
 	public final void run(final String... args) throws Exception {
 		final var arguments = (ReflectionCommandLineRunnerArgumentsImpl) SerializationUtils.deserialize(Base64Utils.decodeFromString(args[0]));
-		
+
 		final var bean = applicationContext.getBean(arguments.getExecutedBean());
-		final Method method = ReflectionUtils.findMethod(arguments.getExecutedBean(), arguments.getMethodName(),
-				arguments.getParameterTypes());
+		final Method method = ReflectionUtils.findMethod(arguments.getExecutedBean(), arguments.getMethodName(), arguments.getParameterTypes());
 		Assert.notNull(method, "Method not found.");
 		method.setAccessible(true);
 		ReflectionUtils.invokeMethod(method, bean, arguments.getParameterValues());

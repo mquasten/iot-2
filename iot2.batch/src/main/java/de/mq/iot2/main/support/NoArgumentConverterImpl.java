@@ -9,7 +9,7 @@ class NoArgumentConverterImpl implements Converter<List<String>, Object[]> {
 
 	@Override
 	public Object[] convert(final List<String> argList) {
-	
+
 		Assert.isTrue(argList.isEmpty(), "No Arguments expected.");
 		return new Object[] {};
 	}

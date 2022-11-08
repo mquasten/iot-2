@@ -21,15 +21,14 @@ import de.mq.iot2.main.support.ReflectionCommandLineRunnerArgumentsImpl;
 import de.mq.iot2.main.support.ScanUtil;
 import de.mq.iot2.main.support.SimpleReflectionCommandLineRunner;
 
-public class SpringBootConsoleApplication {
+public abstract class AbstractSpringBootConsoleApplication {
 
 	public static final void main(final String[] args) throws Exception {
 		process(args, SimpleReflectionCommandLineRunner.class);
 	}
 
-	private static void process(final String[] args, final Class<?> primarySource ) {
-		final Map<String, Method> methods = ScanUtil
-				.findBatchMethods(SimpleReflectionCommandLineRunner.COMPONENT_SCAN_BASE_PACKAGE);
+	static void process(final String[] args, final Class<?> primarySource) {
+		final Map<String, Method> methods = ScanUtil.findBatchMethods(SimpleReflectionCommandLineRunner.COMPONENT_SCAN_BASE_PACKAGE);
 		final var options = new Options();
 		try {
 			final var cmd = parser(options, args, methods.keySet());
@@ -37,37 +36,24 @@ public class SpringBootConsoleApplication {
 			final Method method = methods.get(commandAsString);
 			final BatchMethod declaredAnnotation = method.getDeclaredAnnotation(BatchMethod.class);
 
-			final Object[] convertedArgs = BeanUtils.instantiateClass(declaredAnnotation.converterClass())
-					.convert(cmd.getArgList());
+			final Object[] convertedArgs = BeanUtils.instantiateClass(declaredAnnotation.converterClass()).convert(cmd.getArgList());
 
-			if (method.getParameterCount() != convertedArgs.length) {
-				throw new ParseException(String.format(
-						"Number of Parameters in %s and returned number of Aruments from Concerter %s are different.",
-						method.getName(), declaredAnnotation.converterClass()));
-			}
-
-			SpringApplication.run(primarySource, Base64Utils.encodeToString(
-					SerializationUtils.serialize(new ReflectionCommandLineRunnerArgumentsImpl(method, convertedArgs))));
-		} catch (final ParseException exception) {
+			ReflectionCommandLineRunnerArgumentsImpl commandLineRunnerArguments = new ReflectionCommandLineRunnerArgumentsImpl(method, convertedArgs);
+			SpringApplication.run(primarySource, Base64Utils.encodeToString(SerializationUtils.serialize(commandLineRunnerArguments)));
+		} catch (final Exception exception) {
 			final HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("java -jar <file> [OPTION]... [ARGUMENT]...", options);
 			System.err.println("\n" + exception.getMessage());
 		}
 	}
 
-	private static CommandLine parser(final Options options, final String[] args, Collection<String> commands)
-			throws ParseException {
-		options.addOption(Option.builder("c").hasArg().required()
-				.desc(String.format("command: %s", StringUtils.collectionToDelimitedString(commands, "|")))
-				.argName("command").build());
+	private static CommandLine parser(final Options options, final String[] args, Collection<String> commands) throws ParseException {
+		options.addOption(Option.builder("c").hasArg().required().desc(String.format("command: %s", StringUtils.collectionToDelimitedString(commands, "|"))).argName("command").build());
 		final var parser = new DefaultParser();
 		return parser.parse(options, args);
 	}
 
 	private static final String command(final CommandLine cmd, Collection<String> commands) throws ParseException {
-		if (!cmd.hasOption("c")) {
-			throw new ParseException("Command missing.");
-		}
 		final var command = cmd.getOptionValue("c");
 		if (!commands.contains(command)) {
 			throw new ParseException("Command is not defined.");

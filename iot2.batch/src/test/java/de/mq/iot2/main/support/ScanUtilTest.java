@@ -14,31 +14,31 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.util.ReflectionUtils;
 
 class ScanUtilTest {
-	
+
 	@Test
 	void findBatchMethods() {
-		final var packageName =getClass().getPackage().getName();
-		
+		final var packageName = getClass().getPackage().getName();
+
 		final var results = ScanUtil.findBatchMethods(packageName);
-		
-		assertEquals(2 , results.size());
+
+		assertEquals(2, results.size());
 		assertTrue(List.of("end-of-day", "setup").containsAll(results.keySet()));
-		results.values().forEach(method -> { 
+		results.values().forEach(method -> {
 			List.of(SetupDatabaseImpl.class, EndOfDayBatchImpl.class).contains(method.getDeclaringClass());
-			assertEquals(ReflectionUtils.findMethod(method.getDeclaringClass(), method.getName(),method.getParameterTypes()), method);
+			assertEquals(ReflectionUtils.findMethod(method.getDeclaringClass(), method.getName(), method.getParameterTypes()), method);
 			assertTrue(method.isAnnotationPresent(BatchMethod.class));
 		});
 	}
 
 	@Test
-	void findBatchMethodsClassCastException()  {
-		final var packageName =getClass().getPackage().getName();
-		final var provider =  Mockito.mock(ClassPathScanningCandidateComponentProvider.class);
-		BeanDefinition beanDefinition =  Mockito.mock(BeanDefinition.class);
+	void findBatchMethodsClassCastException() {
+		final var packageName = getClass().getPackage().getName();
+		final var provider = Mockito.mock(ClassPathScanningCandidateComponentProvider.class);
+		BeanDefinition beanDefinition = Mockito.mock(BeanDefinition.class);
 		Mockito.when(beanDefinition.getBeanClassName()).thenReturn("invalid");
 		Mockito.when(provider.findCandidateComponents(packageName)).thenReturn(Set.of(beanDefinition));
-		
+
 		assertTrue(assertThrows(IllegalStateException.class, () -> ScanUtil.findBatchMethods(packageName, provider)).getCause() instanceof ClassNotFoundException);
 	}
-	
+
 }

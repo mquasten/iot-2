@@ -22,8 +22,7 @@ public interface ScanUtil {
 		return provider;
 	}
 
-	static Map<String, Method> findBatchMethods(final String packageName,
-			final ClassPathScanningCandidateComponentProvider provider) {
+	static Map<String, Method> findBatchMethods(final String packageName, final ClassPathScanningCandidateComponentProvider provider) {
 
 		final Map<String, Method> methods = new HashMap<>();
 		provider.findCandidateComponents(packageName).forEach(bd -> addIfAnnotated(bd, methods));

@@ -17,6 +17,7 @@ import org.springframework.core.convert.converter.Converter;
 public @interface BatchMethod {
 
 	String value();
+
 	Class<? extends Converter<List<String>, Object[]>> converterClass() default NoArgumentConverterImpl.class;
 
 }

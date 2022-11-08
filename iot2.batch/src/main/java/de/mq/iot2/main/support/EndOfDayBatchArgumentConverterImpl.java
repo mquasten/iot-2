@@ -26,8 +26,7 @@ class EndOfDayBatchArgumentConverterImpl implements Converter<List<String>, Obje
 	}
 
 	private LocalDate localDate(final String dateString) {
-		return LocalDate.parse(dateString,
-				DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.GERMAN));
+		return LocalDate.parse(dateString, DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.GERMAN));
 	}
 
 }
