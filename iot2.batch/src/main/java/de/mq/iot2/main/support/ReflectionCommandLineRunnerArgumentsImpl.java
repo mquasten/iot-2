@@ -1,9 +1,9 @@
-package de.mq.iot2.main;
+package de.mq.iot2.main.support;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
-public class ReflectionCommandLineRunnerArguments implements Serializable {
+public class ReflectionCommandLineRunnerArgumentsImpl implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private Class<?> executedBean;
@@ -14,11 +14,11 @@ public class ReflectionCommandLineRunnerArguments implements Serializable {
 	
 	private Object[] parameterValues;
 	
-	public ReflectionCommandLineRunnerArguments(){
+	public ReflectionCommandLineRunnerArgumentsImpl(){
 		
 	}
 	
-	public ReflectionCommandLineRunnerArguments(final Method method, final Object[] parameterValues ){
+	public ReflectionCommandLineRunnerArgumentsImpl(final Method method, final Object[] parameterValues ){
 		executedBean=method.getDeclaringClass();
 		methodName=method.getName();
 		parameterTypes=method.getParameterTypes();

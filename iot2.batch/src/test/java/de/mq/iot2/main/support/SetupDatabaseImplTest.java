@@ -11,11 +11,11 @@ class SetupDatabaseImplTest {
 	private final CalendarService calendarService = Mockito.mock(CalendarService.class);
 	private final ConfigurationService configurationService = Mockito.mock(ConfigurationService.class);
 
-	private final SetupDatabase setupDatabase = new SetupDatabase(calendarService, configurationService);
+	private final SetupDatabaseImpl setupDatabaseImpl = new SetupDatabaseImpl(calendarService, configurationService);
 
 	@Test
 	void run() throws Exception {
-		setupDatabase.execute();
+		setupDatabaseImpl.execute();
 
 		Mockito.verify(calendarService).createDefaultCyclesGroupsAndDays();
 		Mockito.verify(configurationService).createDefaultConfigurationsAndParameters();

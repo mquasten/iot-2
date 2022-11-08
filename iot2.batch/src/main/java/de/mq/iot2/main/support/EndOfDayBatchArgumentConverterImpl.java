@@ -10,19 +10,19 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.util.Assert;
 
-public class EndOfDayBatchArgumentConverter implements Converter<List<String>, Object[]> {
+class EndOfDayBatchArgumentConverterImpl implements Converter<List<String>, Object[]> {
 
 	@Override
 	public Object[] convert(final List<String> objects) {
 
-		Assert.isTrue(objects.size() <= 1, "EndOfDayBatch has 1 optional Parameter.");
+		Assert.isTrue(objects.size() <= 1, "EndOfDayBatchImpl has 1 optional Parameter.");
 		final String value = DataAccessUtils.singleResult(objects);
 
-		if (value == null ) {
-			return new Object[] {LocalDate.now().plusDays(1)};
+		if (value == null) {
+			return new Object[] { LocalDate.now().plusDays(1) };
 		}
 
-		return new Object[] {localDate(value) };
+		return new Object[] { localDate(value) };
 	}
 
 	private LocalDate localDate(final String dateString) {

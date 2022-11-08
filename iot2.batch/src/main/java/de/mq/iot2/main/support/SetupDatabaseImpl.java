@@ -9,14 +9,14 @@ import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.main.SpringBootConsoleApplication;
 
 @Service
-class SetupDatabase {
+class SetupDatabaseImpl {
 
 	private static Logger LOG = LoggerFactory.getLogger(SpringBootConsoleApplication.class);
 
 	private final CalendarService calendarService;
 	private final ConfigurationService configurationService;
 
-	SetupDatabase(final CalendarService calendarService, final ConfigurationService configurationService) {
+	SetupDatabaseImpl(final CalendarService calendarService, final ConfigurationService configurationService) {
 		this.calendarService = calendarService;
 		this.configurationService = configurationService;
 	}

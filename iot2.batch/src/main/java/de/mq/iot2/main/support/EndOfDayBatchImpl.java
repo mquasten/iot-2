@@ -7,15 +7,15 @@ import org.springframework.stereotype.Service;
 import de.mq.iot2.calendar.CalendarService;
 
 @Service
-public class EndOfDayBatch  {
+public class EndOfDayBatchImpl  {
 
 	private final CalendarService calendarService;
 
-	EndOfDayBatch(final CalendarService calendarService) {
+	EndOfDayBatchImpl(final CalendarService calendarService) {
 		this.calendarService = calendarService;
 	}
 
-	@BatchMethod(value="end-of-day", converterClass = EndOfDayBatchArgumentConverter.class)
+	@BatchMethod(value="end-of-day", converterClass = EndOfDayBatchArgumentConverterImpl.class)
 	final void execute(final LocalDate date) {
 		
 		System.out.println("Use date:" + date);

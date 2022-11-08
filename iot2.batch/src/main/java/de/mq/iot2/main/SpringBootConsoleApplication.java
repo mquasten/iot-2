@@ -11,39 +11,25 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.springframework.beans.BeanUtils;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.util.Assert;
 import org.springframework.util.Base64Utils;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 
 import de.mq.iot2.main.support.BatchMethod;
+import de.mq.iot2.main.support.ReflectionCommandLineRunnerArgumentsImpl;
 import de.mq.iot2.main.support.ScanUtil;
+import de.mq.iot2.main.support.SimpleReflectionCommandLineRunner;
 
-@SpringBootApplication
-@EnableJpaRepositories("de.mq.iot2")
-@EntityScan(basePackages = "de.mq.iot2")
-@ComponentScan(basePackages = SpringBootConsoleApplication.COMPONENT_SCAN_BASE_PACKAGE)
-@EnableTransactionManagement()
-public class SpringBootConsoleApplication implements CommandLineRunner {
-
-	static final String COMPONENT_SCAN_BASE_PACKAGE = "de.mq.iot2";
-	private final ApplicationContext applicationContext;
-
-	SpringBootConsoleApplication(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
-	}
+public class SpringBootConsoleApplication {
 
 	public static final void main(final String[] args) throws Exception {
-		final Map<String, Method> methods = ScanUtil.findBatchMethods(COMPONENT_SCAN_BASE_PACKAGE);
+		process(args, SimpleReflectionCommandLineRunner.class);
+	}
+
+	private static void process(final String[] args, final Class<?> primarySource ) {
+		final Map<String, Method> methods = ScanUtil
+				.findBatchMethods(SimpleReflectionCommandLineRunner.COMPONENT_SCAN_BASE_PACKAGE);
 		final var options = new Options();
 		try {
 			final var cmd = parser(options, args, methods.keySet());
@@ -51,14 +37,17 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 			final Method method = methods.get(commandAsString);
 			final BatchMethod declaredAnnotation = method.getDeclaredAnnotation(BatchMethod.class);
 
-			final Object[] convertedArgs = BeanUtils.instantiateClass(declaredAnnotation.converterClass()).convert(cmd.getArgList());
-		
+			final Object[] convertedArgs = BeanUtils.instantiateClass(declaredAnnotation.converterClass())
+					.convert(cmd.getArgList());
+
 			if (method.getParameterCount() != convertedArgs.length) {
-				throw new ParseException(
-						String.format("Number of Parameters in %s and returned number of Aruments from Concerter %s are different.", method.getName(), declaredAnnotation.converterClass()));
+				throw new ParseException(String.format(
+						"Number of Parameters in %s and returned number of Aruments from Concerter %s are different.",
+						method.getName(), declaredAnnotation.converterClass()));
 			}
-			
-			SpringApplication.run(SpringBootConsoleApplication.class, Base64Utils.encodeToString(SerializationUtils.serialize(new ReflectionCommandLineRunnerArguments(method, convertedArgs))));
+
+			SpringApplication.run(primarySource, Base64Utils.encodeToString(
+					SerializationUtils.serialize(new ReflectionCommandLineRunnerArgumentsImpl(method, convertedArgs))));
 		} catch (final ParseException exception) {
 			final HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("java -jar <file> [OPTION]... [ARGUMENT]...", options);
@@ -66,8 +55,11 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 		}
 	}
 
-	private static CommandLine parser(final Options options, final String[] args, Collection<String> commands) throws ParseException {
-		options.addOption(Option.builder("c").hasArg().required().desc(String.format("command: %s", StringUtils.collectionToDelimitedString(commands, "|"))).argName("command").build());
+	private static CommandLine parser(final Options options, final String[] args, Collection<String> commands)
+			throws ParseException {
+		options.addOption(Option.builder("c").hasArg().required()
+				.desc(String.format("command: %s", StringUtils.collectionToDelimitedString(commands, "|")))
+				.argName("command").build());
 		final var parser = new DefaultParser();
 		return parser.parse(options, args);
 	}
@@ -83,17 +75,6 @@ public class SpringBootConsoleApplication implements CommandLineRunner {
 
 		return cmd.getOptionValue("c");
 
-	}
-
-	@Override
-	public void run(final String... args) throws Exception {
-		var arguments= 	(ReflectionCommandLineRunnerArguments) SerializationUtils.deserialize(Base64Utils.decodeFromString(args[0]));
-	
-		final var bean = applicationContext.getBean(arguments.getExecutedBean());
-		final Method method = ReflectionUtils.findMethod(arguments.getExecutedBean(), arguments.getMethodName(), arguments.getParameterTypes());
-		Assert.notNull(method, "Method not found.");
-		method.setAccessible(true);
-		ReflectionUtils.invokeMethod(method,bean, arguments.getParameterValues());
 	}
 
 }

@@ -11,36 +11,41 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
 
 public interface ScanUtil {
-	
-	 static Map<String, Method>  findBatchMethods(final String packageName) {
-		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
-		provider.addIncludeFilter(new AnnotationTypeFilter(Service.class));
-		final Map<String, Method> methods = new HashMap<>();
-		provider.findCandidateComponents(packageName).forEach(bd ->  addIfAnnotated(bd, methods));		
-				
-		return methods;
-		
-		 
-		
+
+	static Map<String, Method> findBatchMethods(final String packageName) {
+		return findBatchMethods(packageName, providerForServiceAnnotation());
 	}
-	
-	 private static void  addIfAnnotated (final BeanDefinition beanDefinition, final Map<String,Method> methods) {
+
+	private static ClassPathScanningCandidateComponentProvider providerForServiceAnnotation() {
+		final var provider = new ClassPathScanningCandidateComponentProvider(false);
+		provider.addIncludeFilter(new AnnotationTypeFilter(Service.class));
+		return provider;
+	}
+
+	static Map<String, Method> findBatchMethods(final String packageName,
+			final ClassPathScanningCandidateComponentProvider provider) {
+
+		final Map<String, Method> methods = new HashMap<>();
+		provider.findCandidateComponents(packageName).forEach(bd -> addIfAnnotated(bd, methods));
+
+		return methods;
+
+	}
+
+	private static void addIfAnnotated(final BeanDefinition beanDefinition, final Map<String, Method> methods) {
 		try {
 			final Class<?> clazz = Class.forName(beanDefinition.getBeanClassName());
-			for(final Method method :  Arrays.asList(clazz.getDeclaredMethods() )) {
-				
-				if (method.isAnnotationPresent(BatchMethod.class)){
-					methods.put(method.getDeclaredAnnotation(BatchMethod.class).value(),method);
-					return;
+			for (final Method method : Arrays.asList(clazz.getDeclaredMethods())) {
+
+				if (method.isAnnotationPresent(BatchMethod.class)) {
+					methods.put(method.getDeclaredAnnotation(BatchMethod.class).value(), method);
 				}
 			}
-			
-	
-		
+
 		} catch (final ClassNotFoundException ex) {
 			throw new IllegalStateException(ex);
 		}
-		
+
 	}
 
 }
