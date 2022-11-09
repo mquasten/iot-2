@@ -83,6 +83,7 @@ class CalendarServiceImp implements CalendarService {
 	}
 
 	@Override
+	@Transactional
 	public Cycle cycle(final LocalDate date) {
 		final var defaultCycle = DataAccessUtils.requiredSingleResult(cycleRepository.findByDefaultCycle(true));
 

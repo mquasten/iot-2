@@ -17,6 +17,7 @@ import javax.persistence.EntityNotFoundException;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.support.CycleRepository;
@@ -36,7 +37,8 @@ class ConfigurationServiceImplTest {
 	private final ConfigurationRepository configurationRepository = Mockito.mock(ConfigurationRepository.class);
 	private final ParameterRepository parameterRepository = Mockito.mock(ParameterRepository.class);
 
-	private final ConfigurationService configurationService = new ConfigurationServiceImpl(configurationRepository, parameterRepository, cycleRepository);
+
+	private final ConfigurationService configurationService = new ConfigurationServiceImpl(configurationRepository, parameterRepository, cycleRepository, new DefaultConversionService());
 
 	@Test
 	void createDefaultConfigurationsAndParameters() {
