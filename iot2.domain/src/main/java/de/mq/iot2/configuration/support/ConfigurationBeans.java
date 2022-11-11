@@ -8,13 +8,11 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 
 @Configuration
-class ConfigurationSpringConfiguration{
+class ConfigurationBeans {
 	@Bean
 	ConversionService conversionService() {
-		DefaultConversionService conversionService= new DefaultConversionService();
-		conversionService.addConverter(String.class, LocalTime.class, source -> {
-			return LocalTime.parse(source);
-		});
+		final var conversionService = new DefaultConversionService();
+		conversionService.addConverter(String.class, LocalTime.class, LocalTime::parse);
 		return conversionService;
 	}
 

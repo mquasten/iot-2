@@ -27,7 +27,7 @@ import de.mq.iot2.support.IdUtil;
 class ConfigurationServiceImpl implements ConfigurationService {
 
 	static final String NON_WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE = "Non Workingday Cycle not found.";
-	private final String CYCLE_KEY_NOT_FOUND_MESSAGE_PATTERN = "Cycle with key %s not found.";
+	static final String CYCLE_KEY_NOT_FOUND_MESSAGE_PATTERN = "Cycle with key %s not found.";
 	static final String WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE = "Workingday Cycle not found.";
 	private static final long CLEAN_UP_CONFIGURATION_ID = 2L;
 	static final long WORKING_DAY_CYCLE_ID = 2L;
@@ -74,14 +74,14 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	@Transactional
 	@Override
 	public Map<Key, ? extends Object> parameters(final RuleKey ruleKey, final Cycle cycle) {
-		Assert.notNull(cycle, "Key is required");
+		Assert.notNull(ruleKey, "Key is required");
 		Assert.notNull(cycle, "Cycle is required");
 		final var configuration = configurationRepository.findByKey(ruleKey).orElseThrow(() -> new EntityNotFoundException(String.format(CYCLE_KEY_NOT_FOUND_MESSAGE_PATTERN, ruleKey)));
 
 		final Collection<? extends Parameter> parameters = parameterRepository.findByConfiguration(configuration);
 
 		final Map<Key, Parameter> cycleParameters = parameters.stream().filter(parameter -> parameter instanceof CycleParameter).filter(parameter -> ((CycleParameter) parameter).cycle().equals(cycle))
-				.collect(Collectors.toMap(Parameter::key, parameter-> parameter));
+				.collect(Collectors.toMap(Parameter::key, parameter -> parameter));
 
 		final Collection<Parameter> globalParameters = parameters.stream().filter(parameter -> !cycleParameters.containsKey(parameter.key())).collect(Collectors.toList());
 
