@@ -9,7 +9,7 @@ public interface CalendarService {
 		Summer(2);
 		
 		private final int offset;
-		TimeType(int offset){
+		TimeType(final int offset){
 			this.offset=offset;
 		}
 		
@@ -21,15 +21,37 @@ public interface CalendarService {
 			return offset;
 		}
 	}
+	
+	public enum TwilightType {
+		Mathematical(-50d),
+		Civil(-6d),
+		Nautical(-12d),
+		Astronomical(-18d);
+		
+		private final double elevation;
+		
+		TwilightType(final double elevation){
+			this.elevation=elevation;
+		}
+		/**
+		 * Elevation Horizont in Winkelminuten. Ist < 0.
+		 * @param elevation
+		 */
+	    public final double horizonElevationInMinutesOfArc() {
+	    	return elevation;
+	    }
+	}
+	
+	
 
 	void createDefaultCyclesGroupsAndDays();
 	
 	Cycle cycle(final LocalDate date);
 
-	TimeType time(final LocalDate date);
+	TimeType timeType(final LocalDate date);
 
-	LocalTime sunDownTime(final LocalDate date);
+	LocalTime sunDownTime(final LocalDate date, final TwilightType twilightType);
 
-	LocalTime sunUpTime(final LocalDate date);
+	LocalTime sunUpTime(final LocalDate date, final TwilightType twilightType);
 
 }

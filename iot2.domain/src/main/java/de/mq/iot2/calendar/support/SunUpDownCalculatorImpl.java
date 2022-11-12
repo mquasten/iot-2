@@ -2,43 +2,40 @@ package de.mq.iot2.calendar.support;
 
 import java.time.LocalTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import de.mq.iot2.calendar.CalendarService.TwilightType;
 
 
 class SunUpDownCalculatorImpl {
 	private final double latitude;
-
 	private final double longitude;
+	private final double h;
 
-	private final double h = -50d / 60d * Math.PI / 180d;
-	// private final double h = -6d*Math.PI/180d;
-
-	@Autowired
-	SunUpDownCalculatorImpl() {
-		this(51.1423399, 6.2815922);
-
+	SunUpDownCalculatorImpl(final TwilightType twilightType) {
+		this(51.1423399, 6.2815922, twilightType);
 	}
 
-	private SunUpDownCalculatorImpl(final double latitudeDegrees, final double longitudeDegrees) {
+	SunUpDownCalculatorImpl(final double latitudeDegrees, final double longitudeDegrees, final TwilightType twilightType) {
 		this.latitude = latitudeDegrees * Math.PI / 180d;
 		this.longitude = longitudeDegrees;
+		h = twilightType.horizonElevationInMinutesOfArc() / 60d * Math.PI / 180d;
 	}
 
-	// @Override
-	public LocalTime sunUpTime(int dayOfYear, int timeZoneOffsetInHours) {
+	LocalTime sunUpTime(int dayOfYear, int timeZoneOffsetInHours) {
 
 		return localTime(time(dayOfYear, timeZoneOffsetInHours, false));
 	}
 
-	// @Override
-	public LocalTime sunDownTime(final int dayOfYear, final int timeZoneOffsetInHours) {
+	LocalTime sunDownTime(final int dayOfYear, final int timeZoneOffsetInHours) {
 		return localTime(time(dayOfYear, timeZoneOffsetInHours, true));
 	}
 
 	private LocalTime localTime(final double result) {
 		final int min = (int) Math.round(60 * (result % 1));
-
-		return LocalTime.of((int) result, (min != 60) ? min : 59);
+		if( min == 60 ) {
+			return LocalTime.of(((int) result)+1, 0);
+		} else {
+			return  LocalTime.of((int) result, min);
+		}
 	}
 
 	private double time(final int dayOfYear, final int timeZoneOffsetInHours, boolean isDown) {

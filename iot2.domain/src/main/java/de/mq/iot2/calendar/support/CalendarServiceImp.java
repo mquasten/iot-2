@@ -13,7 +13,6 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -32,8 +31,7 @@ class CalendarServiceImp implements CalendarService {
 	private final CycleRepository cycleRepository;
 	private final DayGroupRepository dayGroupRepository;
 	private final DayRepository dayRepository;
-	
-	private final Supplier<SunUpDownCalculatorImpl> sunUpDownCalculator;
+
 
 	private final Collection<DayOfWeek> weekendDays = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
 	private final Collection<Entry<Integer, String>> gaussDays = Set.of(new SimpleImmutableEntry<>(-2, "Karfreitag"), new SimpleImmutableEntry<>(0, "Ostersonntag"),
@@ -45,14 +43,9 @@ class CalendarServiceImp implements CalendarService {
 
 	@Autowired
 	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository) {
-		this(cycleRepository,dayGroupRepository,dayRepository , () -> new SunUpDownCalculatorImpl());
-	}
-	
-	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository, Supplier<SunUpDownCalculatorImpl> sunUpDownCalculator) {
 		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
-		this.sunUpDownCalculator=sunUpDownCalculator;
 	}
  
 	@Override
@@ -105,11 +98,11 @@ class CalendarServiceImp implements CalendarService {
 	
 	
 	@Override
-	public TimeType time(final LocalDate date) {
+	public TimeType timeType(final LocalDate date) {
 
-		final LocalDate startSummerTime = lastSundayInMonth(Year.of(date.getYear()), Month.MARCH);
+		final var startSummerTime = lastSundayInMonth(Year.of(date.getYear()), Month.MARCH);
 
-		final LocalDate startWinterTime = lastSundayInMonth(Year.of(date.getYear()), Month.OCTOBER);
+		final var startWinterTime = lastSundayInMonth(Year.of(date.getYear()), Month.OCTOBER);
 
 		if (afterEquals(date, startSummerTime) && date.isBefore(startWinterTime)) {
 			return TimeType.Summer;
@@ -123,19 +116,19 @@ class CalendarServiceImp implements CalendarService {
 	}
 
 	private LocalDate lastSundayInMonth(final Year year, final Month month) {
-		final LocalDate start = LocalDate.of(year.getValue(), Month.of(month.getValue() + 1), 1);
+		final var start = LocalDate.of(year.getValue(), Month.of(month.getValue() + 1), 1);
 		return IntStream.range(1, 8).mapToObj(i -> start.minusDays(i)).filter(date -> date.getDayOfWeek().equals(DayOfWeek.SUNDAY)).findFirst().get();
 
 	}
 
 	@Override
-	public LocalTime sunDownTime(final LocalDate date) {
-		return sunUpDownCalculator.get().sunDownTime(date.getDayOfYear(), time(date).offset());
+	public LocalTime sunDownTime(final LocalDate date, final TwilightType twilightType) {
+		return new SunUpDownCalculatorImpl(twilightType).sunDownTime(date.getDayOfYear(), timeType(date).offset());
 	}
 	
 	@Override
-	public LocalTime sunUpTime(final LocalDate date) {
-		return sunUpDownCalculator.get().sunUpTime(date.getDayOfYear(), time(date).offset());
+	public LocalTime sunUpTime(final LocalDate date, final TwilightType twilightType) {
+		return  new SunUpDownCalculatorImpl(twilightType).sunUpTime(date.getDayOfYear(), timeType(date).offset());
 	}
 	
 	

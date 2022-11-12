@@ -140,14 +140,14 @@ class CalendarServiceImpTest {
 	
 	@ParameterizedTest
 	@MethodSource("timeTypeSummer")
-	void timeSummer(final LocalDate date) {
-		assertEquals(TimeType.Summer, calendarService.time(date));
+	void timeTypeSummer(final LocalDate date) {
+		assertEquals(TimeType.Summer, calendarService.timeType(date));
 	}
 	
 	@ParameterizedTest
 	@MethodSource("timeTypeWinter")
 	void timeWinter(final LocalDate date) {
-		assertEquals(TimeType.Winter, calendarService.time(date));
+		assertEquals(TimeType.Winter, calendarService.timeType(date));
 	}
 
 	
