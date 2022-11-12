@@ -16,10 +16,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.calendar.CalendarService;
+import de.mq.iot2.calendar.CalendarService.TimeType;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
@@ -133,5 +136,28 @@ class CalendarServiceImpTest {
 
 		assertEquals(defaultCycle, calendarService.cycle(LocalDate.now().plusDays(1)));
 	}
+	
+	
+	@ParameterizedTest
+	@MethodSource("timeTypeSummer")
+	void timeSummer(final LocalDate date) {
+		assertEquals(TimeType.Summer, calendarService.time(date));
+	}
+	
+	@ParameterizedTest
+	@MethodSource("timeTypeWinter")
+	void timeWinter(final LocalDate date) {
+		assertEquals(TimeType.Winter, calendarService.time(date));
+	}
 
+	
+	private static Collection<LocalDate> timeTypeSummer() {
+		return List.of(LocalDate.of(2022, 3, 27), LocalDate.of(2022, 10, 29), LocalDate.of(2022, 6, 30) );
+		
+	}
+	
+	private static Collection<LocalDate> timeTypeWinter() {
+		return List.of(LocalDate.of(2022, 3, 26), LocalDate.of(2022, 10, 30), LocalDate.of(2022, 2, 1) );
+		
+	}
 }
