@@ -2,56 +2,54 @@ package de.mq.iot2.calendar;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Optional;
 
 public interface CalendarService {
-	public enum  TimeType {
-		Winter(1),
-		Summer(2);
-		
+	public enum TimeType {
+		Winter(1), Summer(2);
+
 		private final int offset;
-		TimeType(final int offset){
-			this.offset=offset;
+
+		TimeType(final int offset) {
+			this.offset = offset;
 		}
-		
+
 		public String key() {
 			return name().toUpperCase();
 		}
-		
+
 		public int offset() {
 			return offset;
 		}
 	}
-	
+
 	public enum TwilightType {
-		Mathematical(-50d),
-		Civil(-6d),
-		Nautical(-12d),
-		Astronomical(-18d);
-		
+		Mathematical(-50d / 60d), Civil(-6d), Nautical(-12d), Astronomical(-18d);
+
 		private final double elevation;
-		
-		TwilightType(final double elevation){
-			this.elevation=elevation;
+
+		TwilightType(final double elevation) {
+			this.elevation = elevation;
 		}
+
 		/**
-		 * Elevation Horizont in Winkelminuten. Ist < 0.
+		 * Elevation Horizont in Winkelgrad. Ist < 0.
+		 * 
 		 * @param elevation
 		 */
-	    public final double horizonElevationInMinutesOfArc() {
-	    	return elevation;
-	    }
+		public final double horizonElevationInDegrees() {
+			return elevation;
+		}
 	}
-	
-	
 
 	void createDefaultCyclesGroupsAndDays();
-	
+
 	Cycle cycle(final LocalDate date);
 
 	TimeType timeType(final LocalDate date);
 
-	LocalTime sunDownTime(final LocalDate date, final TwilightType twilightType);
+	Optional<LocalTime> sunDownTime(final LocalDate date, final TwilightType twilightType);
 
-	LocalTime sunUpTime(final LocalDate date, final TwilightType twilightType);
+	Optional<LocalTime> sunUpTime(final LocalDate date, final TwilightType twilightType);
 
 }

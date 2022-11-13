@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.CalendarService.TimeType;
+import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
@@ -136,28 +139,37 @@ class CalendarServiceImpTest {
 
 		assertEquals(defaultCycle, calendarService.cycle(LocalDate.now().plusDays(1)));
 	}
-	
-	
+
 	@ParameterizedTest
 	@MethodSource("timeTypeSummer")
 	void timeTypeSummer(final LocalDate date) {
 		assertEquals(TimeType.Summer, calendarService.timeType(date));
 	}
-	
+
 	@ParameterizedTest
 	@MethodSource("timeTypeWinter")
 	void timeWinter(final LocalDate date) {
 		assertEquals(TimeType.Winter, calendarService.timeType(date));
 	}
 
-	
 	private static Collection<LocalDate> timeTypeSummer() {
-		return List.of(LocalDate.of(2022, 3, 27), LocalDate.of(2022, 10, 29), LocalDate.of(2022, 6, 30) );
-		
+		return List.of(LocalDate.of(2022, 3, 27), LocalDate.of(2022, 10, 29), LocalDate.of(2022, 6, 30));
+
 	}
-	
+
 	private static Collection<LocalDate> timeTypeWinter() {
-		return List.of(LocalDate.of(2022, 3, 26), LocalDate.of(2022, 10, 30), LocalDate.of(2022, 2, 1) );
-		
+		return List.of(LocalDate.of(2022, 3, 26), LocalDate.of(2022, 10, 30), LocalDate.of(2022, 2, 1));
+
 	}
+
+	@Test
+	final void sunDownTime() {
+		assertEquals(Optional.of(LocalTime.of(19, 57)), calendarService.sunDownTime(LocalDate.of(2022, 3, 27), TwilightType.Mathematical));
+	}
+
+	@Test
+	final void sunUpTime() {
+		assertEquals(Optional.of(LocalTime.of(7, 23)), calendarService.sunUpTime(LocalDate.of(2022, 3, 27), TwilightType.Mathematical));
+	}
+
 }

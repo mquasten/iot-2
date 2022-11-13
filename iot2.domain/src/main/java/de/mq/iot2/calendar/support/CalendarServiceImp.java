@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -32,7 +33,6 @@ class CalendarServiceImp implements CalendarService {
 	private final DayGroupRepository dayGroupRepository;
 	private final DayRepository dayRepository;
 
-
 	private final Collection<DayOfWeek> weekendDays = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
 	private final Collection<Entry<Integer, String>> gaussDays = Set.of(new SimpleImmutableEntry<>(-2, "Karfreitag"), new SimpleImmutableEntry<>(0, "Ostersonntag"),
 			new SimpleImmutableEntry<>(1, "Ostermontag"), new SimpleImmutableEntry<>(39, "Christi Himmelfahrt"), new SimpleImmutableEntry<>(49, "Pfingstsonntag"),
@@ -47,7 +47,7 @@ class CalendarServiceImp implements CalendarService {
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
 	}
- 
+
 	@Override
 	@Transactional
 	public void createDefaultCyclesGroupsAndDays() {
@@ -95,8 +95,7 @@ class CalendarServiceImp implements CalendarService {
 		return dayRepository.findAll().stream().filter(day -> day.matches(date)).map(day -> day.dayGroup().cycle())
 				.sorted((Comparator<Cycle>) (c1, c2) -> Integer.signum(c1.priority() - c2.priority())).findFirst().orElse(defaultCycle);
 	}
-	
-	
+
 	@Override
 	public TimeType timeType(final LocalDate date) {
 
@@ -122,14 +121,13 @@ class CalendarServiceImp implements CalendarService {
 	}
 
 	@Override
-	public LocalTime sunDownTime(final LocalDate date, final TwilightType twilightType) {
+	public Optional<LocalTime> sunDownTime(final LocalDate date, final TwilightType twilightType) {
 		return new SunUpDownCalculatorImpl(twilightType).sunDownTime(date.getDayOfYear(), timeType(date).offset());
 	}
-	
+
 	@Override
-	public LocalTime sunUpTime(final LocalDate date, final TwilightType twilightType) {
-		return  new SunUpDownCalculatorImpl(twilightType).sunUpTime(date.getDayOfYear(), timeType(date).offset());
+	public Optional<LocalTime> sunUpTime(final LocalDate date, final TwilightType twilightType) {
+		return new SunUpDownCalculatorImpl(twilightType).sunUpTime(date.getDayOfYear(), timeType(date).offset());
 	}
-	
-	
+
 }

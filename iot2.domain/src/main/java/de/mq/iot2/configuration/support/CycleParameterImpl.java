@@ -4,7 +4,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 import org.springframework.util.Assert;
 
@@ -14,7 +13,6 @@ import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.CycleParameter;
 
 @Entity(name = "CycleParameter")
-@Table(name = "CYCLE_PARAMETER")
 @DiscriminatorValue("CycleParameter")
 class CycleParameterImpl extends AbstractParameter implements CycleParameter {
 

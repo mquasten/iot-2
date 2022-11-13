@@ -2,6 +2,8 @@ package de.mq.iot2.configuration;
 
 import java.time.LocalTime;
 
+import de.mq.iot2.calendar.CalendarService.TwilightType;
+
 public interface Parameter {
 	
 	public enum Key {
@@ -9,6 +11,7 @@ public interface Parameter {
 		UpTime(LocalTime.class),
 		MinSunDownTime(LocalTime.class),
 		MaxSunUpTime(LocalTime.class),
+		SunUpDownType(TwilightType.class),
 		
 		DaysBack(Integer.class);
 		
