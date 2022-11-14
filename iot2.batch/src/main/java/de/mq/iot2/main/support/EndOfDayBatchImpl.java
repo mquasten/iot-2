@@ -16,12 +16,12 @@ import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.rules.RuleService;
 import de.mq.iot2.rules.RuleService.Argument;
-import de.mq.iot2.rules.support.TimerRules;
+import de.mq.iot2.rules.support.TimerRulesImpl;
 
 @Service
 public class EndOfDayBatchImpl {
-	private static Logger LOGGER = LoggerFactory.getLogger(TimerRules.class);
-	private final CalendarService calendarService;
+	private static Logger LOGGER = LoggerFactory.getLogger(TimerRulesImpl.class);
+	private final CalendarService calendarService; 
 
 	private final ConfigurationService configurationService;
 	
@@ -48,10 +48,10 @@ public class EndOfDayBatchImpl {
 
 		final var sunDownTime = calendarService.sunDownTime(date, twilightType);
 		
-		final var arguments = Map.of( Argument.Parameter,parameters ,Argument.TimeType, timeType, Argument.SunUpTime, sunUpTime, Argument.SunDownTime, sunDownTime, Argument.Cycle, cycle);
+		final var arguments = Map.of( Argument.TimeType, timeType, Argument.SunUpTime, sunUpTime, Argument.SunDownTime, sunDownTime, Argument.Cycle, cycle);
 
 		LOGGER.debug("Start RulesEngine arguments {}.", arguments );
-		ruleService.processEndOfDayRulesEngine(arguments);
+		ruleService.processEndOfDayRulesEngine(parameters, arguments);
 
 	}
 

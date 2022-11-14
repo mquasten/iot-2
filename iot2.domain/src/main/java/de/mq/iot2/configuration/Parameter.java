@@ -10,6 +10,8 @@ public interface Parameter {
 		
 		UpTime(LocalTime.class),
 		MinSunDownTime(LocalTime.class),
+		MaxSunDownTime(LocalTime.class),
+		MinSunUpTime(LocalTime.class),
 		MaxSunUpTime(LocalTime.class),
 		SunUpDownType(TwilightType.class),
 		

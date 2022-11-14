@@ -21,13 +21,13 @@ class RulesConfiguration {
 	@Bean(name="EndOfDayRules")
 	@Scope("prototype")
 	Rules endOfDayRules() {
-		return new Rules(new TimerRules());
+		return new Rules(new TimerRulesImpl());
 	}
 	
 	@Bean()
 	@Scope("prototype")
 	Rules other() {
-		return new Rules(new TimerRules());
+		return new Rules(new TimerRulesImpl());
 	}
 
 }

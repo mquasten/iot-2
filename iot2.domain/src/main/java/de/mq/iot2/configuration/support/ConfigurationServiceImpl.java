@@ -65,8 +65,10 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	private void saveEndOfDayConfiguration(final Cycle nonWorkingDayCycle, final Cycle workingDyCycle) {
 		final var endOfBayConfiguration = configurationRepository.save(new ConfigurationImpl(1L, RuleKey.EndOfDay, "EndofDayBatch"));
 		parameterRepository.deleteByConfiguration(endOfBayConfiguration);
-		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MaxSunUpTime, "00:01"));
+		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MinSunUpTime, "05:30"));
+		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MaxSunUpTime, "10:00"));
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MinSunDownTime, "17:15"));
+		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MaxSunDownTime, "22:15"));
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.UpTime, "07:15"));
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.SunUpDownType, TwilightType.Mathematical.name()));
 		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "07:15", nonWorkingDayCycle));

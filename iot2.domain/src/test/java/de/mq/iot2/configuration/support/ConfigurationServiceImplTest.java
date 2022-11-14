@@ -68,7 +68,7 @@ class ConfigurationServiceImplTest {
 		assertTrue(savedConfigurations.containsKey(RuleKey.EndOfDay));
 		assertEquals(2, savedConfigurations.size());
 
-		assertEquals(7, savedParameter.size()); 
+		assertEquals(9, savedParameter.size()); 
 
 		final List<? extends Parameter> cleanUpParameter = savedParameter.stream().filter(parameter -> parameter.configuration() == savedConfigurations.get(RuleKey.CleanUp))
 				.collect(Collectors.toList());
@@ -78,8 +78,8 @@ class ConfigurationServiceImplTest {
 
 		final Collection<Key> globalEndOfDayParameter = savedParameter.stream()
 				.filter(parameter -> parameter.configuration() == savedConfigurations.get(RuleKey.EndOfDay) && parameter instanceof ParameterImpl).map(Parameter::key).collect(Collectors.toList());
-		assertEquals(4, globalEndOfDayParameter.size());
-		assertTrue(globalEndOfDayParameter.containsAll(Arrays.asList(Key.UpTime, Key.MinSunDownTime, Key.MaxSunUpTime, Key.SunUpDownType)));
+		assertEquals(6, globalEndOfDayParameter.size());
+		assertTrue(globalEndOfDayParameter.containsAll(Arrays.asList(Key.UpTime, Key.MinSunDownTime,Key.MaxSunDownTime, Key.MinSunUpTime, Key.MaxSunUpTime, Key.SunUpDownType)));
 
 		final Collection<? extends Parameter> endOfDayCycleParameters = savedParameter.stream()
 				.filter(parameter -> (parameter.configuration() == savedConfigurations.get(RuleKey.EndOfDay)) && (parameter instanceof CycleParameterImpl)).collect(Collectors.toList());
@@ -113,18 +113,20 @@ class ConfigurationServiceImplTest {
 		final var configuration = Mockito.mock(Configuration.class);
 		Mockito.when(configurationRepository.findByKey(RuleKey.EndOfDay)).thenReturn(Optional.of(configuration));
 		final var minSunDown = new ParameterImpl(configuration, Key.MinSunDownTime, "17:15");
-		final var maxSunDown = new ParameterImpl(configuration, Key.MaxSunUpTime, "00:01");
+		final var maxSunDown = new ParameterImpl(configuration, Key.MaxSunDownTime, "22:15");
+		final var minSunUp = new ParameterImpl(configuration, Key.MinSunUpTime, "05:30");
+		final var maxSunUp = new ParameterImpl(configuration, Key.MaxSunUpTime, "10:00");
 		final var parameterUpTime = new ParameterImpl(configuration, Key.UpTime, "05:30");
 		final var parameterSunUpDownType = new ParameterImpl(configuration, Key.SunUpDownType, TwilightType.Mathematical.name());
 		final var nonWorkingDayCycleParameterUpTime = new CycleParameterImpl(configuration, Key.UpTime, "07:30", nonWorkingDayCycle);
 
 		Mockito.doAnswer(answer -> answer.getArgument(0, String.class).contains(":") ?  LocalTime.parse(answer.getArgument(0, String.class))  : TwilightType.valueOf(answer.getArgument(0, String.class))).when(conversionService).convert(Mockito.any(), Mockito.any());
-		Mockito.when(parameterRepository.findByConfiguration(configuration)).thenReturn(List.of(minSunDown, maxSunDown, parameterUpTime, parameterSunUpDownType, nonWorkingDayCycleParameterUpTime));
+		Mockito.when(parameterRepository.findByConfiguration(configuration)).thenReturn(List.of(minSunDown, maxSunDown, minSunUp, maxSunUp, parameterUpTime, parameterSunUpDownType, nonWorkingDayCycleParameterUpTime));
 
 		Map<Key, ? extends Object> results = configurationService.parameters(RuleKey.EndOfDay, nonWorkingDayCycle);
 
-		assertEquals(4, results.size());
-		assertTrue(results.keySet().containsAll(List.of(Key.MinSunDownTime, Key.MaxSunUpTime, Key.UpTime, Key.MinSunDownTime)));
+		assertEquals(6, results.size());
+		assertTrue(results.keySet().containsAll(List.of(Key.MinSunDownTime, Key.MaxSunDownTime, Key.MaxSunUpTime, Key.UpTime, Key.MinSunDownTime,  Key.MinSunDownTime)));
 		assertEquals(LocalTime.parse(nonWorkingDayCycleParameterUpTime.value()), results.get(Key.UpTime));
 	}
 
