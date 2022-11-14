@@ -3,56 +3,58 @@ package de.mq.iot2.main.support;
 import java.time.LocalDate;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.CalendarService.TimeType;
 import de.mq.iot2.calendar.CalendarService.TwilightType;
+import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
+import de.mq.iot2.rules.RuleService;
+import de.mq.iot2.rules.RuleService.Argument;
+import de.mq.iot2.rules.support.TimerRules;
 
 @Service
 public class EndOfDayBatchImpl {
-
+	private static Logger LOGGER = LoggerFactory.getLogger(TimerRules.class);
 	private final CalendarService calendarService;
 
 	private final ConfigurationService configurationService;
+	
+	private final RuleService ruleService; 
 
-	EndOfDayBatchImpl(final CalendarService calendarService, final ConfigurationService configurationService) {
+	EndOfDayBatchImpl(final CalendarService calendarService, final ConfigurationService configurationService, final RuleService ruleService) {
 		this.calendarService = calendarService;
 		this.configurationService = configurationService;
+		this.ruleService=ruleService;
 	}
 
 	@BatchMethod(value = "end-of-day", converterClass = EndOfDayBatchArgumentConverterImpl.class)
 	final void execute(final LocalDate date) {
 
-		System.out.println("Use date:" + date);
-
-		final var cycle = calendarService.cycle(date);
-
-		System.out.println("Cycle:" + cycle.name());
+		final Cycle cycle = calendarService.cycle(date);
 
 		final var parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);
-
-		parameters.entrySet().forEach(e -> System.out.println(e.getKey() + "=" + e.getValue()));
-
+		
 		final TimeType timeType = calendarService.timeType(date);
 
-		System.out.println("TimeType:" + timeType);
 		final var twilightType = parameters.containsKey(Key.SunUpDownType) ? (TwilightType) parameters.get(Key.SunUpDownType) : TwilightType.Mathematical;
 
-		System.out.println("TwilightType:" + twilightType);
-
 		final var sunUpTime = calendarService.sunUpTime(date, twilightType);
-		System.out.println("SunUpTime:" + sunUpTime);
 
 		final var sunDownTime = calendarService.sunDownTime(date, twilightType);
-		System.out.println("SunDownTime:" + sunDownTime);
+		
+		final var arguments = Map.of( Argument.Parameter,parameters ,Argument.TimeType, timeType, Argument.SunUpTime, sunUpTime, Argument.SunDownTime, sunDownTime, Argument.Cycle, cycle);
 
-		final var facts = Map.of("parameters", parameters, "timeType", timeType, "sunUpTime", sunUpTime, "sunDownTime", sunDownTime);
-		System.out.println(facts);
+		LOGGER.debug("Start RulesEngine arguments {}.", arguments );
+		ruleService.processEndOfDayRulesEngine(arguments);
 
 	}
+
+	
 
 }

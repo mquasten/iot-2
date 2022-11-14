@@ -120,5 +120,6 @@ public class SunUpDownCalculatorImplTest {
 
 		return 2;
 	}
+	
 
 }
