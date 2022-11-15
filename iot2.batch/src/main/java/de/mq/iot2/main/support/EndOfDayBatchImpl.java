@@ -14,8 +14,8 @@ import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
+import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.rules.RuleService;
-import de.mq.iot2.rules.RuleService.Argument;
 import de.mq.iot2.rules.support.TimerRulesImpl;
 
 @Service
@@ -48,7 +48,7 @@ public class EndOfDayBatchImpl {
 
 		final var sunDownTime = calendarService.sunDownTime(date, twilightType);
 		
-		final var arguments = Map.of( Argument.TimeType, timeType, Argument.SunUpTime, sunUpTime, Argument.SunDownTime, sunDownTime, Argument.Cycle, cycle);
+		final var arguments = Map.of( EndOfDayArguments.TimeType, timeType, EndOfDayArguments.SunUpTime, sunUpTime, EndOfDayArguments.SunDownTime, sunDownTime, EndOfDayArguments.Cycle, cycle);
 
 		LOGGER.debug("Start RulesEngine arguments {}.", arguments );
 		ruleService.process(parameters, arguments);
