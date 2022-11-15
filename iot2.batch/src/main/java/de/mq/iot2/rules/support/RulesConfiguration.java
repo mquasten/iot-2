@@ -1,33 +1,25 @@
 package de.mq.iot2.rules.support;
 
-import org.jeasy.rules.api.Rules;
-import org.jeasy.rules.api.RulesEngine;
-import org.jeasy.rules.api.RulesEngineParameters;
-import org.jeasy.rules.core.DefaultRulesEngine;
+import java.util.Arrays;
+import java.util.Collection;
+
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
+
+
+import de.mq.iot2.rules.RuleService;
 
 @Configuration
 class RulesConfiguration {
 	
-	@Bean()
-	@Scope("prototype")
-	RulesEngine rulesEngine() {
-		final DefaultRulesEngine rulesEngine = new DefaultRulesEngine(new RulesEngineParameters(false, true, false, Integer.MAX_VALUE));
-		rulesEngine.registerRuleListener(new SimpleRulesEngineListener());
-		return rulesEngine;
-	}
-	@Bean(name="EndOfDayRules")
-	@Scope("prototype")
-	Rules endOfDayRules() {
-		return new Rules(new TimerRulesImpl());
+	@Bean(name="EndOfDayRulesService")
+	RuleService endOfDayRulesService() {
+		return new  RuleServiceImpl(endOfDayRules());
 	}
 	
-	@Bean()
-	@Scope("prototype")
-	Rules other() {
-		return new Rules(new TimerRulesImpl());
+	private Collection<?> endOfDayRules() {
+		return Arrays.asList(new TimerRulesImpl());
 	}
 
 }

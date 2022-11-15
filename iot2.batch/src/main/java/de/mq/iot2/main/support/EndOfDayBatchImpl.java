@@ -51,7 +51,7 @@ public class EndOfDayBatchImpl {
 		final var arguments = Map.of( Argument.TimeType, timeType, Argument.SunUpTime, sunUpTime, Argument.SunDownTime, sunDownTime, Argument.Cycle, cycle);
 
 		LOGGER.debug("Start RulesEngine arguments {}.", arguments );
-		ruleService.processEndOfDayRulesEngine(parameters, arguments);
+		ruleService.process(parameters, arguments);
 
 	}
 
