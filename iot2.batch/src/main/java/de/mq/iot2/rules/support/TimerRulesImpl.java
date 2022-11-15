@@ -39,7 +39,7 @@ public class TimerRulesImpl {
 		return true;
 	}
 
-	@Action(order = 1)
+	@Action(order = Integer.MIN_VALUE)
 	public final void setup(final Facts facts) {
 		facts.put(EndOfDayArguments.Timer.name(), new ArrayList<LocalTime>());
 	}
