@@ -95,6 +95,7 @@ class AbstractParameterTest {
 		assertEquals(key.hashCode() + configuration.hashCode() + parameter.getClass().hashCode(), parameter.hashCode());
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	void equals() {
 		final var parameter = newParameter();

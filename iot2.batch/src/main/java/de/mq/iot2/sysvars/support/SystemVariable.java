@@ -13,7 +13,6 @@ public class SystemVariable {
 	@XmlAttribute
 	private String value;
 	@XmlAttribute(name = "ise_id")
-	//@XmlElement(name="ise_id")
 	private String id;
 	
 
