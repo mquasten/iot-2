@@ -1,19 +1,26 @@
 package de.mq.iot2.rules.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+import org.jeasy.rules.api.Facts;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.ReflectionUtils;
 
 import de.mq.iot2.configuration.Parameter.Key;
+import de.mq.iot2.rules.EndOfDayArguments;
+import de.mq.iot2.sysvars.SystemVariable;
 
 class TimerRulesImplTest {
 
@@ -22,6 +29,19 @@ class TimerRulesImplTest {
 	@Test
 	void evaluate() {
 		assertTrue(timerRules.evaluate());
+	}
+
+	@Test
+	void setup() {
+		final Facts facts = new Facts();
+
+		timerRules.setup(facts);
+
+		assertNotNull(facts.getFact(EndOfDayArguments.Timer.name()));
+		assertEquals(0, ((Collection<?>) facts.get(EndOfDayArguments.Timer.name())).size());
+
+		assertNotNull(facts.getFact(EndOfDayArguments.SystemVariables.name()));
+		assertEquals(0, ((Collection<?>) facts.get(EndOfDayArguments.SystemVariables.name())).size());
 	}
 
 	@Test
@@ -144,6 +164,19 @@ class TimerRulesImplTest {
 		ReflectionUtils.doWithFields(TimerRulesImpl.class, field -> time[0] = (LocalTime) ReflectionTestUtils.getField(timerRules, field.getName()),
 				field -> field.isAnnotationPresent(ParameterValue.class) && field.getDeclaredAnnotation(ParameterValue.class).value() == key);
 		return time[0];
+	}
+
+	@Test
+	void addSystemVariable() {
+
+		final Collection<Entry<String, LocalTime>> timer = List.of(new SimpleImmutableEntry<String, LocalTime>("T6", LocalTime.of(17,15)), new SimpleImmutableEntry<String, LocalTime>("T0", LocalTime.of(7, 15)), new SimpleImmutableEntry<String, LocalTime>("T1", LocalTime.of(8, 0)));
+		final Collection<SystemVariable> systemVariables = new ArrayList<>();
+		
+		timerRules.addSystemVariable(timer, systemVariables);
+		
+		assertEquals(1, systemVariables.size());
+		assertEquals(TimerRulesImpl.DAILY_EVENTS_SYSTEM_VARIABLE_NAME, systemVariables.iterator().next().getName());
+		assertEquals("T0:7.15;T1:8.0;T6:17.15", systemVariables.iterator().next().getValue());
 	}
 
 }

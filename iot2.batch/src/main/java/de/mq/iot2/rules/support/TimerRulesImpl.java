@@ -4,9 +4,10 @@ import java.time.LocalTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.jeasy.rules.annotation.Action;
 import org.jeasy.rules.annotation.Condition;
@@ -18,11 +19,14 @@ import org.slf4j.LoggerFactory;
 
 import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.rules.EndOfDayArguments;
+import de.mq.iot2.sysvars.SystemVariable;
 
-@Rule(name = "Timer-Rule", description = "Timer-Rule", priority = 1)
+@Rule(name = "Timer-Rule", description = "Timer-Rule", priority = Integer.MIN_VALUE)
 public class TimerRulesImpl {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(TimerRulesImpl.class);
+	static final String DAILY_EVENTS_SYSTEM_VARIABLE_NAME = "DailyEvents";
+	
 	@ParameterValue(Key.MaxSunUpTime)
 	private final LocalTime maxSunUpTime = LocalTime.of(10, 0);
 	@ParameterValue(Key.MinSunUpTime)
@@ -41,7 +45,8 @@ public class TimerRulesImpl {
 
 	@Action(order = Integer.MIN_VALUE)
 	public final void setup(final Facts facts) {
-		facts.put(EndOfDayArguments.Timer.name(), new ArrayList<LocalTime>());
+		facts.put(EndOfDayArguments.Timer.name(), new ArrayList<>());
+		facts.put(EndOfDayArguments.SystemVariables.name(),new ArrayList<>());
 	}
 
 	@Action(order = 2)
@@ -94,6 +99,19 @@ public class TimerRulesImpl {
 			return maxSunDownTime;
 		}
 		return time;
+	}
+	
+	@Action(order = Integer.MAX_VALUE)
+	public final void addSystemVariable(@Fact("Timer") Collection<Entry<String, LocalTime>> timerList, @Fact("SystemVariables") final Collection<SystemVariable> systemVariables ) {
+		
+		final var stringBuilder = new StringBuilder();
+		final var orderedTimers = timerList.stream().sorted(( e1, e2 )-> e1.getValue().compareTo(e2.getValue())).collect(Collectors.toList());
+		
+		IntStream.range(0, orderedTimers.size()).forEach(i -> stringBuilder.append(String.format("%s:%d.%d%s", orderedTimers.get(i).getKey(), orderedTimers.get(i).getValue().getHour() ,orderedTimers.get(i).getValue().getMinute(),  i<orderedTimers.size()-1? ";" :"" )));
+		
+		systemVariables.add(new SystemVariable(DAILY_EVENTS_SYSTEM_VARIABLE_NAME, stringBuilder.toString()));
+		
+		LOGGER.debug("Add {} Timer to SystemVariable {} value='{}'.", timerList.size(), DAILY_EVENTS_SYSTEM_VARIABLE_NAME, stringBuilder);
 	}
 
 }
