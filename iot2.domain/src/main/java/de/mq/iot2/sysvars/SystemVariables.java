@@ -1,4 +1,4 @@
-package de.mq.iot2.sysvars.support;
+package de.mq.iot2.sysvars;
 
 import java.util.ArrayList;
 import java.util.List;

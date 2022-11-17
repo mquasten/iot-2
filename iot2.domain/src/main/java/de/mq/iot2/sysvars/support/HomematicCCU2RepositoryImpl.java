@@ -8,21 +8,30 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestOperations;
 
+import de.mq.iot2.sysvars.SystemVariable;
+import de.mq.iot2.sysvars.SystemVariables;
+
 @Repository
 class HomematicCCU2RepositoryImpl implements HomematicCCU2Repository {
 
-	private static final String PARAMETER_VALUE = "value";
+	static final String VALUE_REQUIRED_MESSAGE = "Value is required.";
 
-	private static final String PARAMETER_ID = "id";
+	static final String ID_REQUIRED_MESSAGE = "Id is required.";
 
-	private static final String PARAMETER_PORT = "port";
+	static final String SYSTEM_VARIABLE_REQUIRED_MESSAGE = "SystemVariable is required.";
 
-	private static final String RARAMETER_HOST = "host";
+	static final String PARAMETER_VALUE = "value";
+
+	static final String PARAMETER_ID = "id";
+
+	static final String PARAMETER_PORT = "port";
+
+	static final String RARAMETER_HOST = "host";
 
 	private final RestOperations restOperations;
 
-	private final static String SYS_VAR_LIST_URL = "http://{host}:{port}/addons/xmlapi/sysvarlist.cgi";
-	private final static String STATE_CHANGE_URL = "http://{host}:{port}/addons/xmlapi/statechange.cgi?ise_id={id}&new_value={value}";
+	final static String SYS_VAR_LIST_URL = "http://{host}:{port}/addons/xmlapi/sysvarlist.cgi";
+	final static String STATE_CHANGE_URL = "http://{host}:{port}/addons/xmlapi/statechange.cgi?ise_id={id}&new_value={value}";
 
 	private final String host;
 	private final Integer port;
@@ -38,19 +47,19 @@ class HomematicCCU2RepositoryImpl implements HomematicCCU2Repository {
 	public Collection<SystemVariable> readSystemVariables() {
 		final var result = restOperations.getForObject(SYS_VAR_LIST_URL, SystemVariables.class,
 				Map.of(RARAMETER_HOST, host, PARAMETER_PORT, port));
-
 		return result.getSystemVariables();
 
 	}
 
 	@Override
 	public void updateSystemVariable(final SystemVariable systemVariable) {
-		Assert.notNull(systemVariable, "SystemVariable is required.");
-		Assert.hasText(systemVariable.getId(), "Id is required.");
-		Assert.hasText(systemVariable.getValue(), "Id is required.");
+		Assert.notNull(systemVariable, SYSTEM_VARIABLE_REQUIRED_MESSAGE);
+		Assert.hasText(systemVariable.getId(), ID_REQUIRED_MESSAGE);
+		Assert.hasText(systemVariable.getValue(), VALUE_REQUIRED_MESSAGE);
 
 		restOperations.put(STATE_CHANGE_URL, null, Map.of(RARAMETER_HOST, host, PARAMETER_PORT, port, PARAMETER_ID,
 				systemVariable.getId(), PARAMETER_VALUE, systemVariable.getValue()));
 	}
+	
 
 }

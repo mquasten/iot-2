@@ -1,4 +1,4 @@
-package de.mq.iot2.sysvars.support;
+package de.mq.iot2.sysvars;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
