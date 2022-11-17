@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import de.mq.iot2.sysvars.support.SystemVariablesConfiguration;
 import de.mq.iot2.weather.MeteorologicalData;
-
+@Disabled
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { SystemVariablesConfiguration.class, OpenWeatherRepositoryImpl.class,
 		MapToMeteorologicalDataConverterImpl.class })
