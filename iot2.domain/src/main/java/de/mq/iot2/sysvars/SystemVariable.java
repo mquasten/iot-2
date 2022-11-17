@@ -5,6 +5,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.springframework.util.Assert;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "systemVariable")
 public class SystemVariable {
@@ -14,8 +16,16 @@ public class SystemVariable {
 	private String value;
 	@XmlAttribute(name = "ise_id")
 	private String id;
+	public SystemVariable() {
+		
+	}
+	public SystemVariable(final String name, final String value) {
+		Assert.notNull(name, "Name required.");
+		Assert.notNull(value, "Value required.");
+		this.name=name;
+		this.value=value;
+	}
 	
-
 	public String getName() {
 		return name;
 	}
@@ -34,6 +44,6 @@ public class SystemVariable {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 
 }

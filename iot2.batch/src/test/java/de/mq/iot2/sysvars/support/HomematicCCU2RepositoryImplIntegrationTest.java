@@ -18,7 +18,7 @@ import de.mq.iot2.sysvars.SystemVariable;
 @Disabled
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { SystemVariablesConfiguration.class, HomematicCCU2RepositoryImpl.class })
-public class HomematicCCU2RepositoryImplTest {
+public class HomematicCCU2RepositoryImplIntegrationTest {
 
 	@Autowired
 	private HomematicCCU2Repository homematicCCU2Repository;
