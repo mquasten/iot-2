@@ -19,7 +19,7 @@ class RulesConfiguration {
 	}
 	
 	private Collection<?> endOfDayRules() {
-		return Arrays.asList(new TimerRulesImpl());
+		return Arrays.asList(new TimerRuleImpl(), new OtherVariablesRulesImpl());
 	}
 
 }

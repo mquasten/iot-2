@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
@@ -22,9 +21,9 @@ import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.sysvars.SystemVariable;
 
-class TimerRulesImplTest {
+class TimerRuleImplTest {
 
-	private final TimerRulesImpl timerRules = new TimerRulesImpl();
+	private final TimerRuleImpl timerRules = new TimerRuleImpl();
 
 	@Test
 	void evaluate() {
@@ -155,13 +154,13 @@ class TimerRulesImplTest {
 	}
 
 	private void injectParameter(final Key key, final LocalTime time) {
-		ReflectionUtils.doWithFields(TimerRulesImpl.class, field -> ReflectionTestUtils.setField(timerRules, field.getName(), time),
+		ReflectionUtils.doWithFields(TimerRuleImpl.class, field -> ReflectionTestUtils.setField(timerRules, field.getName(), time),
 				field -> field.isAnnotationPresent(ParameterValue.class) && field.getDeclaredAnnotation(ParameterValue.class).value() == key);
 	}
 
 	private LocalTime getParameter(final Key key) {
 		final LocalTime time[] = new LocalTime[] { null };
-		ReflectionUtils.doWithFields(TimerRulesImpl.class, field -> time[0] = (LocalTime) ReflectionTestUtils.getField(timerRules, field.getName()),
+		ReflectionUtils.doWithFields(TimerRuleImpl.class, field -> time[0] = (LocalTime) ReflectionTestUtils.getField(timerRules, field.getName()),
 				field -> field.isAnnotationPresent(ParameterValue.class) && field.getDeclaredAnnotation(ParameterValue.class).value() == key);
 		return time[0];
 	}
@@ -175,7 +174,7 @@ class TimerRulesImplTest {
 		timerRules.addSystemVariable(timer, systemVariables);
 		
 		assertEquals(1, systemVariables.size());
-		assertEquals(TimerRulesImpl.DAILY_EVENTS_SYSTEM_VARIABLE_NAME, systemVariables.iterator().next().getName());
+		assertEquals(TimerRuleImpl.DAILY_EVENTS_SYSTEM_VARIABLE_NAME, systemVariables.iterator().next().getName());
 		assertEquals("T0:7.15;T1:8.0;T6:17.15", systemVariables.iterator().next().getValue());
 	}
 

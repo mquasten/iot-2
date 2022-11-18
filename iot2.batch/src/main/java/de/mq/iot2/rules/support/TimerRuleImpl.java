@@ -22,9 +22,9 @@ import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.sysvars.SystemVariable;
 
 @Rule(name = "Timer-Rule", description = "Timer-Rule", priority = Integer.MIN_VALUE)
-public class TimerRulesImpl {
+public class TimerRuleImpl {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(TimerRulesImpl.class);
+	private final  static Logger LOGGER = LoggerFactory.getLogger(TimerRuleImpl.class);
 	static final String DAILY_EVENTS_SYSTEM_VARIABLE_NAME = "DailyEvents";
 	
 	@ParameterValue(Key.MaxSunUpTime)
