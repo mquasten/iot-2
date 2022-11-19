@@ -12,7 +12,7 @@ import de.mq.iot2.sysvars.SystemVariable;
 import de.mq.iot2.sysvars.SystemVariables;
 
 @Repository
-class HomematicCCU2RepositoryImpl implements HomematicCCU2Repository {
+class HomematicCCU2RepositoryImpl implements SystemVariableRepository {
 
 	static final String VALUE_REQUIRED_MESSAGE = "Value is required.";
 

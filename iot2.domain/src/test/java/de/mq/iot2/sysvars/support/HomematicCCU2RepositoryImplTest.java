@@ -32,7 +32,7 @@ class HomematicCCU2RepositoryImplTest {
 	
 	private final RestOperations restOperations = mock(RestOperations.class);
 	
-	private final HomematicCCU2Repository homematicCCU2Repository = new HomematicCCU2RepositoryImpl(restOperations, HOST, PORT);
+	private final SystemVariableRepository homematicCCU2Repository = new HomematicCCU2RepositoryImpl(restOperations, HOST, PORT);
 	
 
 	@SuppressWarnings("unchecked")

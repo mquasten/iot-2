@@ -21,13 +21,13 @@ import de.mq.iot2.sysvars.SystemVariable;
 public class HomematicCCU2RepositoryImplIntegrationTest {
 
 	@Autowired
-	private HomematicCCU2Repository homematicCCU2Repository;
+	private SystemVariableRepository systemVariableRepository;
 	@Disabled
 	@Test
 	void readSystemVariables() {
 		final var expectedSystemVariables = Set.of("DailyEvents", "LastBatchrun", "Month", "Temperature", "Time",
 				"Workingday");
-		final Set<String> systemVariables = homematicCCU2Repository.readSystemVariables().stream()
+		final Set<String> systemVariables = systemVariableRepository.readSystemVariables().stream()
 				.map(SystemVariable::getName).collect(Collectors.toSet());
 
 		assertTrue(systemVariables.size() >= expectedSystemVariables.size());
@@ -41,7 +41,7 @@ public class HomematicCCU2RepositoryImplIntegrationTest {
 		systemVariable.setId("6572");
 		systemVariable.setValue(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy-HH:mm:ss")));
 
-		homematicCCU2Repository.updateSystemVariable(systemVariable);
+		systemVariableRepository.updateSystemVariable(systemVariable);
 	}
 
 }

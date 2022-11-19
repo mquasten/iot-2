@@ -26,6 +26,7 @@ public class TimerRuleImpl {
 
 	private final  static Logger LOGGER = LoggerFactory.getLogger(TimerRuleImpl.class);
 	static final String DAILY_EVENTS_SYSTEM_VARIABLE_NAME = "DailyEvents";
+	private static final int DEFAULT_PRIORITY = 2;
 	
 	@ParameterValue(Key.MaxSunUpTime)
 	private final LocalTime maxSunUpTime = LocalTime.of(10, 0);
@@ -49,7 +50,7 @@ public class TimerRuleImpl {
 		facts.put(EndOfDayArguments.SystemVariables.name(),new ArrayList<>());
 	}
 
-	@Action(order = 2)
+	@Action(order = DEFAULT_PRIORITY)
 	public final void timerUpFirst(@Fact("Timer") Collection<Entry<String, LocalTime>> timerList) {
 		final var timerName = "T0";
 		if (upTime == null) {
@@ -63,7 +64,7 @@ public class TimerRuleImpl {
 		timerList.add(new AbstractMap.SimpleImmutableEntry<>(timerName, upTime));
 	}
 
-	@Action(order = 2)
+	@Action(order = DEFAULT_PRIORITY)
 	public final void timerUpSecond(@Fact("SunUpTime") final Optional<LocalTime> sunUpTime, @Fact("Timer") Collection<Entry<String, LocalTime>> timerList) {
 		final var timerName = "T1";
 		final var time = sunUpTime(sunUpTime);
@@ -82,7 +83,7 @@ public class TimerRuleImpl {
 		return time;
 	}
 
-	@Action(order = 2)
+	@Action(order = DEFAULT_PRIORITY)
 	public final void timerDown(@Fact("SunDownTime") final Optional<LocalTime> sunDownTime, @Fact("Timer") Collection<Entry<String, LocalTime>> timerList) {
 		final var timerName = "T6";
 		final var time = sunDownTime(sunDownTime);
