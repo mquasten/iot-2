@@ -63,7 +63,7 @@ class OtherVariablesRulesImplTest {
 
 		assertEquals(1, systemVariables.size());
 		assertEquals(OtherVariablesRulesImpl.TIME_TYP_SYSTEM_VARIABLE_NAME, systemVariables.stream().findAny().get().getName());
-		assertEquals(timeType.name().toUpperCase(), systemVariables.stream().findAny().get().getValue());
+		assertEquals(String.valueOf(timeType.ordinal()), systemVariables.stream().findAny().get().getValue());
 	}
 
 	@Test
@@ -79,7 +79,7 @@ class OtherVariablesRulesImplTest {
 
 		assertEquals(1, systemVariables.size());
 		assertEquals(OtherVariablesRulesImpl.MONTH_SYSTEM_VARIABLE_NAME, systemVariables.stream().findAny().get().getName());
-		assertEquals(month.name(), systemVariables.stream().findAny().get().getValue());
+		assertEquals(String.valueOf(month.ordinal()), systemVariables.stream().findAny().get().getValue());
 	}
 
 	@Test

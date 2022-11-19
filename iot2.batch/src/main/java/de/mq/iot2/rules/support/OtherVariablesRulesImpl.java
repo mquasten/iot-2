@@ -56,7 +56,7 @@ public class OtherVariablesRulesImpl {
 	public final void timeType(@Fact("TimeType") final TimeType timeType,  @Fact("SystemVariables") final Collection<SystemVariable> systemVariables ) {
 		Assert.notNull(timeType, "TimeType is required.");
 		systemVariablesNotNullGuard(systemVariables);
-		final var  systemVariable = new SystemVariable(TIME_TYP_SYSTEM_VARIABLE_NAME, timeType.name().toUpperCase());
+		final var  systemVariable = new SystemVariable(TIME_TYP_SYSTEM_VARIABLE_NAME, ""+ timeType.ordinal());
 		systemVariables.add(systemVariable);
 		writeSystemVariable2Logger(systemVariable);
 	}
@@ -66,7 +66,8 @@ public class OtherVariablesRulesImpl {
 		Assert.notNull(date, "Date is required.");
 		systemVariablesNotNullGuard(systemVariables);
 	
-		final var  systemVariable = new SystemVariable(MONTH_SYSTEM_VARIABLE_NAME, date.getMonth().name());
+		final var  systemVariable = new SystemVariable(MONTH_SYSTEM_VARIABLE_NAME, ""+ date.getMonth().ordinal());
+		
 		systemVariables.add(systemVariable);
 		writeSystemVariable2Logger(systemVariable);
 	}
