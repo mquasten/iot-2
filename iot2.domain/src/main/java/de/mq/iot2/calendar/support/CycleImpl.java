@@ -11,6 +11,7 @@ import de.mq.iot2.support.IdUtil;
 
 @Entity(name = "Cycle")
 public class CycleImpl implements Cycle {
+
 	private static final String NAME_IS_REQUIRED_MESSAGE = "Name is required.";
 
 	@Id
@@ -96,6 +97,14 @@ public class CycleImpl implements Cycle {
 		}
 
 		return other.name.equals(name);
+	}
+	
+	@Override
+	public String toString() {
+		if( name == null) {
+		return super.toString();
+		} 
+		return name;
 	}
 
 }

@@ -3,6 +3,8 @@ package de.mq.iot2.sysvars.support;
 import java.util.Collection;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
@@ -13,6 +15,7 @@ import de.mq.iot2.sysvars.SystemVariables;
 
 @Repository
 class HomematicCCU2RepositoryImpl implements SystemVariableRepository {
+	private static Logger LOGGER = LoggerFactory.getLogger(HomematicCCU2RepositoryImpl.class);
 
 	static final String VALUE_REQUIRED_MESSAGE = "Value is required.";
 
@@ -36,8 +39,7 @@ class HomematicCCU2RepositoryImpl implements SystemVariableRepository {
 	private final String host;
 	private final Integer port;
 
-	HomematicCCU2RepositoryImpl(final RestOperations restOperations, @Value("${iot2.ccu2.host}") final String host,
-			@Value("${iot2.ccu2.port:80}") final Integer port) {
+	HomematicCCU2RepositoryImpl(final RestOperations restOperations, @Value("${iot2.ccu2.host}") final String host, @Value("${iot2.ccu2.port:80}") final Integer port) {
 		this.restOperations = restOperations;
 		this.host = host;
 		this.port = port;
@@ -45,8 +47,7 @@ class HomematicCCU2RepositoryImpl implements SystemVariableRepository {
 
 	@Override
 	public Collection<SystemVariable> readSystemVariables() {
-		final var result = restOperations.getForObject(SYS_VAR_LIST_URL, SystemVariables.class,
-				Map.of(RARAMETER_HOST, host, PARAMETER_PORT, port));
+		final var result = restOperations.getForObject(SYS_VAR_LIST_URL, SystemVariables.class, Map.of(RARAMETER_HOST, host, PARAMETER_PORT, port));
 		return result.getSystemVariables();
 
 	}
@@ -56,10 +57,8 @@ class HomematicCCU2RepositoryImpl implements SystemVariableRepository {
 		Assert.notNull(systemVariable, SYSTEM_VARIABLE_REQUIRED_MESSAGE);
 		Assert.hasText(systemVariable.getId(), ID_REQUIRED_MESSAGE);
 		Assert.hasText(systemVariable.getValue(), VALUE_REQUIRED_MESSAGE);
-
-		restOperations.put(STATE_CHANGE_URL, null, Map.of(RARAMETER_HOST, host, PARAMETER_PORT, port, PARAMETER_ID,
-				systemVariable.getId(), PARAMETER_VALUE, systemVariable.getValue()));
+		restOperations.put(STATE_CHANGE_URL, null, Map.of(RARAMETER_HOST, host, PARAMETER_PORT, port, PARAMETER_ID, systemVariable.getId(), PARAMETER_VALUE, systemVariable.getValue()));
+		LOGGER.debug("Systemvariable {} value='{}' updated.", systemVariable.getName(), systemVariable.getValue());
 	}
-	
 
 }

@@ -132,4 +132,15 @@ class CycleImplTest {
 		ReflectionTestUtils.setField(cycle, NAME_FIELD_NAME, RandomTestUtil.randomString());
 		assertFalse(cycle.equals(other));
 	}
+
+	@Test
+	void string() {
+		assertEquals(name, new CycleImpl(id, name, priority).toString());
+	}
+
+	@Test
+	void stringNameNull() {
+		final var cycle = newWithDefaultConstructor();
+		assertEquals(CycleImpl.class.getName() + "@" + Integer.toHexString(System.identityHashCode(cycle)), cycle.toString());
+	}
 }
