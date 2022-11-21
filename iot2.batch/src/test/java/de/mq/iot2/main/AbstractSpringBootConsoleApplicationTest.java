@@ -20,7 +20,7 @@ import org.springframework.util.SerializationUtils;
 import de.mq.iot2.main.support.EndOfDayBatchImpl;
 import de.mq.iot2.main.support.ReflectionCommandLineRunnerArgumentsImpl;
 
-class SpringBootConsoleApplicationTest {
+class AbstractSpringBootConsoleApplicationTest {
 
 	private final static List<String> ARGUMENTS = new ArrayList<>();
 

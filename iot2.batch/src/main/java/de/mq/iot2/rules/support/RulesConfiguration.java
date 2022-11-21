@@ -14,7 +14,7 @@ import de.mq.iot2.rules.RuleService;
 class RulesConfiguration {
 	
 	@Bean(name="EndOfDayRulesService")
-	RuleService endOfDayRulesService() {
+	RuleService endOfDayRuleService() {
 		return new  RuleServiceImpl(endOfDayRules());
 	}
 	

@@ -37,7 +37,7 @@ public class EndOfDayBatchImpl {
 		this.configurationService = configurationService;
 		this.ruleService=ruleService;
 		this.systemVariableService=systemVariableService;
-	}
+	} 
 
 	@BatchMethod(value = "end-of-day", converterClass = EndOfDayBatchArgumentConverterImpl.class)
 	final void execute(final LocalDate date) {
