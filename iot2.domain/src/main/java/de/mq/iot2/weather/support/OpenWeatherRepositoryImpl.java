@@ -19,14 +19,14 @@ public class OpenWeatherRepositoryImpl implements WeatherRepository  {
 	
 	
 	
-	private static final String PARAMETER_KEY = "key";
-	private static final String PARAMETER_COUNTRY = "country";
-	private static final String PARAMETER_CITY = "city";
+	static final String PARAMETER_KEY = "key";
+	static final String PARAMETER_COUNTRY = "country";
+	static final String PARAMETER_CITY = "city";
 	final static String OPEN_WEATHER_FORE_CAST_URL  = "http://api.openweathermap.org/data/2.5/forecast?q={city},{country}&appid={key}&units=metric";
 	final static String OPEN_WEATHER_WEATHER_URL  = "http://api.openweathermap.org/data/2.5/weather?q={city},{country}&appid={key}&units=metric";
 	
 	static final String FORECAST_LIST_NODE_NAME = "list";
-	private static final String MAIN_NODE_NAME = "main";
+	static final String MAIN_NODE_NAME = "main";
 
 	private final Converter<Map<String,Object> , MeteorologicalData> meteorologicalDataConverter;
 	private final RestOperations restOperations;
