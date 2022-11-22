@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @PropertySource(value="classpath:/application.properties" ,ignoreResourceNotFound=true)
-public class SystemVariablesConfiguration {
+class SystemVariablesConfiguration {
 
 	@Bean
 	RestOperations restOperations() {

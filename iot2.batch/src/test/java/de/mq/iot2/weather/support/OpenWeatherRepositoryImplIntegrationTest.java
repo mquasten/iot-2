@@ -12,14 +12,15 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import de.mq.iot2.sysvars.support.SystemVariablesConfiguration;
+
 import de.mq.iot2.weather.MeteorologicalData;
 @Disabled
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { SystemVariablesConfiguration.class, OpenWeatherRepositoryImpl.class,
+@ContextConfiguration(classes = { TestSystemVariablesConfiguration.class, OpenWeatherRepositoryImpl.class,
 		MapToMeteorologicalDataConverterImpl.class })
 class OpenWeatherRepositoryImplIntegrationTest {
 
@@ -44,4 +45,9 @@ class OpenWeatherRepositoryImplIntegrationTest {
 		//System.out.println(meteorologicalData.dateTime());
 	}
 
+}
+
+@ComponentScan("de.mq.iot2.sysvars.support")
+class TestSystemVariablesConfiguration {
+	
 }
