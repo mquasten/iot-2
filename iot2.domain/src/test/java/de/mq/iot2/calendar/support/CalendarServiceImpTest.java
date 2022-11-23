@@ -32,12 +32,14 @@ import de.mq.iot2.calendar.DayGroup;
 import de.mq.iot2.support.RandomTestUtil;
 
 class CalendarServiceImpTest {
+	private static final double LONGITUDE = 6.2815922;
+	private static final double LATITUDE = 51.1423399;
 	private static final String VALUE_FIELD_NAME = "value";
 	private final CycleRepository cycleRepository = Mockito.mock(CycleRepository.class);
 	private final DayGroupRepository dayGroupRepository = Mockito.mock(DayGroupRepository.class);
 	private final DayRepository dayRepository = Mockito.mock(DayRepository.class);
 
-	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository);
+	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, LATITUDE, LONGITUDE);
 
 	@Test
 	void createDefaultCyclesGroupsAndDays() {

@@ -23,7 +23,7 @@ class RuleServiceImpl implements RuleService {
 	}
 
 	@Override
-	public Map<String,Object> process(final Map<Key, ? extends Object> parameter, final Map<? extends Enum<?>, Object> arguments) {
+	public Map<String,Object> process(final Map<Key, Object> parameter, final Map<? extends Enum<?>, Object> arguments) {
 		final RulesEngine rulesEngine = rulesEngine();
 		final Rules rules = rules(parameter, pojoRules);
 		Facts facts = facts(arguments);

@@ -9,11 +9,9 @@ class SunUpDownCalculatorImpl {
 	private final double latitude;
 	private final double longitude;
 	private final double h;
-
-	SunUpDownCalculatorImpl(final TwilightType twilightType) {
-		this(51.1423399, 6.2815922, twilightType);
-	}
-
+	// fuer Wegberg:
+	//longitude=6.2815922 
+    //latitude=51.1423399 
 	SunUpDownCalculatorImpl(final double latitudeDegrees, final double longitudeDegrees, final TwilightType twilightType) {
 		this.latitude = latitudeDegrees * Math.PI / 180d;
 		this.longitude = longitudeDegrees;

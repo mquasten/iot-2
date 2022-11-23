@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,8 @@ class CalendarServiceImp implements CalendarService {
 	private final CycleRepository cycleRepository;
 	private final DayGroupRepository dayGroupRepository;
 	private final DayRepository dayRepository;
-
+	private final double longitude;
+	private final double latitude;
 	private final Collection<DayOfWeek> weekendDays = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
 	private final Collection<Entry<Integer, String>> gaussDays = Set.of(new SimpleImmutableEntry<>(-2, "Karfreitag"), new SimpleImmutableEntry<>(0, "Ostersonntag"),
 			new SimpleImmutableEntry<>(1, "Ostermontag"), new SimpleImmutableEntry<>(39, "Christi Himmelfahrt"), new SimpleImmutableEntry<>(49, "Pfingstsonntag"),
@@ -42,10 +44,12 @@ class CalendarServiceImp implements CalendarService {
 			new SimpleImmutableEntry<>(MonthDay.of(12, 25), "1. Weihnachtsfeiertag"), new SimpleImmutableEntry<>(MonthDay.of(12, 26), "2. Weihnachtsfeiertag"));
 
 	@Autowired
-	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository) {
+	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository, @Value("${iot2.calendar.latitude}") final double latitude, @Value("${iot2.calendar.longitude}") final double longitude  ) {
 		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
+		this.latitude=latitude;
+		this.longitude=longitude;
 	}
 
 	@Override
@@ -122,12 +126,12 @@ class CalendarServiceImp implements CalendarService {
 
 	@Override
 	public Optional<LocalTime> sunDownTime(final LocalDate date, final TwilightType twilightType) {
-		return new SunUpDownCalculatorImpl(twilightType).sunDownTime(date.getDayOfYear(), timeType(date).offset());
+		return new SunUpDownCalculatorImpl(latitude,longitude,twilightType).sunDownTime(date.getDayOfYear(), timeType(date).offset());
 	}
 
 	@Override
 	public Optional<LocalTime> sunUpTime(final LocalDate date, final TwilightType twilightType) {
-		return new SunUpDownCalculatorImpl(twilightType).sunUpTime(date.getDayOfYear(), timeType(date).offset());
+		return new SunUpDownCalculatorImpl(latitude, longitude, twilightType).sunUpTime(date.getDayOfYear(), timeType(date).offset());
 	}
 
 }

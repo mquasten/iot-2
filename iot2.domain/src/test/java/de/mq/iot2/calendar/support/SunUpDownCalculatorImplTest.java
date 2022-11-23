@@ -20,12 +20,16 @@ public class SunUpDownCalculatorImplTest {
 
 	@Test
 	final void sunDownTime() {
-		assertEquals(Optional.of(LocalTime.of(19, 57)), new SunUpDownCalculatorImpl(TwilightType.Mathematical).sunDownTime(86, 2));
+		assertEquals(Optional.of(LocalTime.of(19, 57)), newSunUpDownCalculator(TwilightType.Mathematical).sunDownTime(86, 2));
 	}
+	
+	private SunUpDownCalculatorImpl newSunUpDownCalculator(final TwilightType twilightType) {
+		return new SunUpDownCalculatorImpl(51.1423399, 6.2815922, twilightType);
+    } 
 
 	@Test
 	final void sunUpTime() {
-		assertEquals(Optional.of(LocalTime.of(7, 23)), new SunUpDownCalculatorImpl(TwilightType.Mathematical).sunUpTime(86, 2));
+		assertEquals(Optional.of(LocalTime.of(7, 23)), newSunUpDownCalculator(TwilightType.Mathematical).sunUpTime(86, 2));
 	}
 
 	@Test
@@ -37,29 +41,29 @@ public class SunUpDownCalculatorImplTest {
 	final void sunUpTime0Minutes() {
 		// am 17.10, 289. Tag sind es im Algorithmus 60 Minuten -> plus eine Stunde , 0
 		// Minuten.
-		assertEquals(Optional.of(LocalTime.of(8, 0)), new SunUpDownCalculatorImpl(TwilightType.Mathematical).sunUpTime(289, 2));
+		assertEquals(Optional.of(LocalTime.of(8, 0)), newSunUpDownCalculator(TwilightType.Mathematical).sunUpTime(289, 2));
 	}
 
 	@Test
 	final void sunUpTimeNotExists() {
-		assertTrue(new SunUpDownCalculatorImpl(TwilightType.Astronomical).sunUpTime(182, 2).isEmpty());
+		assertTrue(newSunUpDownCalculator(TwilightType.Astronomical).sunUpTime(182, 2).isEmpty());
 	}
 
 	@Test
 	final void sunDownTimeNotExists() {
-		assertTrue(new SunUpDownCalculatorImpl(TwilightType.Astronomical).sunDownTime(182, 2).isEmpty());
+		assertTrue(newSunUpDownCalculator(TwilightType.Astronomical).sunDownTime(182, 2).isEmpty());
 	}
 
 	@Test
 	final void sunDownTimeGt24() {
-		assertEquals(Optional.of(LocalTime.of(1, 10)), new SunUpDownCalculatorImpl(TwilightType.Astronomical).sunDownTime(144, 2));
+		assertEquals(Optional.of(LocalTime.of(1, 10)), newSunUpDownCalculator(TwilightType.Astronomical).sunDownTime(144, 2));
 	}
 
 	@ParameterizedTest
 	@MethodSource("days")
 	final void sunUpDownAstronomicalExists(final int day) {
 
-		final var sunUpDownCalculator = new SunUpDownCalculatorImpl(TwilightType.Astronomical);
+		final var sunUpDownCalculator = newSunUpDownCalculator(TwilightType.Astronomical);
 		final var offset = offsetEstimation(day);
 		if ((day >= 145) && (day <= 201)) {
 			assertTrue(sunUpDownCalculator.sunDownTime(day, offset).isEmpty());
@@ -78,7 +82,7 @@ public class SunUpDownCalculatorImplTest {
 	@ParameterizedTest
 	@MethodSource("days")
 	final void sunUpDownMathematicalExists(final int day) {
-		final var sunUpDownCalculator = new SunUpDownCalculatorImpl(TwilightType.Mathematical);
+		final var sunUpDownCalculator = newSunUpDownCalculator(TwilightType.Mathematical);
 		final var offset = offsetEstimation(day);
 		final var sunDownTime = sunUpDownCalculator.sunDownTime(day, offset);
 		assertFalse(sunDownTime.isEmpty());
@@ -90,7 +94,7 @@ public class SunUpDownCalculatorImplTest {
 	@MethodSource("days")
 	final void sunUpDownCivilExists(final int day) {
 		final var offset = offsetEstimation(day);
-		final var sunUpDownCalculator = new SunUpDownCalculatorImpl(TwilightType.Civil);
+		final var sunUpDownCalculator = newSunUpDownCalculator(TwilightType.Civil);
 		final var sunDownTime = sunUpDownCalculator.sunDownTime(day, offset);
 		assertFalse(sunDownTime.isEmpty());
 		assertFalse(sunUpDownCalculator.sunUpTime(day, offset).isEmpty());
@@ -100,7 +104,7 @@ public class SunUpDownCalculatorImplTest {
 	@ParameterizedTest
 	@MethodSource("days")
 	final void sunUpDownNauticalExists(final int day) {
-		final var sunUpDownCalculator = new SunUpDownCalculatorImpl(TwilightType.Nautical);
+		final var sunUpDownCalculator = newSunUpDownCalculator(TwilightType.Nautical);
 		final var offset = offsetEstimation(day);
 		Optional<LocalTime> sunDownTime = sunUpDownCalculator.sunDownTime(day, offset);
 		assertFalse(sunDownTime.isEmpty());

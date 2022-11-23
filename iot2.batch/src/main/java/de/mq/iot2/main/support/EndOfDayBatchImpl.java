@@ -63,7 +63,7 @@ public class EndOfDayBatchImpl {
 
 		@SuppressWarnings("unchecked")
 		final Collection<SystemVariable> systemVariables = (Collection<SystemVariable>) results.get(EndOfDayArguments.SystemVariables.name());
-		
+		Assert.notEmpty(systemVariables, "Systemvariables required.");
 		LOGGER.debug("{} Systemvariables calculated.", systemVariables.size());
 		systemVariableService.update(systemVariables);
 		

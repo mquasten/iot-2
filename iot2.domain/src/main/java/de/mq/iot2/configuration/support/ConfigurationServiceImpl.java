@@ -77,7 +77,7 @@ class ConfigurationServiceImpl implements ConfigurationService {
 
 	@Transactional
 	@Override
-	public Map<Key, ? extends Object> parameters(final RuleKey ruleKey, final Cycle cycle) {
+	public Map<Key, Object> parameters(final RuleKey ruleKey, final Cycle cycle) {
 		Assert.notNull(ruleKey, "Key is required");
 		Assert.notNull(cycle, "Cycle is required");
 		final var configuration = configurationRepository.findByKey(ruleKey).orElseThrow(() -> new EntityNotFoundException(String.format(CYCLE_KEY_NOT_FOUND_MESSAGE_PATTERN, ruleKey)));
@@ -89,7 +89,7 @@ class ConfigurationServiceImpl implements ConfigurationService {
 
 		final Collection<Parameter> globalParameters = parameters.stream().filter(parameter -> !cycleParameters.containsKey(parameter.key())).collect(Collectors.toList());
 
-		final Map<Key, ? extends Object> results = Stream.concat(cycleParameters.values().stream(), globalParameters.stream())
+		final Map<Key,Object> results = Stream.concat(cycleParameters.values().stream(), globalParameters.stream())
 				.map(parameter -> new SimpleImmutableEntry<>(parameter.key(), conversionService.convert(parameter.value(), parameter.key().type())))
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 

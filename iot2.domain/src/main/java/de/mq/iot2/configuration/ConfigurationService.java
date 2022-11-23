@@ -10,6 +10,6 @@ public interface ConfigurationService {
 
 	void createDefaultConfigurationsAndParameters();
 
-	Map<Key, ? extends Object> parameters(final RuleKey key, final Cycle cycle);
+	Map<Key,Object> parameters(final RuleKey key, final Cycle cycle);
 
 }

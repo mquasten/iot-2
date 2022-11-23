@@ -41,12 +41,12 @@ class RuleServiceImplTest {
 		final var minSunDownTime = LocalTime.parse("17:15");
 		final var upTime = LocalTime.parse("07:15");
 		final var sunUpTime = LocalTime.of(8, 20);
-		final var parameters = Map.of(Key.MinSunUpTime, LocalTime.parse("05:30"), Key.MaxSunUpTime, LocalTime.parse("09:30"), Key.MinSunDownTime, minSunDownTime, Key.MaxSunDownTime,
+		final Map<Key,Object> parameters = Map.of(Key.MinSunUpTime, LocalTime.parse("05:30"), Key.MaxSunUpTime, LocalTime.parse("09:30"), Key.MinSunDownTime, minSunDownTime, Key.MaxSunDownTime,
 				LocalTime.parse("22:15"), Key.UpTime, upTime, Key.SunUpDownType, TwilightType.Mathematical);
 		final var arguments = Map.of(EndOfDayArguments.Date, LocalDate.of(2022, 12, 25), EndOfDayArguments.TimeType, TimeType.Winter, EndOfDayArguments.SunUpTime, Optional.of(sunUpTime),
 				EndOfDayArguments.SunDownTime, Optional.of(LocalTime.of(16, 45)), EndOfDayArguments.Cycle, cycle);
 
-		final var results = ruleService.process(parameters, arguments);
+		 Map<String,Object> results = ruleService.process(parameters, arguments);
 
 		assertEquals(7, results.size());
 		assertTrue(results.keySet().containsAll(arguments.keySet().stream().map(EndOfDayArguments::name).collect(Collectors.toList())));
@@ -83,7 +83,7 @@ class RuleServiceImplTest {
 		final var maxSunUpTime = LocalTime.parse("09:30");
 		final var minSunUpTime = LocalTime.parse("05:30");
 		final var maxSunDownTime = LocalTime.parse("22:15");
-		final var parameters = Map.of(Key.MinSunUpTime, minSunUpTime, Key.MaxSunUpTime, maxSunUpTime, Key.MinSunDownTime, minSunDownTime, Key.MaxSunDownTime, maxSunDownTime, Key.UpTime, upTime,
+		final Map<Key,Object> parameters = Map.of(Key.MinSunUpTime, minSunUpTime, Key.MaxSunUpTime, maxSunUpTime, Key.MinSunDownTime, minSunDownTime, Key.MaxSunDownTime, maxSunDownTime, Key.UpTime, upTime,
 				Key.SunUpDownType, TwilightType.Mathematical);
 
 		final var arguments = Map.of(EndOfDayArguments.Date, LocalDate.of(2022, 12, 25), EndOfDayArguments.TimeType, TimeType.Winter, EndOfDayArguments.SunUpTime, Optional.of(LocalTime.of(8, 20)),
