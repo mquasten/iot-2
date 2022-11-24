@@ -38,7 +38,6 @@ class EndOfDayBatchImplTest {
 
 	@Test
 	final void execute() {
-
 		final var sunUpTime = LocalTime.of(8, 0);
 		final var sunDownTime = LocalTime.of(17, 0);
 		Mockito.when(calendarService.cycle(date)).thenReturn(cycle);
@@ -65,5 +64,23 @@ class EndOfDayBatchImplTest {
 
 		Mockito.verify(systemVariableService).update(systemVariables);
 	}
+	
+	@Test
+	final void executeDefaultTwilightType() {
+		final var sunUpTime = LocalTime.of(8, 0);
+		final var sunDownTime = LocalTime.of(17, 0);
+		Mockito.when(calendarService.cycle(date)).thenReturn(cycle);
+		final Map<Key, Object> parameters = Map.of(Key.MaxSunDownTime, LocalTime.of(23, 30));
+		Mockito.when(calendarService.timeType(date)).thenReturn(TimeType.Winter);
+		Mockito.when(configurationService.parameters(RuleKey.EndOfDay, cycle)).thenReturn(parameters);
+		Mockito.when(calendarService.sunUpTime(date, TwilightType.Mathematical)).thenReturn(Optional.of(sunUpTime));
+		Mockito.when(calendarService.sunDownTime(date, TwilightType.Mathematical)).thenReturn(Optional.of(sunDownTime));
+		final var systemVariables = List.of(new SystemVariable());
+		Mockito.when(ruleService.process(Mockito.anyMap(), Mockito.anyMap())).thenReturn(Map.of(EndOfDayArguments.SystemVariables.name(), systemVariables));
 
+		endOfDayBatch.execute(date);
+		
+		Mockito.verify(systemVariableService).update(systemVariables);
+	}
+	
 }
