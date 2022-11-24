@@ -108,8 +108,7 @@ public class TimerRuleImpl {
 		final var stringBuilder = new StringBuilder();
 		final var orderedTimers = timerList.stream().sorted(( e1, e2 )-> e1.getValue().compareTo(e2.getValue())).collect(Collectors.toList());
 		
-		IntStream.range(0, orderedTimers.size()).forEach(i -> stringBuilder.append(String.format("%s:%d.%d%s", orderedTimers.get(i).getKey(), orderedTimers.get(i).getValue().getHour() ,orderedTimers.get(i).getValue().getMinute(),  i<orderedTimers.size()-1? ";" :"" )));
-		
+		IntStream.range(0, orderedTimers.size()).forEach(i -> stringBuilder.append(String.format("%s:%s%s", orderedTimers.get(i).getKey(), orderedTimers.get(i).getValue().getHour() + 0.01*orderedTimers.get(i).getValue().getMinute(),  i<orderedTimers.size()-1? ";" :"" )));
 		systemVariables.add(new SystemVariable(DAILY_EVENTS_SYSTEM_VARIABLE_NAME, stringBuilder.toString()));
 		
 		LOGGER.debug("Add {} Timer to SystemVariable {} value='{}'.", timerList.size(), DAILY_EVENTS_SYSTEM_VARIABLE_NAME, stringBuilder);

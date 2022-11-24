@@ -168,14 +168,14 @@ class TimerRuleImplTest {
 	@Test
 	void addSystemVariable() {
 
-		final Collection<Entry<String, LocalTime>> timer = List.of(new SimpleImmutableEntry<String, LocalTime>("T6", LocalTime.of(17,15)), new SimpleImmutableEntry<String, LocalTime>("T0", LocalTime.of(7, 15)), new SimpleImmutableEntry<String, LocalTime>("T1", LocalTime.of(8, 0)));
+		final Collection<Entry<String, LocalTime>> timer = List.of(new SimpleImmutableEntry<String, LocalTime>("T6", LocalTime.of(17,15)), new SimpleImmutableEntry<String, LocalTime>("T0", LocalTime.of(7, 15)), new SimpleImmutableEntry<String, LocalTime>("T1", LocalTime.of(8, 5)));
 		final Collection<SystemVariable> systemVariables = new ArrayList<>();
 		
 		timerRules.addSystemVariable(timer, systemVariables);
 		
 		assertEquals(1, systemVariables.size());
 		assertEquals(TimerRuleImpl.DAILY_EVENTS_SYSTEM_VARIABLE_NAME, systemVariables.iterator().next().getName());
-		assertEquals("T0:7.15;T1:8.0;T6:17.15", systemVariables.iterator().next().getValue());
+		assertEquals("T0:7.15;T1:8.05;T6:17.15", systemVariables.iterator().next().getValue());
 	}
 
 }

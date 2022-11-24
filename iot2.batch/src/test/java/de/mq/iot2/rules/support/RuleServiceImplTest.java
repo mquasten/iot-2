@@ -64,7 +64,7 @@ class RuleServiceImplTest {
 		final var systemVariableMap = ((Collection<SystemVariable>) results.get(EndOfDayArguments.SystemVariables.name())).stream()
 				.collect(Collectors.toMap(SystemVariable::getName, SystemVariable::getValue));
 		assertEquals(5, systemVariableMap.size());
-		assertEquals("T0:7.15;T1:8.20;T6:17.15", systemVariableMap.get(TimerRuleImpl.DAILY_EVENTS_SYSTEM_VARIABLE_NAME));
+		assertEquals("T0:7.15;T1:8.2;T6:17.15", systemVariableMap.get(TimerRuleImpl.DAILY_EVENTS_SYSTEM_VARIABLE_NAME));
 		assertEquals("" + Month.DECEMBER.ordinal(), systemVariableMap.get(OtherVariablesRulesImpl.MONTH_SYSTEM_VARIABLE_NAME));
 		assertEquals(String.valueOf(false), systemVariableMap.get(OtherVariablesRulesImpl.WORKING_DAY_SYSTEM_VARIABLE_NAME));
 		assertEquals("" + TimeType.Winter.ordinal(), systemVariableMap.get(OtherVariablesRulesImpl.TIME_TYP_SYSTEM_VARIABLE_NAME));
