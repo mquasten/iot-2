@@ -11,6 +11,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -86,6 +87,24 @@ class OtherVariablesRulesImplTest {
 	void MonthNullValues() {
 		assertThrows(IllegalArgumentException.class, () -> otherVariablesRules.month(null, new ArrayList<>()));
 		assertThrows(IllegalArgumentException.class, () -> otherVariablesRules.month(LocalDate.now(), null));
+	}
+	
+	@Test
+	void maxTemperature() {
+		final var temperature=11.11d;
+		otherVariablesRules.maxTemperature(Optional.of(temperature), systemVariables);
+		
+		assertEquals(1, systemVariables.size());
+		assertEquals(OtherVariablesRulesImpl.TEMPERATURE_SYSTEM_VARIABLE_NAME, systemVariables.stream().findAny().get().getName());
+		assertEquals(String.valueOf(temperature), systemVariables.stream().findAny().get().getValue());
+	}
+	
+	@Test
+	void maxTemperatureNoForecast() {
+		otherVariablesRules.maxTemperature(Optional.empty(), systemVariables);
+		
+		assertEquals(0, systemVariables.size());
+		
 	}
 
 	@Test

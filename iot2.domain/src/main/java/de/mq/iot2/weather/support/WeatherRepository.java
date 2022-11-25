@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import de.mq.iot2.weather.MeteorologicalData;
 
-public interface WeatherRepository {
+interface WeatherRepository {
 
 	Collection<MeteorologicalData> forecast();
 

@@ -44,7 +44,7 @@ class OpenWeatherRepositoryImplIntegrationTest {
 		assertTrue(ZonedDateTime.now().toEpochSecond() - meteorologicalData.dateTime().toEpochSecond() < 1000);
 		//System.out.println(meteorologicalData.dateTime());
 	}
-
+	
 }
 
 @ComponentScan("de.mq.iot2.sysvars.support")

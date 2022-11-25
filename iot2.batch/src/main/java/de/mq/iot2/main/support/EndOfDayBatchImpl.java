@@ -20,6 +20,7 @@ import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.rules.RuleService;
 import de.mq.iot2.sysvars.SystemVariable;
 import de.mq.iot2.sysvars.SystemVariableService;
+import de.mq.iot2.weather.support.WeatherService;
 
 @Service
 public class EndOfDayBatchImpl {
@@ -31,12 +32,15 @@ public class EndOfDayBatchImpl {
 	private final RuleService ruleService; 
 	
 	private final SystemVariableService systemVariableService;
+	
+	private final WeatherService weatherService;
 
-	EndOfDayBatchImpl(final CalendarService calendarService, final ConfigurationService configurationService, final RuleService ruleService, final SystemVariableService systemVariableService) {
+	EndOfDayBatchImpl(final CalendarService calendarService, final ConfigurationService configurationService, final RuleService ruleService, final SystemVariableService systemVariableService, final WeatherService weatherService) {
 		this.calendarService = calendarService;
 		this.configurationService = configurationService;
 		this.ruleService=ruleService;
 		this.systemVariableService=systemVariableService;
+		this.weatherService=weatherService;
 	} 
 
 	@BatchMethod(value = "end-of-day", converterClass = EndOfDayBatchArgumentConverterImpl.class)
@@ -54,7 +58,9 @@ public class EndOfDayBatchImpl {
 
 		final var sunDownTime = calendarService.sunDownTime(date, twilightType);
 		
-		final var arguments = Map.of(EndOfDayArguments.Date, date,EndOfDayArguments.TimeType, timeType, EndOfDayArguments.SunUpTime, sunUpTime, EndOfDayArguments.SunDownTime, sunDownTime, EndOfDayArguments.Cycle, cycle);
+		final var maxForecastTemperature = weatherService.maxForecastTemperature(date);
+		
+		final var arguments = Map.of(EndOfDayArguments.Date, date,EndOfDayArguments.TimeType, timeType, EndOfDayArguments.SunUpTime, sunUpTime, EndOfDayArguments.SunDownTime, sunDownTime, EndOfDayArguments.Cycle, cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature);
 
 		LOGGER.debug("Start RulesEngine parameters {} arguments {}.", parameters, arguments );
 		final var results =  ruleService.process(parameters, arguments);

@@ -23,6 +23,7 @@ import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.rules.RuleService;
 import de.mq.iot2.sysvars.SystemVariable;
 import de.mq.iot2.sysvars.SystemVariableService;
+import de.mq.iot2.weather.support.WeatherService;
 
 class EndOfDayBatchImplTest {
 
@@ -30,7 +31,8 @@ class EndOfDayBatchImplTest {
 	private final ConfigurationService configurationService = Mockito.mock(ConfigurationService.class);
 	private final RuleService ruleService = Mockito.mock(RuleService.class);
 	private final SystemVariableService systemVariableService = Mockito.mock(SystemVariableService.class);
-	private final EndOfDayBatchImpl endOfDayBatch = new EndOfDayBatchImpl(calendarService, configurationService, ruleService, systemVariableService);
+	private final WeatherService weatherService = Mockito.mock(WeatherService.class);
+	private final EndOfDayBatchImpl endOfDayBatch = new EndOfDayBatchImpl(calendarService, configurationService, ruleService, systemVariableService, weatherService);
 
 	private final LocalDate date = LocalDate.now().plusDays(1);
 
@@ -40,12 +42,14 @@ class EndOfDayBatchImplTest {
 	final void execute() {
 		final var sunUpTime = LocalTime.of(8, 0);
 		final var sunDownTime = LocalTime.of(17, 0);
+		final var maxForecastTemperature = Optional.of( 11.11d);;
 		Mockito.when(calendarService.cycle(date)).thenReturn(cycle);
 		final Map<Key, Object> parameters = Map.of(Key.SunUpDownType, TwilightType.Civil);
 		Mockito.when(calendarService.timeType(date)).thenReturn(TimeType.Winter);
 		Mockito.when(configurationService.parameters(RuleKey.EndOfDay, cycle)).thenReturn(parameters);
 		Mockito.when(calendarService.sunUpTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunUpTime));
 		Mockito.when(calendarService.sunDownTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunDownTime));
+		Mockito.when(weatherService.maxForecastTemperature(date)).thenReturn(maxForecastTemperature);
 		@SuppressWarnings("unchecked")
 		ArgumentCaptor<Map<Key, Object>> parameterCapture = ArgumentCaptor.forClass(Map.class);
 		@SuppressWarnings("unchecked")
@@ -61,6 +65,7 @@ class EndOfDayBatchImplTest {
 		assertEquals(Optional.of(sunUpTime), argumentCaptor.getValue().get(EndOfDayArguments.SunUpTime));
 		assertEquals(Optional.of(sunDownTime), argumentCaptor.getValue().get(EndOfDayArguments.SunDownTime));
 		assertEquals(cycle, argumentCaptor.getValue().get(EndOfDayArguments.Cycle));
+		assertEquals(maxForecastTemperature, argumentCaptor.getValue().get(EndOfDayArguments.MaxForecastTemperature));
 
 		Mockito.verify(systemVariableService).update(systemVariables);
 	}

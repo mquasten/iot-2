@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-
+import java.util.Optional;
 
 import org.jeasy.rules.annotation.Action;
 import org.jeasy.rules.annotation.Condition;
@@ -28,6 +28,7 @@ public class OtherVariablesRulesImpl {
 	final static String WORKING_DAY_SYSTEM_VARIABLE_NAME="Workingday";
 	final static String TIME_TYP_SYSTEM_VARIABLE_NAME="Time";
 	final static String MONTH_SYSTEM_VARIABLE_NAME="Month";
+	final static String TEMPERATURE_SYSTEM_VARIABLE_NAME="Temperature";
 	final static String LAST_BATCH_RUN_VARIABLE_NAME="LastBatchrun";
 	@Condition
 	public final boolean evaluate() {
@@ -71,6 +72,19 @@ public class OtherVariablesRulesImpl {
 		systemVariables.add(systemVariable);
 		writeSystemVariable2Logger(systemVariable);
 	}
+	
+	@Action(order = DEFAULT_PRIORITY)
+	public final void maxTemperature(@Fact("MaxForecastTemperature") final Optional<Double> maxForecastTemperature,  @Fact("SystemVariables") final Collection<SystemVariable> systemVariables ) {
+		maxForecastTemperature.ifPresent(temperature -> addTemperatureSystemVariable(systemVariables, temperature));
+	}
+
+	private void addTemperatureSystemVariable(final Collection<SystemVariable> systemVariables, Double temperature) {
+		final var systemVariable = new SystemVariable(TEMPERATURE_SYSTEM_VARIABLE_NAME , "" + temperature);
+		systemVariables.add(systemVariable);
+		writeSystemVariable2Logger(systemVariable);
+	}
+	
+	
 	
 	@Action(order = DEFAULT_PRIORITY)
 	public final void lastBatchrun(@Fact("SystemVariables") final Collection<SystemVariable> systemVariables ) {
