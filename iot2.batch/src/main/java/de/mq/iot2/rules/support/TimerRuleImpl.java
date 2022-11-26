@@ -38,6 +38,11 @@ public class TimerRuleImpl {
 	private final LocalTime minSunDownTime = LocalTime.of(15, 0);
 	@ParameterValue(Key.UpTime)
 	private final LocalTime upTime = null;
+	@ParameterValue(Key.ShadowTime)
+	private final LocalTime shadowTime=null;
+	@ParameterValue(Key.ShadowTemperature)
+	private final Double shadowTemperature=Double.MAX_VALUE;
+	
 
 	@Condition
 	public final boolean evaluate() {
@@ -82,6 +87,24 @@ public class TimerRuleImpl {
 		}
 		return time;
 	}
+	
+	@Action(order = DEFAULT_PRIORITY)
+	public final void timerShadowTemperature(@Fact("MaxForecastTemperature") final Optional<Double> maxForecastTemperature, @Fact("Timer") Collection<Entry<String, LocalTime>> timerList) {
+		if( shadowTime==null) {
+			return;
+		}
+		if( maxForecastTemperature.isEmpty()) {
+			return;
+		}
+		final var timerName = "T2";
+		if(maxForecastTemperature.get()>= shadowTemperature) {
+			LOGGER.debug("Add Timer {} {}.", timerName, shadowTime);
+			timerList.add(new AbstractMap.SimpleImmutableEntry<>(timerName, shadowTime));
+		}
+	
+	}
+
+	
 
 	@Action(order = DEFAULT_PRIORITY)
 	public final void timerDown(@Fact("SunDownTime") final Optional<LocalTime> sunDownTime, @Fact("Timer") Collection<Entry<String, LocalTime>> timerList) {

@@ -41,9 +41,11 @@ class RuleServiceImplTest {
 		final var minSunDownTime = LocalTime.parse("17:15");
 		final var upTime = LocalTime.parse("07:15");
 		final var sunUpTime = LocalTime.of(8, 20);
-		final var maxForecastTemperature=Optional.of(11.11d);
+		final var maxForecastTemperature=Optional.of(25d);
+		final var shadowTemperature = 25d;
+		final var shadowTime = LocalTime.of(9, 0);
 		final Map<Key,Object> parameters = Map.of(Key.MinSunUpTime, LocalTime.parse("05:30"), Key.MaxSunUpTime, LocalTime.parse("09:30"), Key.MinSunDownTime, minSunDownTime, Key.MaxSunDownTime,
-				LocalTime.parse("22:15"), Key.UpTime, upTime, Key.SunUpDownType, TwilightType.Mathematical);
+				LocalTime.parse("22:15"), Key.UpTime, upTime, Key.SunUpDownType, TwilightType.Mathematical, Key.ShadowTemperature, shadowTemperature, Key.ShadowTime, shadowTime);
 		final var arguments = Map.of(EndOfDayArguments.Date, LocalDate.of(2022, 12, 25), EndOfDayArguments.TimeType, TimeType.Winter, EndOfDayArguments.SunUpTime, Optional.of(sunUpTime),
 				EndOfDayArguments.SunDownTime, Optional.of(LocalTime.of(16, 45)), EndOfDayArguments.Cycle, cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature);
 
@@ -55,9 +57,10 @@ class RuleServiceImplTest {
 
 		@SuppressWarnings("unchecked")
 		final var timerMap = ((Collection<Entry<String, LocalTime>>) results.get(EndOfDayArguments.Timer.name())).stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-		assertEquals(3, timerMap.size());
+		assertEquals(4, timerMap.size());
 		assertEquals(upTime, timerMap.get("T0"));
 		assertEquals(sunUpTime, timerMap.get("T1"));
+		assertEquals(shadowTime, timerMap.get("T2"));
 		assertEquals(minSunDownTime, timerMap.get("T6"));
 
 		assertTrue(results.containsKey(EndOfDayArguments.SystemVariables.name()));
@@ -65,7 +68,7 @@ class RuleServiceImplTest {
 		final var systemVariableMap = ((Collection<SystemVariable>) results.get(EndOfDayArguments.SystemVariables.name())).stream()
 				.collect(Collectors.toMap(SystemVariable::getName, SystemVariable::getValue));
 		assertEquals(6, systemVariableMap.size());
-		assertEquals("T0:7.15;T1:8.2;T6:17.15", systemVariableMap.get(TimerRuleImpl.DAILY_EVENTS_SYSTEM_VARIABLE_NAME));
+		assertEquals("T0:7.15;T1:8.2;T2:9.0;T6:17.15", systemVariableMap.get(TimerRuleImpl.DAILY_EVENTS_SYSTEM_VARIABLE_NAME));
 		assertEquals("" + Month.DECEMBER.ordinal(), systemVariableMap.get(OtherVariablesRulesImpl.MONTH_SYSTEM_VARIABLE_NAME));
 		assertEquals(String.valueOf(false), systemVariableMap.get(OtherVariablesRulesImpl.WORKING_DAY_SYSTEM_VARIABLE_NAME));
 		assertEquals("" + TimeType.Winter.ordinal(), systemVariableMap.get(OtherVariablesRulesImpl.TIME_TYP_SYSTEM_VARIABLE_NAME));
@@ -86,23 +89,27 @@ class RuleServiceImplTest {
 		final var minSunUpTime = LocalTime.parse("05:30");
 		final var maxSunDownTime = LocalTime.parse("22:15");
 		final var maxForecastTemperature=Optional.of(11.11d);
+		final var shadowTemperature = 25d;
+		final var shadowTime = LocalTime.of(9, 0);
 		final Map<Key,Object> parameters = Map.of(Key.MinSunUpTime, minSunUpTime, Key.MaxSunUpTime, maxSunUpTime, Key.MinSunDownTime, minSunDownTime, Key.MaxSunDownTime, maxSunDownTime, Key.UpTime, upTime,
-				Key.SunUpDownType, TwilightType.Mathematical);
+				Key.SunUpDownType, TwilightType.Mathematical, Key.ShadowTemperature , shadowTemperature, Key.ShadowTime, shadowTime);
 
 		final var arguments = Map.of(EndOfDayArguments.Date, LocalDate.of(2022, 12, 25), EndOfDayArguments.TimeType, TimeType.Winter, EndOfDayArguments.SunUpTime, Optional.of(LocalTime.of(8, 20)),
 				EndOfDayArguments.SunDownTime, Optional.of(LocalTime.of(16, 45)), EndOfDayArguments.Cycle, Mockito.mock(Cycle.class), EndOfDayArguments.MaxForecastTemperature , maxForecastTemperature );
 
 		ruleService.process(parameters, arguments);
 
-		final Map<String, LocalTime> injectedValues = new HashMap<>();
-		ReflectionUtils.doWithFields(TimerRuleImpl.class, field -> injectedValues.put(StringUtils.capitalize(field.getName()), (LocalTime) ReflectionTestUtils.getField(timerRule, field.getName())),
-				field -> field.getType() == LocalTime.class);
-		assertEquals(5, injectedValues.size());
+		final Map<String, Object> injectedValues = new HashMap<>();
+		ReflectionUtils.doWithFields(TimerRuleImpl.class, field -> injectedValues.put(StringUtils.capitalize(field.getName()),  ReflectionTestUtils.getField(timerRule, field.getName())),
+				field -> field.isAnnotationPresent(ParameterValue.class));
+		assertEquals(7, injectedValues.size());
 		assertEquals(upTime, injectedValues.get(Key.UpTime.name()));
 		assertEquals(maxSunUpTime, injectedValues.get(Key.MaxSunUpTime.name()));
 		assertEquals(minSunDownTime, injectedValues.get(Key.MinSunDownTime.name()));
 		assertEquals(minSunUpTime, injectedValues.get(Key.MinSunUpTime.name()));
 		assertEquals(maxSunDownTime, injectedValues.get(Key.MaxSunDownTime.name()));
+		assertEquals(shadowTemperature, injectedValues.get(Key.ShadowTemperature.name()));
+		assertEquals(shadowTime, injectedValues.get(Key.ShadowTime.name()));
 	}
 
 	@Test
@@ -114,15 +121,17 @@ class RuleServiceImplTest {
 
 		ruleService.process(Map.of(), arguments);
 
-		final Map<String, LocalTime> injectedValues = new HashMap<>();
-		ReflectionUtils.doWithFields(TimerRuleImpl.class, field -> injectedValues.put(StringUtils.capitalize(field.getName()), (LocalTime) ReflectionTestUtils.getField(timerRule, field.getName())),
-				field -> field.getType() == LocalTime.class);
-		assertEquals(5, injectedValues.size());
+		final Map<String, Object> injectedValues = new HashMap<>();
+		ReflectionUtils.doWithFields(TimerRuleImpl.class, field -> injectedValues.put(StringUtils.capitalize(field.getName()),  ReflectionTestUtils.getField(timerRule, field.getName())),
+				field ->  field.isAnnotationPresent(ParameterValue.class));
+		assertEquals(7, injectedValues.size());
 		assertNull(injectedValues.get(Key.UpTime.name()));
 		assertEquals(LocalTime.of(10, 0), injectedValues.get(Key.MaxSunUpTime.name()));
 		assertEquals(LocalTime.of(15, 0), injectedValues.get(Key.MinSunDownTime.name()));
 		assertEquals(LocalTime.of(5, 0), injectedValues.get(Key.MinSunUpTime.name()));
 		assertEquals(LocalTime.of(23, 0), injectedValues.get(Key.MaxSunDownTime.name()));
+		assertEquals(Double.MAX_VALUE, injectedValues.get(Key.ShadowTemperature.name()));
+		assertNull(injectedValues.get(Key.ShadowTime.name()));
 	}
 
 }

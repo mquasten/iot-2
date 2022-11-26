@@ -72,6 +72,7 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.UpTime, "07:15"));
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.SunUpDownType, TwilightType.Mathematical.name()));
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.ShadowTemperature, "25"));
+		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.ShadowTime, "09:00"));
 		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "07:15", nonWorkingDayCycle));
 		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "05:30", workingDyCycle));
 	}

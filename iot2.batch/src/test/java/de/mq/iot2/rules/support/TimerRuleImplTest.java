@@ -110,6 +110,60 @@ class TimerRuleImplTest {
 		assertEquals("T1", timerList.get(0).getKey());
 		assertEquals(getParameter(Key.MinSunUpTime), timerList.get(0).getValue());
 	}
+	
+	@Test
+	void timerShadowTemperature() {
+		final List<Entry<String, LocalTime>> timerList = new ArrayList<>();
+		final var temperature = 25d;
+		final var time = LocalTime.of(9, 0);
+		injectParameter(Key.ShadowTemperature, temperature);
+		injectParameter(Key.ShadowTime, time);
+		
+		timerRules.timerShadowTemperature(Optional.of(temperature), timerList);
+		
+		assertEquals(1, timerList.size());
+		assertEquals("T2", timerList.get(0).getKey());
+		assertEquals(time, timerList.get(0).getValue());
+		
+	}
+	
+	@Test
+	void timerShadowTemperatureTemperatorLessThanLimit() {
+		final List<Entry<String, LocalTime>> timerList = new ArrayList<>();
+		final var time = LocalTime.of(9, 0);
+		injectParameter(Key.ShadowTemperature, 25d);
+		injectParameter(Key.ShadowTime, time);
+		
+		timerRules.timerShadowTemperature(Optional.of(24d), timerList);
+		
+		assertEquals(0, timerList.size());
+	}
+	
+	@Test
+	void timerShadowTemperatureNoForeCast() {
+		final List<Entry<String, LocalTime>> timerList = new ArrayList<>();
+		final var temperature = 25d;
+		final var time = LocalTime.of(9, 0);
+		injectParameter(Key.ShadowTemperature, temperature);
+		injectParameter(Key.ShadowTime, time);
+		
+		timerRules.timerShadowTemperature(Optional.empty(), timerList);
+		
+		assertEquals(0, timerList.size());
+	}
+	
+	@Test
+	void timerShadowTemperatureShadowTimeNull() {
+		final List<Entry<String, LocalTime>> timerList = new ArrayList<>();
+		final var temperature = 25d;
+		
+		injectParameter(Key.ShadowTemperature, temperature);
+		
+		
+		timerRules.timerShadowTemperature(Optional.of(temperature), timerList);
+		
+		assertEquals(0, timerList.size());
+	}
 
 	@Test
 	void timerDown() {
@@ -153,7 +207,7 @@ class TimerRuleImplTest {
 		assertEquals(getParameter(Key.MaxSunDownTime), timerList.get(0).getValue());
 	}
 
-	private void injectParameter(final Key key, final LocalTime time) {
+	private void injectParameter(final Key key, final Object time) {
 		ReflectionUtils.doWithFields(TimerRuleImpl.class, field -> ReflectionTestUtils.setField(timerRules, field.getName(), time),
 				field -> field.isAnnotationPresent(ParameterValue.class) && field.getDeclaredAnnotation(ParameterValue.class).value() == key);
 	}

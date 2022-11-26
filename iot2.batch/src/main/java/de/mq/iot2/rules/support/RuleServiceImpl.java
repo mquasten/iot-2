@@ -23,7 +23,7 @@ class RuleServiceImpl implements RuleService {
 	}
 
 	@Override
-	public Map<String,Object> process(final Map<Key, Object> parameter, final Map<? extends Enum<?>, Object> arguments) {
+	public Map<String, Object> process(final Map<Key, Object> parameter, final Map<? extends Enum<?>, Object> arguments) {
 		final RulesEngine rulesEngine = rulesEngine();
 		final Rules rules = rules(parameter, pojoRules);
 		Facts facts = facts(arguments);
@@ -31,9 +31,8 @@ class RuleServiceImpl implements RuleService {
 		return facts.asMap();
 	}
 
-	private  RulesEngine rulesEngine() {
-		final DefaultRulesEngine rulesEngine = new DefaultRulesEngine(
-				new RulesEngineParameters(false, true, false, Integer.MAX_VALUE));
+	private RulesEngine rulesEngine() {
+		final DefaultRulesEngine rulesEngine = new DefaultRulesEngine(new RulesEngineParameters(false, true, false, Integer.MAX_VALUE));
 		rulesEngine.registerRuleListener(new SimpleRulesEngineListener());
 		return rulesEngine;
 	}
@@ -41,16 +40,14 @@ class RuleServiceImpl implements RuleService {
 	private Rules rules(final Map<Key, ? extends Object> parameter, final Collection<?> pojoRules) {
 		final Rules rules = new Rules();
 		for (final Object rule : pojoRules) {
-			ReflectionUtils.doWithFields(rule.getClass(), field -> setField(rule, field, parameter),
-					field -> field.isAnnotationPresent(ParameterValue.class));
+			ReflectionUtils.doWithFields(rule.getClass(), field -> setField(rule, field, parameter), field -> field.isAnnotationPresent(ParameterValue.class));
 			rules.register(rule);
 		}
 
 		return rules;
 	}
 
-	private void setField(final Object rule, Field field, final Map<Key, ? extends Object> parameter)
-			throws IllegalAccessException {
+	private void setField(final Object rule, Field field, final Map<Key, ? extends Object> parameter) throws IllegalAccessException {
 		field.setAccessible(true);
 		final Key key = field.getDeclaredAnnotation(ParameterValue.class).value();
 		if (parameter.containsKey(key)) {

@@ -15,6 +15,7 @@ public interface Parameter {
 		MaxSunUpTime(LocalTime.class),
 		SunUpDownType(TwilightType.class),
 		ShadowTemperature(Double.class),
+		ShadowTime(LocalTime.class),
 		DaysBack(Integer.class);
 		
 		private final Class<?> type;
