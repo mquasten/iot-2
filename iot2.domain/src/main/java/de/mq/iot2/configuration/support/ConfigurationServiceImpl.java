@@ -4,6 +4,7 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -87,8 +88,8 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		final Collection<? extends Parameter> parameters = parameterRepository.findByConfiguration(configuration);
 
 		final Map<Key, Parameter> cycleParameters = parameters.stream().filter(parameter -> parameter instanceof CycleParameter).filter(parameter -> ((CycleParameter) parameter).cycle().equals(cycle))
-				.collect(Collectors.toMap(Parameter::key, parameter -> parameter));
-
+				.collect(Collectors.toMap(Parameter::key, Function.identity()));
+		
 		final Collection<Parameter> globalParameters = parameters.stream().filter(parameter -> !cycleParameters.containsKey(parameter.key())).collect(Collectors.toList());
 
 		final Map<Key,Object> results = Stream.concat(cycleParameters.values().stream(), globalParameters.stream())
