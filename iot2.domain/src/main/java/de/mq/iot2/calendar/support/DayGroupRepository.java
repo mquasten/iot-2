@@ -12,5 +12,7 @@ public interface DayGroupRepository {
 	DayGroup save(final DayGroup dayGroup);
 
 	Optional<DayGroup> findById(final String id);
+	
+	Optional<DayGroup> findByName(final String name);
 
 }

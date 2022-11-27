@@ -7,6 +7,7 @@ import java.time.Month;
 import java.time.MonthDay;
 import java.time.Year;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Comparator;
@@ -14,17 +15,21 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.Cycle;
+import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
 
 @Service
@@ -44,12 +49,13 @@ class CalendarServiceImp implements CalendarService {
 			new SimpleImmutableEntry<>(MonthDay.of(12, 25), "1. Weihnachtsfeiertag"), new SimpleImmutableEntry<>(MonthDay.of(12, 26), "2. Weihnachtsfeiertag"));
 
 	@Autowired
-	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository, @Value("${iot2.calendar.latitude}") final double latitude, @Value("${iot2.calendar.longitude}") final double longitude  ) {
+	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository, @Value("${iot2.calendar.latitude}") final double latitude,
+			@Value("${iot2.calendar.longitude}") final double longitude) {
 		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
-		this.latitude=latitude;
-		this.longitude=longitude;
+		this.latitude = latitude;
+		this.longitude = longitude;
 	}
 
 	@Override
@@ -126,12 +132,44 @@ class CalendarServiceImp implements CalendarService {
 
 	@Override
 	public Optional<LocalTime> sunDownTime(final LocalDate date, final TwilightType twilightType) {
-		return new SunUpDownCalculatorImpl(latitude,longitude,twilightType).sunDownTime(date.getDayOfYear(), timeType(date).offset());
+		return new SunUpDownCalculatorImpl(latitude, longitude, twilightType).sunDownTime(date.getDayOfYear(), timeType(date).offset());
 	}
 
 	@Override
 	public Optional<LocalTime> sunUpTime(final LocalDate date, final TwilightType twilightType) {
 		return new SunUpDownCalculatorImpl(latitude, longitude, twilightType).sunUpTime(date.getDayOfYear(), timeType(date).offset());
+	}
+
+	@Override
+	@Transactional
+	public int addLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate) {
+		final Collection<Day<LocalDate>> days = localDateDays(name, fromDate, toDate);
+		days.forEach(dayRepository::save);
+		return days.size();
+
+	}
+	@Override
+	@Transactional
+	public int deleteLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate) {
+		final Collection<Day<LocalDate>> days = localDateDays(name, fromDate, toDate);
+		days.forEach(dayRepository::delete);
+		return days.size();
+
+	}
+
+	private Collection<Day<LocalDate>> localDateDays(final String name, final LocalDate fromDate, final LocalDate toDate) {
+
+		Assert.hasText(name, "Name of dayGroup required.");
+		Assert.notNull(fromDate, "FromDate required.");
+		Assert.notNull(fromDate, "ToDate required.");
+		final var dayGroup = dayGroupRepository.findByName(name).orElseThrow(() -> new IncorrectResultSizeDataAccessException(String.format("DayGroup %s not found", name), 1, 0));
+
+		if (dayGroup.readOnly()) {
+			throw new IllegalStateException("DayGroup is readonly.");
+		}
+
+		final Long numberOfDays = fromDate.until(toDate, ChronoUnit.DAYS);
+		return  IntStream.rangeClosed(0, numberOfDays.intValue()).mapToObj(i -> new LocalDateDayImp(dayGroup, fromDate.plusDays(i))).collect(Collectors.toList());
 	}
 
 }

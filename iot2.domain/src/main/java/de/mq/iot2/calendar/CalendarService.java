@@ -52,4 +52,11 @@ public interface CalendarService {
 
 	Optional<LocalTime> sunUpTime(final LocalDate date, final TwilightType twilightType);
 
+	int addLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate);
+
+	int deleteLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate);
+
+
+
+
 }
