@@ -6,6 +6,8 @@ import java.time.LocalTime;
 import java.time.Month;
 import java.time.MonthDay;
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -31,6 +33,7 @@ import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
+import de.mq.iot2.support.IdUtil;
 
 @Service
 class CalendarServiceImp implements CalendarService {
@@ -143,20 +146,30 @@ class CalendarServiceImp implements CalendarService {
 	@Override
 	@Transactional
 	public int addLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate) {
-		final Collection<Day<LocalDate>> days = localDateDays(name, fromDate, toDate);
-		days.forEach(dayRepository::save);
+		final Collection<Day<LocalDate>> days = localDateDays(name, fromDate, toDate).stream().filter(day ->dayRepository.findById(IdUtil.getId(day)).isEmpty()).collect(Collectors.toList());
+		days.forEach( dayRepository::save);
 		return days.size();
 
 	}
+
+	
 	@Override
 	@Transactional
 	public int deleteLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate) {
-		final Collection<Day<LocalDate>> days = localDateDays(name, fromDate, toDate);
+		final Collection<Day<LocalDate>> days = localDateDays(name, fromDate, toDate).stream().filter(day -> hasSameGroup(day)).collect(Collectors.toList());
 		days.forEach(dayRepository::delete);
 		return days.size();
 
 	}
 
+	private boolean  hasSameGroup(Day<LocalDate> day) {
+		final var existing =dayRepository.findById(IdUtil.getId(day));
+		if ( existing.isEmpty()) {
+			return false;
+		}
+		return existing.get().dayGroup().equals(day.dayGroup());
+	}
+	
 	private Collection<Day<LocalDate>> localDateDays(final String name, final LocalDate fromDate, final LocalDate toDate) {
 
 		Assert.hasText(name, "Name of dayGroup required.");
@@ -169,7 +182,7 @@ class CalendarServiceImp implements CalendarService {
 		}
 
 		final Long numberOfDays = fromDate.until(toDate, ChronoUnit.DAYS);
-		return  IntStream.rangeClosed(0, numberOfDays.intValue()).mapToObj(i -> new LocalDateDayImp(dayGroup, fromDate.plusDays(i))).collect(Collectors.toList());
+		return  IntStream.rangeClosed(0, numberOfDays.intValue()).mapToObj(i -> new LocalDateDayImp(dayGroup, fromDate.plusDays(i),  fromDate.plusDays(i).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.GERMAN)))).collect(Collectors.toList());
 	}
 
 }

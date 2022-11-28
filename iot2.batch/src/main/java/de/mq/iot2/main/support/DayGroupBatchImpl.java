@@ -21,14 +21,14 @@ class DayGroupBatchImpl {
 	final void addLocalDate(final String dayGroup, final LocalDate fromDate, final LocalDate toDate) {
 		
 	   final int numberOfDays =  calendarService.addLocalDateDays(dayGroup, fromDate, toDate);
-	   LOGGER.info("{} days added to DayGroup {} if not exist." , numberOfDays, dayGroup);
+	   LOGGER.info("{} days added to DayGroup {}." , numberOfDays, dayGroup);
 	   
 	}
 	
 	@BatchMethod(value = "delete-local-date", converterClass = DayGroupBatchConverterImpl.class)
 	final void deleteLocalDate(final String dayGroup, final LocalDate fromDate, final LocalDate toDate) {
 		 final int numberOfDays =  calendarService.deleteLocalDateDays(dayGroup, fromDate, toDate);
-		 LOGGER.info("{} days deleted from DayGroup {} if exist." , numberOfDays, dayGroup);
+		 LOGGER.info("{} days deleted from DayGroup {}." , numberOfDays, dayGroup);
 	}
 
 }

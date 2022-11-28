@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.UUID;
 
+import javax.persistence.Id;
+
 import org.junit.jupiter.api.Test;
 
 class IdUtilTest { 
@@ -41,6 +43,20 @@ class IdUtilTest {
 		final var last = values[values.length - 1];
 		return values[values.length - 2] +"-"+ last.substring(0, last.length() - 2);
 	}
+	
+	@Test
+    void getId() {
+		final var  id = RandomTestUtil.randomString();
+    	final var testEntity=new TestEntity(id);
+    	assertEquals(id, IdUtil.getId(testEntity));
+    }
+}
 
-
+class TestEntity {
+	
+	@Id
+	private final String id;
+	TestEntity(final String id){
+		this.id=id;
+	}
 }
