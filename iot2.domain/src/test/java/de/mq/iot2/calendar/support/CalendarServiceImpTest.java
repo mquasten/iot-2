@@ -1,7 +1,11 @@
 package de.mq.iot2.calendar.support;
 
+import static de.mq.iot2.calendar.support.CalendarServiceImp.DAY_GROUP_NOT_FOUND_MESSAGE;
+import static de.mq.iot2.calendar.support.CalendarServiceImp.DAY_GROUP_READONLY_MESSAGE;
+import static de.mq.iot2.calendar.support.CalendarServiceImp.LIMIT_OF_DAYS_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.DayOfWeek;
@@ -21,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.calendar.CalendarService;
@@ -29,6 +34,7 @@ import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
+import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.RandomTestUtil;
 
 class CalendarServiceImpTest {
@@ -38,8 +44,9 @@ class CalendarServiceImpTest {
 	private final CycleRepository cycleRepository = Mockito.mock(CycleRepository.class);
 	private final DayGroupRepository dayGroupRepository = Mockito.mock(DayGroupRepository.class);
 	private final DayRepository dayRepository = Mockito.mock(DayRepository.class);
+	private final static int DAY_LIMIT = 30;
 
-	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, LATITUDE, LONGITUDE);
+	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, LATITUDE, LONGITUDE, DAY_LIMIT);
 
 	@Test
 	void createDefaultCyclesGroupsAndDays() {
@@ -172,6 +179,73 @@ class CalendarServiceImpTest {
 	@Test
 	final void sunUpTime() {
 		assertEquals(Optional.of(LocalTime.of(7, 23)), calendarService.sunUpTime(LocalDate.of(2022, 3, 27), TwilightType.Mathematical));
+	}
+
+	@Test
+	final void addLocalDateDays() {
+		final var groupName = RandomTestUtil.randomString();
+		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName, false);
+		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
+
+		assertEquals(2, calendarService.addLocalDateDays(groupName, LocalDate.now(), LocalDate.now().plusDays(1)));
+
+		Mockito.verify(dayRepository).save(new LocalDateDayImp(dayGroup, LocalDate.now()));
+		Mockito.verify(dayRepository).save(new LocalDateDayImp(dayGroup, LocalDate.now().plusDays(1)));
+	}
+
+	@Test
+	final void addLocalDateDaysAlreadyExists() {
+		final var groupName = RandomTestUtil.randomString();
+		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName, false);
+		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
+		final Day<LocalDate> existingDay1 = new LocalDateDayImp(Mockito.mock(DayGroup.class), LocalDate.now());
+		final Day<LocalDate> existingDay2 = new LocalDateDayImp(Mockito.mock(DayGroup.class), LocalDate.now().plusDays(1));
+		Mockito.when(dayRepository.findById(IdUtil.getId(existingDay1))).thenReturn(Optional.of(existingDay1));
+		Mockito.when(dayRepository.findById(IdUtil.getId(existingDay2))).thenReturn(Optional.of(existingDay2));
+
+		assertEquals(0, calendarService.addLocalDateDays(groupName, LocalDate.now(), LocalDate.now().plusDays(1)));
+
+		Mockito.verify(dayRepository, Mockito.never()).save(Mockito.any());
+	}
+
+	@Test
+	final void addLocalDateDaysDayGroupNotFound() {
+		final var dayGroup = RandomTestUtil.randomString();
+		assertEquals(String.format(DAY_GROUP_NOT_FOUND_MESSAGE, dayGroup),
+				assertThrows(IncorrectResultSizeDataAccessException.class, () -> calendarService.addLocalDateDays(dayGroup, LocalDate.now(), LocalDate.now())).getMessage());
+
+	}
+
+	@Test
+	final void addLocalDateDaysDayGroupReadonly() {
+		final var groupName = RandomTestUtil.randomString();
+		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName);
+		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
+		assertEquals(DAY_GROUP_READONLY_MESSAGE, assertThrows(IllegalStateException.class, () -> calendarService.addLocalDateDays(groupName, LocalDate.now(), LocalDate.now())).getMessage());
+
+	}
+
+	@Test
+	final void addLocalDateDaysMandatoryParameters() {
+		assertThrows(IllegalArgumentException.class, () -> calendarService.addLocalDateDays(null, LocalDate.now(), LocalDate.now()));
+		assertThrows(IllegalArgumentException.class, () -> calendarService.addLocalDateDays(RandomTestUtil.randomString(), null, LocalDate.now()));
+		assertThrows(IllegalArgumentException.class, () -> calendarService.addLocalDateDays(RandomTestUtil.randomString(), LocalDate.now(), null));
+	}
+
+	@Test
+	final void addLocalDateDaysFromBeforeTo() {
+		final var groupName = RandomTestUtil.randomString();
+		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName, false);
+		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
+
+		assertEquals(0, calendarService.addLocalDateDays(groupName, LocalDate.now().plusDays(1), LocalDate.now()));
+	}
+
+	@Test
+	final void addLocalDateDaysDayLimit() {
+		assertEquals(String.format(LIMIT_OF_DAYS_MESSAGE, DAY_LIMIT),
+				assertThrows(IllegalArgumentException.class, () -> calendarService.addLocalDateDays(RandomTestUtil.randomString(), LocalDate.now(), LocalDate.now().plusDays(DAY_LIMIT + 1)))
+						.getMessage());
 	}
 
 }

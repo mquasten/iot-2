@@ -38,11 +38,15 @@ import de.mq.iot2.support.IdUtil;
 @Service
 class CalendarServiceImp implements CalendarService {
 
+	static final String LIMIT_OF_DAYS_MESSAGE = "Limit of days is %s.";
+	static final String DAY_GROUP_READONLY_MESSAGE = "DayGroup is readonly.";
+	static final String DAY_GROUP_NOT_FOUND_MESSAGE = "DayGroup %s not found";
 	private final CycleRepository cycleRepository;
 	private final DayGroupRepository dayGroupRepository;
 	private final DayRepository dayRepository;
 	private final double longitude;
 	private final double latitude;
+	private final int dayLimit;
 	private final Collection<DayOfWeek> weekendDays = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
 	private final Collection<Entry<Integer, String>> gaussDays = Set.of(new SimpleImmutableEntry<>(-2, "Karfreitag"), new SimpleImmutableEntry<>(0, "Ostersonntag"),
 			new SimpleImmutableEntry<>(1, "Ostermontag"), new SimpleImmutableEntry<>(39, "Christi Himmelfahrt"), new SimpleImmutableEntry<>(49, "Pfingstsonntag"),
@@ -53,12 +57,13 @@ class CalendarServiceImp implements CalendarService {
 
 	@Autowired
 	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository, @Value("${iot2.calendar.latitude}") final double latitude,
-			@Value("${iot2.calendar.longitude}") final double longitude) {
+			@Value("${iot2.calendar.longitude}") final double longitude, @Value("${iot2.calendar.dayslimit:30}") final int dayLimit) {
 		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.dayLimit = dayLimit;
 	}
 
 	@Override
@@ -146,13 +151,12 @@ class CalendarServiceImp implements CalendarService {
 	@Override
 	@Transactional
 	public int addLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate) {
-		final Collection<Day<LocalDate>> days = localDateDays(name, fromDate, toDate).stream().filter(day ->dayRepository.findById(IdUtil.getId(day)).isEmpty()).collect(Collectors.toList());
-		days.forEach( dayRepository::save);
+		final Collection<Day<LocalDate>> days = localDateDays(name, fromDate, toDate).stream().filter(day -> dayRepository.findById(IdUtil.getId(day)).isEmpty()).collect(Collectors.toList());
+		days.forEach(dayRepository::save);
 		return days.size();
 
 	}
 
-	
 	@Override
 	@Transactional
 	public int deleteLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate) {
@@ -162,27 +166,32 @@ class CalendarServiceImp implements CalendarService {
 
 	}
 
-	private boolean  hasSameGroup(Day<LocalDate> day) {
-		final var existing =dayRepository.findById(IdUtil.getId(day));
-		if ( existing.isEmpty()) {
+	private boolean hasSameGroup(Day<LocalDate> day) {
+		final var existing = dayRepository.findById(IdUtil.getId(day));
+		if (existing.isEmpty()) {
 			return false;
 		}
 		return existing.get().dayGroup().equals(day.dayGroup());
 	}
-	
+
 	private Collection<Day<LocalDate>> localDateDays(final String name, final LocalDate fromDate, final LocalDate toDate) {
 
 		Assert.hasText(name, "Name of dayGroup required.");
 		Assert.notNull(fromDate, "FromDate required.");
-		Assert.notNull(fromDate, "ToDate required.");
-		final var dayGroup = dayGroupRepository.findByName(name).orElseThrow(() -> new IncorrectResultSizeDataAccessException(String.format("DayGroup %s not found", name), 1, 0));
-
-		if (dayGroup.readOnly()) {
-			throw new IllegalStateException("DayGroup is readonly.");
-		}
+		Assert.notNull(toDate, "ToDate required.");
 
 		final Long numberOfDays = fromDate.until(toDate, ChronoUnit.DAYS);
-		return  IntStream.rangeClosed(0, numberOfDays.intValue()).mapToObj(i -> new LocalDateDayImp(dayGroup, fromDate.plusDays(i),  fromDate.plusDays(i).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.GERMAN)))).collect(Collectors.toList());
+		Assert.isTrue(numberOfDays <= dayLimit, String.format(LIMIT_OF_DAYS_MESSAGE, dayLimit));
+
+		final var dayGroup = dayGroupRepository.findByName(name).orElseThrow(() -> new IncorrectResultSizeDataAccessException(String.format(DAY_GROUP_NOT_FOUND_MESSAGE, name), 1, 0));
+
+		if (dayGroup.readOnly()) {
+			throw new IllegalStateException(DAY_GROUP_READONLY_MESSAGE);
+		}
+
+		return IntStream.rangeClosed(0, numberOfDays.intValue())
+				.mapToObj(i -> new LocalDateDayImp(dayGroup, fromDate.plusDays(i), fromDate.plusDays(i).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.GERMAN))))
+				.collect(Collectors.toList());
 	}
 
 }
