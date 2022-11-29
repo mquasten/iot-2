@@ -57,6 +57,7 @@ class CalendarServiceImpTest {
 
 		Mockito.doAnswer(answer -> {
 			final var cycle = answer.getArgument(0, Cycle.class);
+			System.out.println(cycle.name());
 			savedCyles.put(cycle.name(), cycle);
 			return cycle;
 		}).when(cycleRepository).save(Mockito.any(Cycle.class));
@@ -112,7 +113,7 @@ class CalendarServiceImpTest {
 		assertEquals(nonWorkingDayCycle, fixedDayGroup.cycle());
 		assertFalse(nonWorkingDayCycle.isDeaultCycle());
 
-		savedCyles.values().stream().filter(c -> !c.equals(nonWorkingDayCycle)).forEach(c -> assertTrue(c.isDeaultCycle()));
+		savedCyles.values().stream().filter(c -> !c.equals(nonWorkingDayCycle)).forEach(c -> assertTrue(c.isDeaultCycle()));	
 	}
 
 	@Test
@@ -247,5 +248,97 @@ class CalendarServiceImpTest {
 				assertThrows(IllegalArgumentException.class, () -> calendarService.addLocalDateDays(RandomTestUtil.randomString(), LocalDate.now(), LocalDate.now().plusDays(DAY_LIMIT + 1)))
 						.getMessage());
 	}
+	
+	@Test
+	final void deleteLocalDateDays() {
+		final var groupName = RandomTestUtil.randomString();
+		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName, false);
+		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
+		final var day1 = new LocalDateDayImp(dayGroup, LocalDate.now());
+		final var day2 = new LocalDateDayImp(dayGroup, LocalDate.now().plusDays(1));
+		Mockito.when(dayRepository.findById(IdUtil.getId(day1))).thenReturn(Optional.of(day1));
+		Mockito.when(dayRepository.findById(IdUtil.getId(day2))).thenReturn(Optional.of(day2));
+		
+		assertEquals(2, calendarService.deleteLocalDateDays(groupName,  LocalDate.now(), LocalDate.now().plusDays(1)));
+		
+		Mockito.verify(dayRepository).delete(day1);
+		Mockito.verify(dayRepository).delete(day2);
+	}
+	@Test
+	final void deleteLocalDateDaysNotExists() {
+		final var groupName = RandomTestUtil.randomString();
+		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName, false);
+		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
+		final var day1 = new LocalDateDayImp(dayGroup, LocalDate.now());
+		final var day2 = new LocalDateDayImp(dayGroup, LocalDate.now().plusDays(1));
+		
+		
+		assertEquals(0, calendarService.deleteLocalDateDays(groupName,  LocalDate.now(), LocalDate.now().plusDays(1)));
+		
+		Mockito.verify(dayRepository, Mockito.never()).delete(day1);
+		Mockito.verify(dayRepository, Mockito.never()).delete(day2);
+	}
+	
+	@Test
+	final void deleteLocalDateDaysOtherGroup() {
+		final var groupName = RandomTestUtil.randomString();
+		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName, false);
+		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
+		final var day1 = new LocalDateDayImp(Mockito.mock(DayGroup.class), LocalDate.now());
+		final var day2 = new LocalDateDayImp(Mockito.mock(DayGroup.class), LocalDate.now().plusDays(1));
+		Mockito.when(dayRepository.findById(IdUtil.getId(day1))).thenReturn(Optional.of(day1));
+		Mockito.when(dayRepository.findById(IdUtil.getId(day2))).thenReturn(Optional.of(day2));
+		
+		assertEquals(0, calendarService.deleteLocalDateDays(groupName,  LocalDate.now(), LocalDate.now().plusDays(1)));
+		
+		Mockito.verify(dayRepository, Mockito.never()).delete(day1);
+		Mockito.verify(dayRepository, Mockito.never()).delete(day2);
+	}
+	
+	
+	@Test
+	final void deleteLocalDateDaysDayGroupNotFound() {
+		final var dayGroup = RandomTestUtil.randomString();
+		assertEquals(String.format(DAY_GROUP_NOT_FOUND_MESSAGE, dayGroup),
+				assertThrows(IncorrectResultSizeDataAccessException.class, () -> calendarService.deleteLocalDateDays(dayGroup, LocalDate.now(), LocalDate.now())).getMessage());
+
+	}
+
+	@Test
+	final void deleteLocalDateDaysDayGroupReadonly() {
+		final var groupName = RandomTestUtil.randomString();
+		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName);
+		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
+		assertEquals(DAY_GROUP_READONLY_MESSAGE, assertThrows(IllegalStateException.class, () -> calendarService.deleteLocalDateDays(groupName, LocalDate.now(), LocalDate.now())).getMessage());
+
+	}
+
+	@Test
+	final void deleteLocalDateDaysMandatoryParameters() {
+		assertThrows(IllegalArgumentException.class, () -> calendarService.deleteLocalDateDays(null, LocalDate.now(), LocalDate.now()));
+		assertThrows(IllegalArgumentException.class, () -> calendarService.deleteLocalDateDays(RandomTestUtil.randomString(), null, LocalDate.now()));
+		assertThrows(IllegalArgumentException.class, () -> calendarService.deleteLocalDateDays(RandomTestUtil.randomString(), LocalDate.now(), null));
+	}
+
+	@Test
+	final void deleteLocalDateDaysFromBeforeTo() {
+		final var groupName = RandomTestUtil.randomString();
+		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName, false);
+		final var day1 = new LocalDateDayImp(dayGroup, LocalDate.now());
+		final var day2 = new LocalDateDayImp(dayGroup, LocalDate.now().plusDays(1));
+		Mockito.when(dayRepository.findById(IdUtil.getId(day1))).thenReturn(Optional.of(day1));
+		Mockito.when(dayRepository.findById(IdUtil.getId(day2))).thenReturn(Optional.of(day2));
+		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
+
+		assertEquals(0, calendarService.deleteLocalDateDays(groupName, LocalDate.now().plusDays(1), LocalDate.now()));
+	}
+
+	@Test
+	final void deleteLocalDateDaysDayLimit() {
+		assertEquals(String.format(LIMIT_OF_DAYS_MESSAGE, DAY_LIMIT),
+				assertThrows(IllegalArgumentException.class, () -> calendarService.deleteLocalDateDays(RandomTestUtil.randomString(), LocalDate.now(), LocalDate.now().plusDays(DAY_LIMIT + 1)))
+						.getMessage());
+	}
+	
 
 }
