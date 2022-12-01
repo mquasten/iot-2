@@ -38,6 +38,7 @@ import de.mq.iot2.support.IdUtil;
 @Service
 class CalendarServiceImp implements CalendarService {
 
+	static final String OTHER_UP_TIMES_GROUP_NAME = "Sonderzeiten";
 	static final String LIMIT_OF_DAYS_MESSAGE = "Limit of days is %s.";
 	static final String DAY_GROUP_READONLY_MESSAGE = "DayGroup is readonly.";
 	static final String DAY_GROUP_NOT_FOUND_MESSAGE = "DayGroup %s not found";
@@ -72,9 +73,12 @@ class CalendarServiceImp implements CalendarService {
 
 		final var cycle = cycleRepository.save(new CycleImpl(1L, "Freizeit", 101));
 		cycleRepository.save(new CycleImpl(2L, "Arbeitstage", 102, true));
+		
 		createOrUpdatePublicHolidays(cycle);
 		createOrUpdateWeekend(cycle);
 		createOrUpdateVacation(cycle);
+		final var otherTimesCycle = cycleRepository.save(new CycleImpl(3L, "abweichender Tagesbeginn",100));
+		dayGroupRepository.save(new DayGroupImpl(otherTimesCycle, 4L, OTHER_UP_TIMES_GROUP_NAME, false));
 	}
 
 	private void createOrUpdateVacation(final Cycle cycle) {

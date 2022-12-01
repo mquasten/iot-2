@@ -57,7 +57,6 @@ class CalendarServiceImpTest {
 
 		Mockito.doAnswer(answer -> {
 			final var cycle = answer.getArgument(0, Cycle.class);
-			System.out.println(cycle.name());
 			savedCyles.put(cycle.name(), cycle);
 			return cycle;
 		}).when(cycleRepository).save(Mockito.any(Cycle.class));
@@ -112,8 +111,12 @@ class CalendarServiceImpTest {
 		assertEquals(nonWorkingDayCycle, gaussDayGroup.cycle());
 		assertEquals(nonWorkingDayCycle, fixedDayGroup.cycle());
 		assertFalse(nonWorkingDayCycle.isDeaultCycle());
+	
+		
+		final DayGroup otherTimesDayGroup =  savedDayGroups.get(CalendarServiceImp.OTHER_UP_TIMES_GROUP_NAME);
+		assertFalse(otherTimesDayGroup.cycle().isDeaultCycle());
 
-		savedCyles.values().stream().filter(c -> !c.equals(nonWorkingDayCycle)).forEach(c -> assertTrue(c.isDeaultCycle()));	
+		savedCyles.values().stream().filter(c -> !c.equals(nonWorkingDayCycle) &&  !c.equals(otherTimesDayGroup.cycle())).forEach(c -> assertTrue(c.isDeaultCycle()));	
 	}
 
 	@Test

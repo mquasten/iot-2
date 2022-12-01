@@ -36,6 +36,7 @@ class ConfigurationServiceImplTest {
 	private final ConversionService conversionService = Mockito.mock(ConversionService.class);
 	private final Cycle workingDayCycle = Mockito.mock(Cycle.class);
 	private final Cycle nonWorkingDayCycle = Mockito.mock(Cycle.class);
+	private final Cycle otherTimesCycle = Mockito.mock(Cycle.class);
 	private final CycleRepository cycleRepository = Mockito.mock(CycleRepository.class);
 	private final ConfigurationRepository configurationRepository = Mockito.mock(ConfigurationRepository.class);
 	private final ParameterRepository parameterRepository = Mockito.mock(ParameterRepository.class);
@@ -46,6 +47,7 @@ class ConfigurationServiceImplTest {
 
 		Mockito.when(cycleRepository.findById(IdUtil.id(ConfigurationServiceImpl.NON_WORKING_DAY_CYCLE_ID))).thenReturn(Optional.of(nonWorkingDayCycle));
 		Mockito.when(cycleRepository.findById(IdUtil.id(ConfigurationServiceImpl.WORKING_DAY_CYCLE_ID))).thenReturn(Optional.of(workingDayCycle));
+		Mockito.when(cycleRepository.findById(IdUtil.id(ConfigurationServiceImpl.OTHER_TIMES_CYCLE_ID))).thenReturn(Optional.of(otherTimesCycle));
 
 		final Map<RuleKey, Configuration> savedConfigurations = new HashMap<>();
 		Mockito.doAnswer(answer -> {
@@ -68,7 +70,7 @@ class ConfigurationServiceImplTest {
 		assertTrue(savedConfigurations.containsKey(RuleKey.EndOfDay));
 		assertEquals(2, savedConfigurations.size());
 
-		assertEquals(11, savedParameter.size()); 
+		assertEquals(12, savedParameter.size()); 
 
 		final List<? extends Parameter> cleanUpParameter = savedParameter.stream().filter(parameter -> parameter.configuration() == savedConfigurations.get(RuleKey.CleanUp))
 				.collect(Collectors.toList());
@@ -83,10 +85,10 @@ class ConfigurationServiceImplTest {
 
 		final Collection<? extends Parameter> endOfDayCycleParameters = savedParameter.stream()
 				.filter(parameter -> (parameter.configuration() == savedConfigurations.get(RuleKey.EndOfDay)) && (parameter instanceof CycleParameterImpl)).collect(Collectors.toList());
-		assertEquals(2, endOfDayCycleParameters.size());
+		assertEquals(3, endOfDayCycleParameters.size());
 		endOfDayCycleParameters.forEach(parameter -> {
 			assertEquals(Key.UpTime, parameter.key());
-			assertTrue(List.of(workingDayCycle, nonWorkingDayCycle).contains(((CycleParameter) parameter).cycle()));
+			assertTrue(List.of(workingDayCycle, nonWorkingDayCycle, otherTimesCycle).contains(((CycleParameter) parameter).cycle()));
 
 		});
 
@@ -97,6 +99,7 @@ class ConfigurationServiceImplTest {
 	@Test
 	void createDefaultConfigurationsAndParametersWorkingDayCycleNotFoud() {
 		Mockito.when(cycleRepository.findById(IdUtil.id(ConfigurationServiceImpl.NON_WORKING_DAY_CYCLE_ID))).thenReturn(Optional.of(nonWorkingDayCycle));
+		Mockito.when(cycleRepository.findById(IdUtil.id(ConfigurationServiceImpl.OTHER_TIMES_CYCLE_ID))).thenReturn(Optional.of(otherTimesCycle));
 		assertEquals(ConfigurationServiceImpl.WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE,
 				assertThrows(EntityNotFoundException.class, () -> configurationService.createDefaultConfigurationsAndParameters()).getMessage());
 	}
@@ -104,7 +107,16 @@ class ConfigurationServiceImplTest {
 	@Test
 	void createDefaultConfigurationsAndParametersNonWorkingDayCycleNotFoud() {
 		Mockito.when(cycleRepository.findById(IdUtil.id(ConfigurationServiceImpl.WORKING_DAY_CYCLE_ID))).thenReturn(Optional.of(workingDayCycle));
+		Mockito.when(cycleRepository.findById(IdUtil.id(ConfigurationServiceImpl.OTHER_TIMES_CYCLE_ID))).thenReturn(Optional.of(otherTimesCycle));
 		assertEquals(ConfigurationServiceImpl.NON_WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE,
+				assertThrows(EntityNotFoundException.class, () -> configurationService.createDefaultConfigurationsAndParameters()).getMessage());
+	}
+	
+	@Test
+	void createDefaultConfigurationsAndParametersOtherTimesCycleNotFoud() {
+		Mockito.when(cycleRepository.findById(IdUtil.id(ConfigurationServiceImpl.WORKING_DAY_CYCLE_ID))).thenReturn(Optional.of(workingDayCycle));
+		Mockito.when(cycleRepository.findById(IdUtil.id(ConfigurationServiceImpl.NON_WORKING_DAY_CYCLE_ID))).thenReturn(Optional.of(nonWorkingDayCycle));
+		assertEquals(ConfigurationServiceImpl.OTHER_TIMES_CYCLE_NOT_FOUND_MESSAGE,
 				assertThrows(EntityNotFoundException.class, () -> configurationService.createDefaultConfigurationsAndParameters()).getMessage());
 	}
 

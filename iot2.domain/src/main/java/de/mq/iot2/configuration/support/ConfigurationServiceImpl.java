@@ -31,7 +31,10 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	static final String NON_WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE = "Non Workingday Cycle not found.";
 	static final String CYCLE_KEY_NOT_FOUND_MESSAGE_PATTERN = "Cycle with key %s not found.";
 	static final String WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE = "Workingday Cycle not found.";
+	static final String OTHER_TIMES_CYCLE_NOT_FOUND_MESSAGE = "Other Times Cycle not found.";
+
 	private static final long CLEAN_UP_CONFIGURATION_ID = 2L;
+	static final long OTHER_TIMES_CYCLE_ID = 3L;
 	static final long WORKING_DAY_CYCLE_ID = 2L;
 	static final long NON_WORKING_DAY_CYCLE_ID = 1L;
 	private final ConfigurationRepository configurationRepository;
@@ -53,7 +56,8 @@ class ConfigurationServiceImpl implements ConfigurationService {
 
 		final var nonWorkingDayCycle = cycleRepository.findById(IdUtil.id(NON_WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException(NON_WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE));
 		final var workingDayCycle = cycleRepository.findById(IdUtil.id(WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException(WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE));
-		saveEndOfDayConfiguration(nonWorkingDayCycle, workingDayCycle);
+		final var otherTimesCycle = cycleRepository.findById(IdUtil.id(OTHER_TIMES_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException(OTHER_TIMES_CYCLE_NOT_FOUND_MESSAGE));
+		saveEndOfDayConfiguration(nonWorkingDayCycle, workingDayCycle, otherTimesCycle);
 		saveCleanUpConfiguration();
 	}
 
@@ -63,7 +67,7 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		parameterRepository.save(new ParameterImpl(cleanUpConfiguration, Key.DaysBack, "30"));
 	}
 
-	private void saveEndOfDayConfiguration(final Cycle nonWorkingDayCycle, final Cycle workingDyCycle) {
+	private void saveEndOfDayConfiguration(final Cycle nonWorkingDayCycle, final Cycle workingDayCycle, final Cycle otherTimesCycle) {
 		final var endOfBayConfiguration = configurationRepository.save(new ConfigurationImpl(1L, RuleKey.EndOfDay, "EndofDayBatch"));
 		parameterRepository.deleteByConfiguration(endOfBayConfiguration);
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.MinSunUpTime, "05:30"));
@@ -75,7 +79,8 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.ShadowTemperature, "25"));
 		parameterRepository.save(new ParameterImpl(endOfBayConfiguration, Key.ShadowTime, "09:00"));
 		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "07:15", nonWorkingDayCycle));
-		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "05:30", workingDyCycle));
+		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "06:30", otherTimesCycle));
+		parameterRepository.save(new CycleParameterImpl(endOfBayConfiguration, Key.UpTime, "05:30", workingDayCycle));
 	}
 
 	@Transactional
