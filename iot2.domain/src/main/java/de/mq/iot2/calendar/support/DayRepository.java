@@ -1,8 +1,10 @@
 package de.mq.iot2.calendar.support;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
 
 import de.mq.iot2.calendar.Day;
@@ -14,6 +16,8 @@ public interface DayRepository {
 	Optional<Day<?>> findById(final String id);
 	
 	Collection<Day<?>> findAll();
+	@Query("select d from LocaldateDay d")
+	Collection<Day<LocalDate>> findAllLocalDateDays(); 
 
 	Collection<Day<?>> findByDayGroup(final DayGroup dayGroup);
 

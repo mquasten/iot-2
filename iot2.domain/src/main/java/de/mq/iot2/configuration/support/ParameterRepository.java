@@ -1,18 +1,23 @@
 package de.mq.iot2.configuration.support;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
 
 import de.mq.iot2.configuration.Configuration;
+import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.Parameter;
+import de.mq.iot2.configuration.Parameter.Key;
 
 @RepositoryDefinition(domainClass = AbstractParameter.class, idClass = String.class)
 public interface ParameterRepository {
 	Collection<Parameter> findByConfiguration(final Configuration configuration);
 
+	@Query("select p  from GlobalParameter p where p.configuration.key= ?1 and p.key= ?2")
+	Optional<Parameter> findByRuleKeyAndKey(final RuleKey ruleKey, final Key key );
 	Parameter save(final Parameter parameter);
 
 	@Modifying

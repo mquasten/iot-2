@@ -157,7 +157,7 @@ class ConfigurationServiceImplTest {
 
 	@Test
 	void parametersConfigurationNotFound() {
-		assertEquals(String.format(ConfigurationServiceImpl.CYCLE_KEY_NOT_FOUND_MESSAGE_PATTERN, RuleKey.EndOfDay),
+		assertEquals(String.format(ConfigurationServiceImpl.CONFIGURATION_KEY_NOT_FOUND_MESSAGE_PATTERN, RuleKey.EndOfDay),
 				assertThrows(EntityNotFoundException.class, () -> configurationService.parameters(RuleKey.EndOfDay, nonWorkingDayCycle)).getMessage());
 	}
 

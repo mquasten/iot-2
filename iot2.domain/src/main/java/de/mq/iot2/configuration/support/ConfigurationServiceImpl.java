@@ -4,6 +4,7 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,7 +30,7 @@ import de.mq.iot2.support.IdUtil;
 class ConfigurationServiceImpl implements ConfigurationService {
 
 	static final String NON_WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE = "Non Workingday Cycle not found.";
-	static final String CYCLE_KEY_NOT_FOUND_MESSAGE_PATTERN = "Cycle with key %s not found.";
+	static final String CONFIGURATION_KEY_NOT_FOUND_MESSAGE_PATTERN = "Configuration with key %s not found.";
 	static final String WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE = "Workingday Cycle not found.";
 	static final String OTHER_TIMES_CYCLE_NOT_FOUND_MESSAGE = "Other Times Cycle not found.";
 
@@ -88,21 +89,28 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	public Map<Key, Object> parameters(final RuleKey ruleKey, final Cycle cycle) {
 		Assert.notNull(ruleKey, "Key is required");
 		Assert.notNull(cycle, "Cycle is required");
-		final var configuration = configurationRepository.findByKey(ruleKey).orElseThrow(() -> new EntityNotFoundException(String.format(CYCLE_KEY_NOT_FOUND_MESSAGE_PATTERN, ruleKey)));
+		final var configuration = configurationRepository.findByKey(ruleKey).orElseThrow(() -> new EntityNotFoundException(String.format(CONFIGURATION_KEY_NOT_FOUND_MESSAGE_PATTERN, ruleKey)));
 
 		final Collection<? extends Parameter> parameters = parameterRepository.findByConfiguration(configuration);
 
 		final Map<Key, Parameter> cycleParameters = parameters.stream().filter(parameter -> parameter instanceof CycleParameter).filter(parameter -> ((CycleParameter) parameter).cycle().equals(cycle))
 				.collect(Collectors.toMap(Parameter::key, Function.identity()));
-		
+
 		final Collection<Parameter> globalParameters = parameters.stream().filter(parameter -> !cycleParameters.containsKey(parameter.key())).collect(Collectors.toList());
 
-		final Map<Key,Object> results = Stream.concat(cycleParameters.values().stream(), globalParameters.stream())
+		final Map<Key, Object> results = Stream.concat(cycleParameters.values().stream(), globalParameters.stream())
 				.map(parameter -> new SimpleImmutableEntry<>(parameter.key(), conversionService.convert(parameter.value(), parameter.key().type())))
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
 		return results;
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Transactional
+	@Override
+	public <T> Optional<T> parameter(final RuleKey ruleKey, final Key key) {
+		 return   (Optional<T>) parameterRepository.findByRuleKeyAndKey(ruleKey, key).map(parameter -> conversionService.convert(parameter.value(), key.type()));
 	}
 
 }

@@ -56,6 +56,8 @@ public interface CalendarService {
 
 	int deleteLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate);
 
+	int deleteLocalDateDays(final int days);
+
 
 
 

@@ -73,11 +73,11 @@ class CalendarServiceImp implements CalendarService {
 
 		final var cycle = cycleRepository.save(new CycleImpl(1L, "Freizeit", 101));
 		cycleRepository.save(new CycleImpl(2L, "Arbeitstage", 102, true));
-		
+
 		createOrUpdatePublicHolidays(cycle);
 		createOrUpdateWeekend(cycle);
 		createOrUpdateVacation(cycle);
-		final var otherTimesCycle = cycleRepository.save(new CycleImpl(3L, "abweichender Tagesbeginn",100));
+		final var otherTimesCycle = cycleRepository.save(new CycleImpl(3L, "abweichender Tagesbeginn", 100));
 		dayGroupRepository.save(new DayGroupImpl(otherTimesCycle, 4L, OTHER_UP_TIMES_GROUP_NAME, false));
 	}
 
@@ -196,6 +196,19 @@ class CalendarServiceImp implements CalendarService {
 		return IntStream.rangeClosed(0, numberOfDays.intValue())
 				.mapToObj(i -> new LocalDateDayImp(dayGroup, fromDate.plusDays(i), fromDate.plusDays(i).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.GERMAN))))
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public int deleteLocalDateDays(final int daysBack) {
+		Assert.isTrue(daysBack > 0, "DaysBack should be > 0.");
+		final var deleteDate = LocalDate.now().minusDays(daysBack);
+		final Collection<Day<LocalDate>> toBeRemoved = dayRepository.findAllLocalDateDays().stream().filter(day -> beforeEquals(day.value(), deleteDate)).collect(Collectors.toList());
+		toBeRemoved.forEach(dayRepository::delete);
+		return toBeRemoved.size();
+	}
+
+	private boolean beforeEquals(final LocalDate date, final LocalDate otherDate) {
+		return date.isBefore(otherDate) || date.isEqual(otherDate);
 	}
 
 }

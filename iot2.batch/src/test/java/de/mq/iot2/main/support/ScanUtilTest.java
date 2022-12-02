@@ -21,8 +21,8 @@ class ScanUtilTest {
 
 		final var results = ScanUtil.findBatchMethods(packageName);
 
-		assertEquals(4, results.size());
-		assertTrue(List.of("end-of-day", "setup", "add-local-date" , "delete-local-date").containsAll(results.keySet()));
+		assertEquals(5, results.size());
+		assertTrue(List.of("end-of-day", "setup", "add-local-date" , "delete-local-date", "cleanup").containsAll(results.keySet()));
 		results.values().forEach(method -> {
 			List.of(SetupDatabaseImpl.class, EndOfDayBatchImpl.class).contains(method.getDeclaringClass());
 			assertEquals(ReflectionUtils.findMethod(method.getDeclaringClass(), method.getName(), method.getParameterTypes()), method);
