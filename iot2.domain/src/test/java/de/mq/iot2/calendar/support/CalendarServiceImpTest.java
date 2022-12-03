@@ -1,5 +1,6 @@
 package de.mq.iot2.calendar.support;
 
+import static de.mq.iot2.calendar.support.CalendarServiceImp.DAYS_BACK_INVALID_MESSAGE;
 import static de.mq.iot2.calendar.support.CalendarServiceImp.DAY_GROUP_NOT_FOUND_MESSAGE;
 import static de.mq.iot2.calendar.support.CalendarServiceImp.DAY_GROUP_READONLY_MESSAGE;
 import static de.mq.iot2.calendar.support.CalendarServiceImp.LIMIT_OF_DAYS_MESSAGE;
@@ -24,6 +25,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -343,5 +345,29 @@ class CalendarServiceImpTest {
 						.getMessage());
 	}
 	
+	@Test
+	final void deleteLocalDateDaysCleanup() {
+		@SuppressWarnings("unchecked")
+		final Day<LocalDate> dayEqulasLimit = Mockito.mock(Day.class);
+		@SuppressWarnings("unchecked")
+		final Day<LocalDate> dayBeforeLimit = Mockito.mock(Day.class);
+		@SuppressWarnings("unchecked")
+		final Day<LocalDate> dayAfterLimit = Mockito.mock(Day.class);
+		Mockito.when(dayEqulasLimit.value()).thenReturn(LocalDate.now().minusDays(DAY_LIMIT));
+		Mockito.when(dayBeforeLimit.value()).thenReturn(LocalDate.now().minusDays(2*DAY_LIMIT));
+		Mockito.when(dayAfterLimit.value()).thenReturn(LocalDate.now().minusDays(DAY_LIMIT-1));
+		Mockito.when(dayRepository.findAllLocalDateDays()).thenReturn(List.of(dayEqulasLimit,dayBeforeLimit, dayAfterLimit));
+		
+		assertEquals(2, calendarService.deleteLocalDateDays(DAY_LIMIT));
+		
+		Mockito.verify(dayRepository).delete(dayEqulasLimit);
+		Mockito.verify(dayRepository).delete(dayBeforeLimit);
+	}
+	
+	@ParameterizedTest
+	@ValueSource(ints = {0, -1})
+	final void deleteLocalDateDaysCleanupInvalidDaysBack(final int daysBack) {
+		assertEquals(DAYS_BACK_INVALID_MESSAGE, assertThrows(IllegalArgumentException.class, ()-> calendarService.deleteLocalDateDays(daysBack)).getMessage());
+	}
 
 }

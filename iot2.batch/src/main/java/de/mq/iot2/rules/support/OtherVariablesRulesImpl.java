@@ -1,9 +1,12 @@
 package de.mq.iot2.rules.support;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.jeasy.rules.annotation.Action;
@@ -30,6 +33,8 @@ public class OtherVariablesRulesImpl {
 	final static String MONTH_SYSTEM_VARIABLE_NAME="Month";
 	final static String TEMPERATURE_SYSTEM_VARIABLE_NAME="Temperature";
 	final static String LAST_BATCH_RUN_VARIABLE_NAME="LastBatchrun";
+	
+	final static DecimalFormat DECIMAL_FORMAT_CCU2 = new DecimalFormat("#.000000", new DecimalFormatSymbols(Locale.US)); 
 	@Condition
 	public final boolean evaluate() {
 		return true;
@@ -79,7 +84,7 @@ public class OtherVariablesRulesImpl {
 	}
 
 	private void addTemperatureSystemVariable(final Collection<SystemVariable> systemVariables, Double temperature) {
-		final var systemVariable = new SystemVariable(TEMPERATURE_SYSTEM_VARIABLE_NAME , "" + temperature);
+		final var systemVariable = new SystemVariable(TEMPERATURE_SYSTEM_VARIABLE_NAME , DECIMAL_FORMAT_CCU2.format(temperature));
 		systemVariables.add(systemVariable);
 		writeSystemVariable2Logger(systemVariable);
 	}

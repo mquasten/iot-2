@@ -18,7 +18,7 @@ class CleanUpBatchImpl {
 	private final CalendarService calendarService;
 	private final ConfigurationService configurationService;
 
-	CleanUpBatchImpl(CalendarService calendarService, final ConfigurationService configurationService) {
+	CleanUpBatchImpl(final CalendarService calendarService, final ConfigurationService configurationService) {
 		this.calendarService = calendarService;
 		this.configurationService = configurationService;
 	}

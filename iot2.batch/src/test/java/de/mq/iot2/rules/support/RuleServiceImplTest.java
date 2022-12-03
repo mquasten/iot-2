@@ -1,5 +1,6 @@
 package de.mq.iot2.rules.support;
 
+import static de.mq.iot2.rules.support.OtherVariablesRulesImpl.DECIMAL_FORMAT_CCU2;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,7 +73,9 @@ class RuleServiceImplTest {
 		assertEquals("" + Month.DECEMBER.ordinal(), systemVariableMap.get(OtherVariablesRulesImpl.MONTH_SYSTEM_VARIABLE_NAME));
 		assertEquals(String.valueOf(false), systemVariableMap.get(OtherVariablesRulesImpl.WORKING_DAY_SYSTEM_VARIABLE_NAME));
 		assertEquals("" + TimeType.Winter.ordinal(), systemVariableMap.get(OtherVariablesRulesImpl.TIME_TYP_SYSTEM_VARIABLE_NAME));
-		assertEquals("" + maxForecastTemperature.get(), systemVariableMap.get(OtherVariablesRulesImpl.TEMPERATURE_SYSTEM_VARIABLE_NAME));
+		
+		
+		assertEquals(DECIMAL_FORMAT_CCU2.format(maxForecastTemperature.get()), systemVariableMap.get(OtherVariablesRulesImpl.TEMPERATURE_SYSTEM_VARIABLE_NAME));
 		assertTrue(1 >= LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
 				- LocalDateTime.parse(systemVariableMap.get(OtherVariablesRulesImpl.LAST_BATCH_RUN_VARIABLE_NAME), DateTimeFormatter.ofPattern(OtherVariablesRulesImpl.LAST_BATCH_RUN_DATE_FORMAT))
 						.toEpochSecond(ZoneOffset.UTC));

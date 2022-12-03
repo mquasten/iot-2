@@ -96,7 +96,7 @@ class OtherVariablesRulesImplTest {
 		
 		assertEquals(1, systemVariables.size());
 		assertEquals(OtherVariablesRulesImpl.TEMPERATURE_SYSTEM_VARIABLE_NAME, systemVariables.stream().findAny().get().getName());
-		assertEquals(String.valueOf(temperature), systemVariables.stream().findAny().get().getValue());
+		assertEquals(OtherVariablesRulesImpl.DECIMAL_FORMAT_CCU2.format(temperature), systemVariables.stream().findAny().get().getValue());
 	}
 	
 	@Test

@@ -38,6 +38,7 @@ import de.mq.iot2.support.IdUtil;
 @Service
 class CalendarServiceImp implements CalendarService {
 
+	static final String DAYS_BACK_INVALID_MESSAGE = "DaysBack should be > 0.";
 	static final String OTHER_UP_TIMES_GROUP_NAME = "Sonderzeiten";
 	static final String LIMIT_OF_DAYS_MESSAGE = "Limit of days is %s.";
 	static final String DAY_GROUP_READONLY_MESSAGE = "DayGroup is readonly.";
@@ -200,7 +201,7 @@ class CalendarServiceImp implements CalendarService {
 
 	@Override
 	public int deleteLocalDateDays(final int daysBack) {
-		Assert.isTrue(daysBack > 0, "DaysBack should be > 0.");
+		Assert.isTrue(daysBack > 0, DAYS_BACK_INVALID_MESSAGE);
 		final var deleteDate = LocalDate.now().minusDays(daysBack);
 		final Collection<Day<LocalDate>> toBeRemoved = dayRepository.findAllLocalDateDays().stream().filter(day -> beforeEquals(day.value(), deleteDate)).collect(Collectors.toList());
 		toBeRemoved.forEach(dayRepository::delete);

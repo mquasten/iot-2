@@ -166,5 +166,21 @@ class ConfigurationServiceImplTest {
 		assertThrows(IllegalArgumentException.class, () -> configurationService.parameters(null, nonWorkingDayCycle));
 		assertThrows(IllegalArgumentException.class, () -> configurationService.parameters(RuleKey.EndOfDay, null));
 	}
+	
+	@Test
+	void parameter() {
+		final var value = 30; 
+		final var parameter = Mockito.mock(Parameter.class );
+		Mockito.when(parameter.value()).thenReturn(""+value);
+		Mockito.when(conversionService.convert("" + value, Integer.class)).thenReturn(value);
+		Mockito.when(parameterRepository.findByRuleKeyAndKey(RuleKey.CleanUp, Key.DaysBack)).thenReturn(Optional.of(parameter));
+		assertEquals(Optional.of(value), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack));
+	}
+	
+	@Test
+	void parameterNotExists() {
+		Mockito.when(conversionService.convert(Mockito.any(), Mockito.any())).thenReturn(30);
+		assertEquals(Optional.empty(), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack));
+	}
 
 }
