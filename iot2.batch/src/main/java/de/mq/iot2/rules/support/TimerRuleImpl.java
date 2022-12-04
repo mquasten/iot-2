@@ -26,6 +26,8 @@ public class TimerRuleImpl {
 
 	private final  static Logger LOGGER = LoggerFactory.getLogger(TimerRuleImpl.class);
 	static final String DAILY_EVENTS_SYSTEM_VARIABLE_NAME = "DailyEvents";
+	
+	//static final String DAILY_EVENTS_SYSTEM_VARIABLE_NAME = "EventExecutions";
 	private static final int DEFAULT_PRIORITY = 2;
 	
 	@ParameterValue(Key.MaxSunUpTime)

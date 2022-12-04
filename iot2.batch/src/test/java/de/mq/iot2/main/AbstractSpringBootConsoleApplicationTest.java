@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.util.Base64Utils;
-import org.springframework.util.SerializationUtils;
+
 
 import de.mq.iot2.main.support.EndOfDayBatchImpl;
 import de.mq.iot2.main.support.ReflectionCommandLineRunnerArgumentsImpl;
