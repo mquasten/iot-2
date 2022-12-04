@@ -51,6 +51,7 @@ public abstract class AbstractSpringBootConsoleApplication {
 	private static CommandLine parser(final Options options, final String[] args, Collection<String> commands) throws ParseException {
 		options.addOption(Option.builder("c").hasArg().required().desc(String.format("command: %s", StringUtils.collectionToDelimitedString(commands, "|"))).argName("command").build());
 		final var parser = new DefaultParser();
+		
 		return parser.parse(options, args);
 	}
 
