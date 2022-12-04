@@ -2,6 +2,7 @@ package de.mq.iot2.main.support;
 
 import java.lang.reflect.Method;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -12,7 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.Assert;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.SerializationUtils;
+
 
 @SpringBootApplication
 @EnableJpaRepositories("de.mq.iot2")

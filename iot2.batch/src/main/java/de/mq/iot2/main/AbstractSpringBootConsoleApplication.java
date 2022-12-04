@@ -10,10 +10,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.util.Base64Utils;
-import org.springframework.util.SerializationUtils;
+
 import org.springframework.util.StringUtils;
 
 import de.mq.iot2.main.support.BatchMethod;

@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.UUID;
 
-import javax.persistence.Id;
-
 import org.junit.jupiter.api.Test;
+
+import jakarta.persistence.Id;
 
 class IdUtilTest { 
 

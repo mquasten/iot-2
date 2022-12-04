@@ -1,13 +1,13 @@
 package de.mq.iot2.calendar.support;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.support.IdUtil;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity(name = "Cycle")
 public class CycleImpl implements Cycle {

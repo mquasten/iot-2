@@ -1,16 +1,17 @@
 package de.mq.iot2.configuration.support;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
+
 
 import org.springframework.util.Assert;
 
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.support.IdUtil;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity(name = "Configuration")
 @Table(name = "CONFIGURATION")

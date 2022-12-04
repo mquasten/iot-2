@@ -1,9 +1,10 @@
 package de.mq.iot2.configuration.support;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+
 
 import de.mq.iot2.configuration.Configuration;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 
 @Entity(name = "GlobalParameter")

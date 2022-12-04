@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityNotFoundException;
+
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -30,6 +30,7 @@ import de.mq.iot2.configuration.CycleParameter;
 import de.mq.iot2.configuration.Parameter;
 import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.support.IdUtil;
+import jakarta.persistence.EntityNotFoundException;
 
 class ConfigurationServiceImplTest {
 

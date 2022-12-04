@@ -5,13 +5,13 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.function.Supplier;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.DayGroup;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
 
 @Entity(name = GaussDayImpl.ENTITY_NAME)
 @DiscriminatorValue(GaussDayImpl.ENTITY_NAME)

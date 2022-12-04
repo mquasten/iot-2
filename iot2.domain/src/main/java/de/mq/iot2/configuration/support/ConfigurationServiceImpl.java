@@ -9,8 +9,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +23,7 @@ import de.mq.iot2.configuration.CycleParameter;
 import de.mq.iot2.configuration.Parameter;
 import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.support.IdUtil;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 class ConfigurationServiceImpl implements ConfigurationService {

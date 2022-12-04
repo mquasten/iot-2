@@ -1,9 +1,6 @@
 package de.mq.iot2.configuration.support;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+
 
 import org.springframework.util.Assert;
 
@@ -11,6 +8,10 @@ import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.support.CycleImpl;
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.CycleParameter;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity(name = "CycleParameter")
 @DiscriminatorValue("CycleParameter")

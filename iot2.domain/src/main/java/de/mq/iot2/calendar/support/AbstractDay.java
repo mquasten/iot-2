@@ -4,21 +4,21 @@ import java.math.BigInteger;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
 import de.mq.iot2.support.IdUtil;
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity(name = AbstractDay.ENTITY_NAME)
 @Table(name = "SPECIAL_DAY")

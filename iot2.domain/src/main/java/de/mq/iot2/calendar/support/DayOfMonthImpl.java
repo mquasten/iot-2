@@ -3,12 +3,13 @@ package de.mq.iot2.calendar.support;
 import java.time.LocalDate;
 import java.time.MonthDay;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+
 
 import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.DayGroup;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 @Entity(name = DayOfMonthImpl.ENTITY_NAME)
 @DiscriminatorValue(DayOfMonthImpl.ENTITY_NAME)

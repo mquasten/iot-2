@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.Random;
 import java.util.UUID;
 
-import javax.persistence.Id;
-
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
+
+import jakarta.persistence.Id;
 
 
 
