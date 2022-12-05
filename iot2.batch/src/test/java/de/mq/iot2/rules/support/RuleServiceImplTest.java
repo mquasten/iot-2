@@ -48,11 +48,10 @@ class RuleServiceImplTest {
 		final Map<Key,Object> parameters = Map.of(Key.MinSunUpTime, LocalTime.parse("05:30"), Key.MaxSunUpTime, LocalTime.parse("09:30"), Key.MinSunDownTime, minSunDownTime, Key.MaxSunDownTime,
 				LocalTime.parse("22:15"), Key.UpTime, upTime, Key.SunUpDownType, TwilightType.Mathematical, Key.ShadowTemperature, shadowTemperature, Key.ShadowTime, shadowTime);
 		final var arguments = Map.of(EndOfDayArguments.Date, LocalDate.of(2022, 12, 25), EndOfDayArguments.TimeType, TimeType.Winter, EndOfDayArguments.SunUpTime, Optional.of(sunUpTime),
-				EndOfDayArguments.SunDownTime, Optional.of(LocalTime.of(16, 45)), EndOfDayArguments.Cycle, cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature);
+				EndOfDayArguments.SunDownTime, Optional.of(LocalTime.of(16, 45)), EndOfDayArguments.Cycle, cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature, EndOfDayArguments.UpdateTime, Optional.empty());
 
-		 Map<String,Object> results = ruleService.process(parameters, arguments);
-
-		assertEquals(8, results.size());
+		final Map<String,Object> results = ruleService.process(parameters, arguments);
+		assertEquals(9, results.size());
 		assertTrue(results.keySet().containsAll(arguments.keySet().stream().map(EndOfDayArguments::name).collect(Collectors.toList())));
 		assertTrue(results.containsKey(EndOfDayArguments.Timer.name()));
 
@@ -98,7 +97,7 @@ class RuleServiceImplTest {
 				Key.SunUpDownType, TwilightType.Mathematical, Key.ShadowTemperature , shadowTemperature, Key.ShadowTime, shadowTime);
 
 		final var arguments = Map.of(EndOfDayArguments.Date, LocalDate.of(2022, 12, 25), EndOfDayArguments.TimeType, TimeType.Winter, EndOfDayArguments.SunUpTime, Optional.of(LocalTime.of(8, 20)),
-				EndOfDayArguments.SunDownTime, Optional.of(LocalTime.of(16, 45)), EndOfDayArguments.Cycle, Mockito.mock(Cycle.class), EndOfDayArguments.MaxForecastTemperature , maxForecastTemperature );
+				EndOfDayArguments.SunDownTime, Optional.of(LocalTime.of(16, 45)), EndOfDayArguments.Cycle, Mockito.mock(Cycle.class), EndOfDayArguments.MaxForecastTemperature , maxForecastTemperature , EndOfDayArguments.UpdateTime, Optional.empty());
 
 		ruleService.process(parameters, arguments);
 
@@ -120,7 +119,7 @@ class RuleServiceImplTest {
 		final var timerRule = new TimerRuleImpl();
 		final var ruleService = new RuleServiceImpl(List.of(new OtherVariablesRulesImpl(), timerRule));
 		final var arguments = Map.of(EndOfDayArguments.Date, LocalDate.of(2022, 12, 25), EndOfDayArguments.TimeType, TimeType.Winter, EndOfDayArguments.SunUpTime, Optional.of(LocalTime.of(8, 20)),
-				EndOfDayArguments.SunDownTime, Optional.of(LocalTime.of(16, 45)), EndOfDayArguments.Cycle, Mockito.mock(Cycle.class), EndOfDayArguments.MaxForecastTemperature, Optional.empty());
+				EndOfDayArguments.SunDownTime, Optional.of(LocalTime.of(16, 45)), EndOfDayArguments.Cycle, Mockito.mock(Cycle.class), EndOfDayArguments.MaxForecastTemperature, Optional.empty(), EndOfDayArguments.UpdateTime, Optional.empty());
 
 		ruleService.process(Map.of(), arguments);
 

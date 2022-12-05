@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -18,13 +19,13 @@ import jakarta.validation.Valid;
 class ConfigurationController {
 	
 	@GetMapping("/configuration")
-	String configuration(final Model model, @RequestParam(value = "configurationId", required = false) String configurationId) {
+	String configuration(final Model model, @RequestParam(value = "configurationId", required = false, defaultValue = "") String configurationId) {
 		System.out.println("/configuration?" + configurationId);
 		final var configurations = Map.of("1", "End of Day", "2", "Cleanup");
 				
 				
 				
-		ConfigurationModel configurationModel= new ConfigurationModel();
+		final ConfigurationModel configurationModel= new ConfigurationModel();
 		if (configurations.containsKey(configurationId)) {
 			configurationModel.setConfigurationId(configurationId);
 			configurationModel.setName(configurations.get(configurationId));

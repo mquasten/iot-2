@@ -27,7 +27,7 @@ public class TimerRuleImpl {
 	private final  static Logger LOGGER = LoggerFactory.getLogger(TimerRuleImpl.class);
 	static final String DAILY_EVENTS_SYSTEM_VARIABLE_NAME = "DailyEvents";
 	
-	//static final String DAILY_EVENTS_SYSTEM_VARIABLE_NAME = "EventExecutions";
+	static final String EVENT_EXECUTION = "EventExecutions";
 	private static final int DEFAULT_PRIORITY = 2;
 	
 	@ParameterValue(Key.MaxSunUpTime)
@@ -128,15 +128,16 @@ public class TimerRuleImpl {
 	}
 	
 	@Action(order = Integer.MAX_VALUE)
-	public final void addSystemVariable(@Fact("Timer") Collection<Entry<String, LocalTime>> timerList, @Fact("SystemVariables") final Collection<SystemVariable> systemVariables ) {
-		
+	public final void addSystemVariable(@Fact("Timer") Collection<Entry<String, LocalTime>> timerList,@Fact("UpdateTime") final Optional<LocalTime> updateTime,  @Fact("SystemVariables") final Collection<SystemVariable> systemVariables ) {
+		final var variableName = updateTime.isEmpty() ? DAILY_EVENTS_SYSTEM_VARIABLE_NAME: EVENT_EXECUTION ;
+		final var  minTime = updateTime.orElse(LocalTime.of(0, 0));
 		final var stringBuilder = new StringBuilder();
-		final var orderedTimers = timerList.stream().sorted(( e1, e2 )-> e1.getValue().compareTo(e2.getValue())).collect(Collectors.toList());
+		final var orderedTimers = timerList.stream().filter(entry -> entry.getValue().isAfter(minTime)).sorted(( e1, e2 )-> e1.getValue().compareTo(e2.getValue())).collect(Collectors.toList());
 		
 		IntStream.range(0, orderedTimers.size()).forEach(i -> stringBuilder.append(String.format("%s:%s%s", orderedTimers.get(i).getKey(), orderedTimers.get(i).getValue().getHour() + 0.01*orderedTimers.get(i).getValue().getMinute(),  i<orderedTimers.size()-1? ";" :"" )));
-		systemVariables.add(new SystemVariable(DAILY_EVENTS_SYSTEM_VARIABLE_NAME, stringBuilder.toString()));
+		systemVariables.add(new SystemVariable(variableName, stringBuilder.toString()));
 		
-		LOGGER.debug("Add {} Timer to SystemVariable {} value='{}'.", timerList.size(), DAILY_EVENTS_SYSTEM_VARIABLE_NAME, stringBuilder);
+		LOGGER.debug("Add {} Timer to SystemVariable {} value='{}'.", timerList.size(), variableName, stringBuilder);
 	}
 
 }

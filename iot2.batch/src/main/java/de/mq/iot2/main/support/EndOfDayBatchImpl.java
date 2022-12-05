@@ -1,8 +1,10 @@
 package de.mq.iot2.main.support;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,11 @@ public class EndOfDayBatchImpl {
 	@BatchMethod(value = "end-of-day", converterClass = EndOfDayBatchArgumentConverterImpl.class)
 	final void execute(final LocalDate date) {
 
+		execute(date, Optional.empty());
+		
+	}
+
+	private void execute(final LocalDate date, Optional<LocalTime> uptateTime) {
 		final Cycle cycle = calendarService.cycle(date);
 
 		final var parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);
@@ -60,7 +67,7 @@ public class EndOfDayBatchImpl {
 		
 		final var maxForecastTemperature = weatherService.maxForecastTemperature(date);
 		
-		final var arguments = Map.of(EndOfDayArguments.Date, date,EndOfDayArguments.TimeType, timeType, EndOfDayArguments.SunUpTime, sunUpTime, EndOfDayArguments.SunDownTime, sunDownTime, EndOfDayArguments.Cycle, cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature);
+		final var arguments = Map.of(EndOfDayArguments.Date, date,EndOfDayArguments.TimeType, timeType, EndOfDayArguments.SunUpTime, sunUpTime, EndOfDayArguments.SunDownTime, sunDownTime, EndOfDayArguments.Cycle, cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature, EndOfDayArguments.UpdateTime, uptateTime);
 
 		LOGGER.debug("Start RulesEngine parameters {} arguments {}.", parameters, arguments );
 		final var results =  ruleService.process(parameters, arguments);
@@ -72,6 +79,12 @@ public class EndOfDayBatchImpl {
 		Assert.notEmpty(systemVariables, "Systemvariables required.");
 		LOGGER.debug("{} Systemvariables calculated.", systemVariables.size());
 		systemVariableService.update(systemVariables);
+	}
+	
+	@BatchMethod(value = "end-of-day-update", converterClass = EndOfDayUpdateBatchArgumentConverterImpl.class)
+	final void executeUpdate(final LocalTime time) {
+		
+		execute(LocalDate.now(), Optional.of(time));
 		
 	}
 
