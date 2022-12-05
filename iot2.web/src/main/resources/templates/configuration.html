@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title th:text="Ger&auml;teVerwaltung"></title>
+<style>
+.error {
+	color: red;
+}
+</style>
+</head>
+<body>
+	<div align="center">
+		<h1 th:text="Konfigurationen"></h1>
+		<form action="#" th:action="@{/search}" method="post"
+			th:object="${configuration}">
+			<table>
+				<tr>
+					<td><label th:text="Konfiguration"></label></td>
+					<td><select th:field="*{configurationId}">
+							<option th:each="entry : ${configurations}" th:value="${entry.key}"
+								th:utext="${entry.value}"
+								 th:selected=${configurationId==entry.key}
+								></option>
+					</select></td>
+					<td> <button type="submit" name="submit" th:text="suchen"></button> </td>
+				</tr>
+
+				
+			</table>
+		</form>
+		
+		<div  th:if="${configuration.configurationId != null}">
+		<h2 th:text="'Parameter Konfiguration: ' + ${configuration.name}" ></h2>
+		<table>
+		<tr><td>Name</td> <td>Wert</td> <td></td></tr>
+		<tr th:each="parameter: ${configuration.parameters}" >
+		<td th:text="${parameter.name}"></td>
+		<td th:text="${parameter.value}"></td>
+		<td><form th:action="@{/updateParameter}" th:object="${parameter}" method="post">
+		<input type="hidden" name="id" th:value="${parameter.id}"/>
+		<input type="hidden" name="configurationId" th:value="${configuration.configurationId}"/>
+		<button type="submit" >bearbeiten</button>
+		</form></td>
+		</tr>
+		</table>
+		</div>
+	</div>
+</body>
+</html>
