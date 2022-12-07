@@ -8,8 +8,6 @@
 .error {
 	color: red;
 }
-
-
 </style>
 </head>
 <body>
@@ -19,40 +17,50 @@
 		<h1 th:text="Konfigurationen"></h1>
 		<form action="#" th:action="@{/search}" method="post"
 			th:object="${configuration}">
-			<table >
+			<table>
 				<tr>
-					
+
 					<td><select th:field="*{configurationId}">
-							<option th:each="entry : ${configurations}" th:value="${entry.key}"
-								th:utext="${entry.value}"
-								 th:selected=${configurationId==entry.key}
-								></option>
+							<option th:each="entry : ${configurations}"
+								th:value="${entry.key}" th:utext="${entry.value}"
+								th:selected=${configurationId==entry.key}></option>
 					</select></td>
-					<td> <button type="submit" name="submit" th:text="suchen"></button> </td>
+					<td>
+						<button type="submit" name="submit" th:text="suchen"></button>
+					</td>
 				</tr>
-				<tr> <td colspan="2"> </td></tr>
-				
+				<tr>
+					<td colspan="2"></td>
+				</tr>
+
 			</table>
 		</form>
-		
-		<div  th:if="${configuration.configurationId != null}">
-		<h3 th:text="'Parameter: ' + ${configuration.name}" ></h3>
-		<table>
-		<thead>
-		<tr><th>Name</th> <th>Wert</th> <th></th></tr>
-		</thead>
-		<tbody>
-		<tr th:each="parameter, iStat: ${configuration.parameters}" th:style="${iStat.odd}? 'font-weight: normal;'" >
-		<td th:text="${parameter.name}"></td>
-		<td th:text="${parameter.value}"></td>
-		<td><form th:action="@{/updateParameter}" th:object="${parameter}" method="post">
-		<input type="hidden" name="id" th:value="${parameter.id}"/>
-		<input type="hidden" name="configurationId" th:value="${configuration.configurationId}"/>
-		<button type="submit" >bearbeiten</button>
-		</form></td>
-		</tr>
-		</tbody>
-		</table>
+
+		<div th:if="${configuration.configurationId != null}">
+			<h3 th:text="'Parameter: ' + ${configuration.name}"></h3>
+			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Wert</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="parameter, iStat: ${configuration.parameters}"
+						th:style="${iStat.odd}? 'font-weight: normal;'">
+						<td th:text="${parameter.name}"></td>
+						<td th:text="${parameter.value}"></td>
+						<td><form th:action="@{/updateParameter}"
+								th:object="${parameter}" method="post">
+								<input type="hidden" name="id" th:value="${parameter.id}" /> <input
+									type="hidden" name="configurationId"
+									th:value="${configuration.configurationId}" />
+								<button type="submit">bearbeiten</button>
+							</form></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </body>
