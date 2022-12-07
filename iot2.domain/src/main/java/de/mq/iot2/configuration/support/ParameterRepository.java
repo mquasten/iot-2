@@ -18,6 +18,11 @@ public interface ParameterRepository {
 
 	@Query("select p  from GlobalParameter p where p.configuration.key= ?1 and p.key= ?2")
 	Optional<Parameter> findByRuleKeyAndKey(final RuleKey ruleKey, final Key key );
+	
+	@Query("select p  from Parameter p where p.configuration.id= ?1 order by p.key")
+	Collection<Parameter> findByConfigurationId(final String configurationId );
+	
+	
 	Parameter save(final Parameter parameter);
 
 	@Modifying

@@ -9,28 +9,17 @@
 	color: red;
 }
 
-div.mytable {
-margin: auto;
-width: 1020px;
-padding: 10px; 
-}
+
 </style>
 </head>
 <body>
-<div class="mytable">
-<nav aria-label="breadcrumb">
-<ol class="breadcrumb">
-<li class="breadcrumb-item"><a href="/">Home</a></li>
-<li class="breadcrumb-item active">Konfigurationen</li>
-</ol>
-</nav>
-</div>
+
 
 	<div align="center">
 		<h1 th:text="Konfigurationen"></h1>
 		<form action="#" th:action="@{/search}" method="post"
 			th:object="${configuration}">
-			<table class="table-stripped">
+			<table >
 				<tr>
 					
 					<td><select th:field="*{configurationId}">
@@ -48,9 +37,9 @@ padding: 10px;
 		
 		<div  th:if="${configuration.configurationId != null}">
 		<h3 th:text="'Parameter: ' + ${configuration.name}" ></h3>
-		<table class="table table-striped table-primary">
-		<thead class="ttop">
-		<tr class="table-info"><th>Name</th> <th>Wert</th> <th></th></tr>
+		<table>
+		<thead>
+		<tr><th>Name</th> <th>Wert</th> <th></th></tr>
 		</thead>
 		<tbody>
 		<tr th:each="parameter, iStat: ${configuration.parameters}" th:style="${iStat.odd}? 'font-weight: normal;'" >

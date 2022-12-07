@@ -17,6 +17,7 @@ import org.springframework.util.Assert;
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.support.CycleRepository;
+import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.CycleParameter;
@@ -110,6 +111,18 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public <T> Optional<T> parameter(final RuleKey ruleKey, final Key key) {
 		 return   (Optional<T>) parameterRepository.findByRuleKeyAndKey(ruleKey, key).map(parameter -> conversionService.convert(parameter.value(), key.type()));
+	}
+	
+	@Transactional
+	@Override
+	public Collection<Configuration> configurations(){
+		return configurationRepository.findAll();
+	}
+	
+	@Transactional
+	@Override
+	public Collection<Parameter> parameters(final String configurationId) {
+		return parameterRepository.findByConfigurationId(configurationId);
 	}
 
 }

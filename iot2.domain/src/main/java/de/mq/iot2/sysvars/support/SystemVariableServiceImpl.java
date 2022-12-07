@@ -58,7 +58,7 @@ class SystemVariableServiceImpl implements SystemVariableService {
 
 	private void systemVariableNameAndValueRequiredGuard(final SystemVariable systemVariable) {
 		Assert.hasText(systemVariable.getName(), "Name is required.");
-		Assert.hasText(systemVariable.getValue(), "Value is required.");
+		Assert.notNull(systemVariable.getValue(), "Value is required.");
 	}
 
 	private boolean identical(final SystemVariable systemVariable, final SystemVariable existingSystemVariable) {
