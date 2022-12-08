@@ -1,4 +1,4 @@
-package de.mq.iot2.configuration;
+package de.mq.iot2.configuration.support;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,7 +7,15 @@ import org.springframework.util.CollectionUtils;
 
 public class ConfigurationModel {
 
-	private String configurationId;
+	private String id;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	private String name;
 
@@ -33,12 +41,6 @@ public class ConfigurationModel {
 		this.name = name;
 	}
 
-	public String getConfigurationId() {
-		return configurationId;
-	}
-
-	public void setConfigurationId(String configurationId) {
-		this.configurationId = configurationId;
-	}
+	
 
 }

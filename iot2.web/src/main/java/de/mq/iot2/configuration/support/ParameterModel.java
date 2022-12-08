@@ -1,4 +1,4 @@
-package de.mq.iot2.configuration;
+package de.mq.iot2.configuration.support;
 
 public class ParameterModel {
 	
@@ -10,6 +10,16 @@ public class ParameterModel {
 	
 	private String configurationId;
 	
+	private String cycle;
+	
+	public String getCycle() {
+		return cycle;
+	}
+
+	public void setCycle(String cycle) {
+		this.cycle = cycle;
+	}
+
 	public String getConfigurationId() {
 		return configurationId;
 	}
