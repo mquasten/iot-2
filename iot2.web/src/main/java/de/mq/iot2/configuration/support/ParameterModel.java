@@ -8,6 +8,9 @@ public class ParameterModel {
 	
 	private String value;
 	
+	private String configuration;
+	
+
 	private String configurationId;
 	
 	private String cycle;
@@ -50,6 +53,14 @@ public class ParameterModel {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+	
+	public String getConfiguration() {
+		return configuration;
+	}
+
+	public void setConfiguration(String configuration) {
+		this.configuration = configuration;
 	}
 
 	

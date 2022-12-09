@@ -20,4 +20,6 @@ public interface ConfigurationService {
 
 	Collection<Parameter> parameters(final String configurationId);
 
+	Parameter parameter(final String parameterId);
+
 }

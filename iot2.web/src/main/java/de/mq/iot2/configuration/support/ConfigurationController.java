@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 
 
 @Controller
-class ConfigurationController implements ErrorController{
+class ConfigurationController  implements ErrorController{
 	
 	private final  ConfigurationService configurationService;
 	
@@ -36,7 +36,7 @@ class ConfigurationController implements ErrorController{
 	
 	
 	@GetMapping("/configuration")
-	String configuration(final Model model, @RequestParam(value = "configurationId", required = true, defaultValue = "") String configurationId) {
+	String configuration(final Model model, @RequestParam(value = "configurationId", required = false, defaultValue = "") String configurationId) {
 		final var configurations = configurationService.configurations().stream().collect(Collectors.toMap(configuration -> IdUtil.getId(configuration), Configuration::name));		
 		final ConfigurationModel configurationModel= new ConfigurationModel();
 		if (configurations.containsKey(configurationId)) {
@@ -59,16 +59,17 @@ class ConfigurationController implements ErrorController{
 		return String.format("redirect:configuration?configurationId=%s", configurationModel.getId());
 	}
 	
-	@PostMapping(value = "/updateParameter")
+	@PostMapping(value = "/showParameter")
 	String editParameter(@ModelAttribute("parameter") @Valid final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
 		System.out.println("/updateParameter: " + parameterModel.getId());
-		return String.format("redirect:configuration?configurationId=%s", parameterModel.getConfigurationId());
+		return String.format("redirect:parameter?parameterId=%s", parameterModel.getId());
 	}
+
 	
 	@RequestMapping("/error")
     public String handleError() {
         //do something like logging
         return "error";
-    }
+    } 
 
 }

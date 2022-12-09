@@ -64,7 +64,7 @@ li:not(:first-child)::before {
 						<td th:text="${parameter.name}"></td>
 						<td th:text="${parameter.cycle}"></td>
 						<td th:text="${parameter.value}"></td>
-						<td><form th:action="@{/updateParameter}"
+						<td><form th:action="@{/showParameter}"
 								th:object="${parameter}" method="post">
 								<input type="hidden" name="id" th:value="${parameter.id}" /> <input
 									type="hidden" name="configurationId"

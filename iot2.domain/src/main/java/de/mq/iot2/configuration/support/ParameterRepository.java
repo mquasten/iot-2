@@ -14,6 +14,8 @@ import de.mq.iot2.configuration.Parameter.Key;
 
 @RepositoryDefinition(domainClass = AbstractParameter.class, idClass = String.class)
 public interface ParameterRepository {
+	Optional<Parameter> findById(final String id);
+	
 	Collection<Parameter> findByConfiguration(final Configuration configuration);
 
 	@Query("select p  from GlobalParameter p where p.configuration.key= ?1 and p.key= ?2")

@@ -16,6 +16,8 @@ class ParameterConverter implements Converter<Parameter, ParameterModel> {
 		parameterModel.setId(IdUtil.getId(parameter));
 		parameterModel.setName(parameter.key().name());
 		parameterModel.setValue(parameter.value());
+		parameterModel.setConfiguration(parameter.configuration().name());
+		parameterModel.setConfigurationId(IdUtil.getId(parameter.configuration()));
 		if (parameter instanceof CycleParameter) {
 			parameterModel.setCycle(((CycleParameter) parameter).cycle().name());
 		}

@@ -34,6 +34,8 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	static final String WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE = "Workingday Cycle not found.";
 	static final String OTHER_TIMES_CYCLE_NOT_FOUND_MESSAGE = "Other Times Cycle not found.";
 
+	static final String PARAMETER_ID_NOT_FOUND_MESSAGE_PATTERN = "Parameter with id %s not found.";
+	
 	private static final long CLEAN_UP_CONFIGURATION_ID = 2L;
 	static final long OTHER_TIMES_CYCLE_ID = 3L;
 	static final long WORKING_DAY_CYCLE_ID = 2L;
@@ -122,7 +124,14 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	@Transactional
 	@Override
 	public Collection<Parameter> parameters(final String configurationId) {
+		Assert.hasText(configurationId, "ConfigurationId is required.");
 		return parameterRepository.findByConfigurationId(configurationId);
+	}
+	@Transactional
+	@Override
+	public Parameter parameter(final String parameterId) {
+		Assert.hasText(parameterId, "ParameterId is required.");
+		return parameterRepository.findById(parameterId).orElseThrow(() -> new EntityNotFoundException(String.format(PARAMETER_ID_NOT_FOUND_MESSAGE_PATTERN, parameterId)));
 	}
 
 }
