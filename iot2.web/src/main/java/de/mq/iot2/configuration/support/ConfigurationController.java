@@ -1,14 +1,15 @@
 package de.mq.iot2.configuration.support;
 import java.util.stream.Collectors;
 
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.mq.iot2.configuration.Configuration;
@@ -20,7 +21,7 @@ import jakarta.validation.Valid;
 
 
 @Controller
-class ConfigurationController {
+class ConfigurationController implements ErrorController{
 	
 	private final  ConfigurationService configurationService;
 	
@@ -31,28 +32,30 @@ class ConfigurationController {
 		this.parameterConverter=parameterConverter;
 	}
 
+	
+	
+	
 	@GetMapping("/configuration")
-	String configuration(final Model model, @RequestParam(value = "configurationId", required = false, defaultValue = "") String configurationId) {
-		System.out.println("/configuration?" + configurationId);
+	String configuration(final Model model, @RequestParam(value = "configurationId", required = true, defaultValue = "") String configurationId) {
 		final var configurations = configurationService.configurations().stream().collect(Collectors.toMap(configuration -> IdUtil.getId(configuration), Configuration::name));		
 		final ConfigurationModel configurationModel= new ConfigurationModel();
 		if (configurations.containsKey(configurationId)) {
 			configurationModel.setId(configurationId);
 			configurationModel.setName(configurations.get(configurationId));
 			configurationModel.setParameters(configurationService.parameters(configurationId).stream().map(parameter -> parameterConverter.convert(parameter)).collect(Collectors.toList()));
-		}
-		
+			
+		} 
 		model.addAttribute("configuration", configurationModel );
-		
 		model.addAttribute("configurations", configurations.entrySet());
+		
 		return "configuration";
 	}
 
-	
+
+
 
 	@PostMapping(value = "/search")
 	String search(@ModelAttribute("configuration") @Valid final ConfigurationModel configurationModel, final BindingResult bindingResult, final Model model) {
-		System.out.println("/search");
 		return String.format("redirect:configuration?configurationId=%s", configurationModel.getId());
 	}
 	
@@ -61,5 +64,11 @@ class ConfigurationController {
 		System.out.println("/updateParameter: " + parameterModel.getId());
 		return String.format("redirect:configuration?configurationId=%s", parameterModel.getConfigurationId());
 	}
+	
+	@RequestMapping("/error")
+    public String handleError() {
+        //do something like logging
+        return "error";
+    }
 
 }

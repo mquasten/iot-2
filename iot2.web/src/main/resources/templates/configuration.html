@@ -1,20 +1,32 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="ISO-8859-1">
-<link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+<meta charset="UTF-8">
+
 <title th:text="Ger&auml;teVerwaltung"></title>
 <style>
 .error {
 	color: red;
 }
+li {
+    display: inline;
+    list-style-type: none;
+}
+li:not(:first-child)::before {
+    content: '» ';
+}
+
 </style>
 </head>
 <body>
-
-
 	<div align="center">
-		<h1 th:text="Konfigurationen"></h1>
+	<ol>
+	<li><a href="/">Home</a></li>
+	<li th:text="#{configuration.headline}"></li>
+	</ol>
+	</div>
+	<div align="center">
+		<h1 th:text="#{configuration.headline}"></h1>
 		<form action="#" th:action="@{/search}" method="post"
 			th:object="${configuration}">
 			<table>
@@ -26,7 +38,7 @@
 								th:selected=${configurationId==entry.key}></option>
 					</select></td>
 					<td>
-						<button type="submit" name="submit" th:text="suchen"></button>
+						<button type="submit" name="submit" th:text="#{configuration.search}"></button>
 					</td>
 				</tr>
 				<tr>
@@ -37,19 +49,18 @@
 		</form>
 
 		<div th:if="${configuration.id != null}">
-			<h3 th:text="'Parameter: ' + ${configuration.name}"></h3>
+			<h3 th:text="#{configuration.parametertable.headline} + '&nbsp;'+ ${configuration.name}"></h3>
 			<table>
 				<thead>
 					<tr>
-						<th>Name</th>
-						<th>Cycle</th>
-						<th>Wert</th>
+						<th th:text="#{configuration.parametertable.name}"></th>
+						<th th:text="#{configuration.parametertable.cycle}"></th>
+						<th th:text="#{configuration.parametertable.value}"></th>
 						<th></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:each="parameter, iStat: ${configuration.parameters}"
-						th:style="${iStat.odd}? 'font-weight: normal;'">
+					<tr th:each="parameter: ${configuration.parameters}">
 						<td th:text="${parameter.name}"></td>
 						<td th:text="${parameter.cycle}"></td>
 						<td th:text="${parameter.value}"></td>
@@ -58,7 +69,7 @@
 								<input type="hidden" name="id" th:value="${parameter.id}" /> <input
 									type="hidden" name="configurationId"
 									th:value="${configuration.id}" />
-								<button type="submit">bearbeiten</button>
+								<button type="submit" th:text="#{configuration.parametertable.edit}"></button>
 							</form></td>
 					</tr>
 				</tbody>
