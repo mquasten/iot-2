@@ -1,11 +1,14 @@
 package de.mq.iot2.configuration.support;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class ParameterModel {
 	
 	private String id;
 	
 	private String name;
 	
+	@NotBlank
 	private String value;
 	
 	private String configuration;

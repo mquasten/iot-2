@@ -127,6 +127,7 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		Assert.hasText(configurationId, "ConfigurationId is required.");
 		return parameterRepository.findByConfigurationId(configurationId);
 	}
+	
 	@Transactional
 	@Override
 	public Parameter parameter(final String parameterId) {

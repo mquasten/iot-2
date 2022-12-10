@@ -33,9 +33,9 @@ li:not(:first-child)::before {
 				<tr>
 
 					<td><select th:field="*{id}">
-							<option th:each="entry : ${configurations}"
-								th:value="${entry.key}" th:utext="${entry.value}"
-								th:selected=${configurationId==entry.key}></option>
+							<option th:each="configuration : ${configurations}"
+								th:value="${configuration.id}" th:utext="${configuration.name}"
+								th:selected=${configurationId==configuration.id}></option>
 					</select></td>
 					<td>
 						<button type="submit" name="submit" th:text="#{configuration.search}"></button>

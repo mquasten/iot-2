@@ -18,7 +18,7 @@ public interface ConfigurationService {
 
 	Collection<Configuration> configurations();
 
-	Collection<Parameter> parameters(final String configurationId);
+	Collection<Parameter> parameters(String configurationId);
 
 	Parameter parameter(final String parameterId);
 
