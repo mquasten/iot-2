@@ -20,6 +20,16 @@ public class ParameterModel {
 	
 	private String cycle;
 	
+	private String cycleId;
+	
+	public String getCycleId() {
+		return cycleId;
+	}
+
+	public void setCycleId(String cycleId) {
+		this.cycleId = cycleId;
+	}
+
 	public String getCycle() {
 		return cycle;
 	}

@@ -9,7 +9,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
@@ -22,29 +21,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter;
+import de.mq.iot2.support.ModelMapper;
 import jakarta.validation.Valid;
 
 @Controller
 class ConfigurationController implements ErrorController {
-
 	private static final String CONFIGURATION_ID_REQUIRED_MESSAGE = "ConfigurationId is required.";
-
 	private final ConfigurationService configurationService;
+	private final ModelMapper<Parameter, ParameterModel> parameterMapper;
+	private final ModelMapper<Configuration, ConfigurationModel> configurationMapper;
 
-	private final Converter<Parameter, ParameterModel> parameterConverter;
-
-	private final Converter<Configuration, ConfigurationModel> configurationConverter;
-	
-
-
-	ConfigurationController(final ConfigurationService configurationService, final Converter<Configuration, ConfigurationModel> configurationConverter,
-			final Converter<Parameter, ParameterModel> parameterConverter) {
+	ConfigurationController(final ConfigurationService configurationService, final ModelMapper<Configuration, ConfigurationModel> configurationMapper,
+			final ModelMapper<Parameter, ParameterModel> parameterMapper) {
 		this.configurationService = configurationService;
-		this.configurationConverter = configurationConverter;
-		this.parameterConverter = parameterConverter;
-		
+		this.configurationMapper = configurationMapper;
+		this.parameterMapper = parameterMapper;
 	}
-	
 
 	@GetMapping("/configuration")
 	String configuration(final Model model) {
@@ -62,7 +54,7 @@ class ConfigurationController implements ErrorController {
 	private Map<String, Object> initModel(final Optional<String> configurationId) {
 
 		final Map<String, Object> attributes = new HashMap<>();
-		final Map<String, ConfigurationModel> configurationMap = configurationService.configurations().stream().map(configuration -> configurationConverter.convert(configuration))
+		final Map<String, ConfigurationModel> configurationMap = configurationService.configurations().stream().map(configuration -> configurationMapper.toWeb(configuration))
 				.collect(Collectors.toMap(ConfigurationModel::getId, Function.identity()));
 
 		final Collection<ConfigurationModel> configurations = configurationMap.values().stream().sorted((c1, c2) -> c1.getName().compareTo(c2.getName())).collect(Collectors.toList());
@@ -77,35 +69,34 @@ class ConfigurationController implements ErrorController {
 	private ConfigurationModel mapParameterInto(final ConfigurationModel configuration) {
 		Assert.notNull(configuration, "Configuration required");
 		Assert.hasText(configuration.getId(), CONFIGURATION_ID_REQUIRED_MESSAGE);
-		configuration.setParameters(configurationService.parameters(configuration.getId()).stream().map(parameter -> parameterConverter.convert(parameter)).collect(Collectors.toList()));
+
+		configuration.setParameters(parameterMapper.toWeb(configurationService.parameters(configuration.getId())));
+
 		return configuration;
 	}
 
 	@PostMapping(value = "/showParameter")
 	String showParameter(@ModelAttribute("parameter") final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
-		model.addAttribute("parameter", parameterConverter.convert(configurationService.parameter(parameterModel.getId())));
+		model.addAttribute("parameter", parameterMapper.toWeb(parameterModel.getId()));
 		return "parameter";
 	}
 
 	@PostMapping(value = "/updateParameter", params = "save")
 	String updateParameter(@ModelAttribute("parameter") @Valid final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
 		Assert.hasText(parameterModel.getConfigurationId(), CONFIGURATION_ID_REQUIRED_MESSAGE);
-		
-        Assert.hasText(parameterModel.getId(), "Id is required.");
-		
-		model.addAllAttributes(initModel(Optional.of(parameterModel.getConfigurationId())));
+		Assert.hasText(parameterModel.getId(), "Id is required.");
+
 		if (bindingResult.hasErrors()) {
 			return "parameter";
 		}
-		
-		
-		
+
+		configurationService.save(parameterMapper.toDomain(parameterModel));
+		model.addAllAttributes(initModel(Optional.of(parameterModel.getConfigurationId())));
 		return "configuration";
 	}
 
 	@PostMapping(value = "/updateParameter", params = "cancel")
-	String cancelUpdateParameter(@ModelAttribute("parameter")  final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
-
+	String cancelUpdateParameter(@ModelAttribute("parameter") final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
 		Assert.hasText(parameterModel.getConfigurationId(), CONFIGURATION_ID_REQUIRED_MESSAGE);
 		model.addAllAttributes(initModel(Optional.of(parameterModel.getConfigurationId())));
 		return "configuration";

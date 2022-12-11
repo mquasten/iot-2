@@ -127,12 +127,12 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		Assert.hasText(configurationId, "ConfigurationId is required.");
 		return parameterRepository.findByConfigurationId(configurationId);
 	}
-	
-	@Transactional
+	@Transactional()
 	@Override
-	public Parameter parameter(final String parameterId) {
-		Assert.hasText(parameterId, "ParameterId is required.");
-		return parameterRepository.findById(parameterId).orElseThrow(() -> new EntityNotFoundException(String.format(PARAMETER_ID_NOT_FOUND_MESSAGE_PATTERN, parameterId)));
+	public  void save(final Parameter parmeter) {
+		Assert.notNull(parmeter, "Parameter is required.");
+		parameterRepository.save(parmeter);
 	}
+	
 
 }
