@@ -34,13 +34,17 @@ class ConfigurationController implements ErrorController {
 	private final Converter<Parameter, ParameterModel> parameterConverter;
 
 	private final Converter<Configuration, ConfigurationModel> configurationConverter;
+	
+
 
 	ConfigurationController(final ConfigurationService configurationService, final Converter<Configuration, ConfigurationModel> configurationConverter,
 			final Converter<Parameter, ParameterModel> parameterConverter) {
 		this.configurationService = configurationService;
 		this.configurationConverter = configurationConverter;
 		this.parameterConverter = parameterConverter;
+		
 	}
+	
 
 	@GetMapping("/configuration")
 	String configuration(final Model model) {
@@ -78,7 +82,7 @@ class ConfigurationController implements ErrorController {
 	}
 
 	@PostMapping(value = "/showParameter")
-	String showParameter(@ModelAttribute("parameter") @Valid final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
+	String showParameter(@ModelAttribute("parameter") final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
 		model.addAttribute("parameter", parameterConverter.convert(configurationService.parameter(parameterModel.getId())));
 		return "parameter";
 	}
@@ -86,16 +90,21 @@ class ConfigurationController implements ErrorController {
 	@PostMapping(value = "/updateParameter", params = "save")
 	String updateParameter(@ModelAttribute("parameter") @Valid final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
 		Assert.hasText(parameterModel.getConfigurationId(), CONFIGURATION_ID_REQUIRED_MESSAGE);
+		
+        Assert.hasText(parameterModel.getId(), "Id is required.");
+		
 		model.addAllAttributes(initModel(Optional.of(parameterModel.getConfigurationId())));
-		if (bindingResult.hasFieldErrors()) {
+		if (bindingResult.hasErrors()) {
 			return "parameter";
 		}
+		
+		
 		
 		return "configuration";
 	}
 
 	@PostMapping(value = "/updateParameter", params = "cancel")
-	String cancelUpdateParameter(@ModelAttribute("parameter") @Valid final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
+	String cancelUpdateParameter(@ModelAttribute("parameter")  final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
 
 		Assert.hasText(parameterModel.getConfigurationId(), CONFIGURATION_ID_REQUIRED_MESSAGE);
 		model.addAllAttributes(initModel(Optional.of(parameterModel.getConfigurationId())));

@@ -14,10 +14,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EntityScan(basePackages = "de.mq.iot2")
 @ComponentScan(basePackages = "de.mq.iot2")
 @EnableTransactionManagement()
-public abstract class ServingWebContentApplication {
+public abstract class Main {
 
     public static void main(String[] args) {
-        SpringApplication.run(ServingWebContentApplication.class, args);
+        SpringApplication.run(Main.class, args);
     }
    
 }
