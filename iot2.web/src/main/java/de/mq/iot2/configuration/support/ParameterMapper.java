@@ -1,5 +1,6 @@
 package de.mq.iot2.configuration.support;
 
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -15,9 +16,11 @@ import jakarta.persistence.Id;
 class ParameterMapper implements ModelMapper<Parameter, ParameterModel> {
 
 	private final ParameterRepository parameterRepository;
+	private final ConversionService conversionService;
 	
-	ParameterMapper(final ParameterRepository parameterRepository) {
+	ParameterMapper(final ParameterRepository parameterRepository, final ConversionService conversionService) {
 		this.parameterRepository = parameterRepository;
+		this.conversionService=conversionService;
 	}
 
 	@Override
@@ -37,21 +40,27 @@ class ParameterMapper implements ModelMapper<Parameter, ParameterModel> {
 	
 	@Override
 	public Parameter toDomain(final String id) {
-		Assert.hasText(id, "Id is required.");
+		idRequiredGuard(id);
 		return parameterRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format("Parameter with id %s not found.", id)));
 		
 	}
+
+	private void idRequiredGuard(final String id) {
+		Assert.hasText(id, "Id is required.");
+	}
 	
 	public Parameter toDomain(final ParameterModel parameterModel ) {
-		
+		Assert.notNull(parameterModel, "ParameterModel is required.");
+		idRequiredGuard(parameterModel.getId());
+		Assert.hasText(parameterModel.getValue(), "Value is required.");
 		final Parameter existingParameter = toDomain(parameterModel.getId());
-		
+		final var valueAsString = conversionService.convert(conversionService.convert(parameterModel.getValue(), existingParameter.key().type()), String.class);
 		if (existingParameter instanceof CycleParameter) {
-			final var parameter =new CycleParameterImpl(existingParameter.configuration(), existingParameter.key(), parameterModel.getValue(), ((CycleParameter)existingParameter).cycle());
+			final var parameter =new CycleParameterImpl(existingParameter.configuration(), existingParameter.key(), valueAsString, ((CycleParameter)existingParameter).cycle());
 			assignId(parameter, parameterModel.getId());
 			return parameter;
 		} else {
-			final var parameter  = new ParameterImpl(existingParameter.configuration(), existingParameter.key(), parameterModel.getValue());
+			final var parameter  = new ParameterImpl(existingParameter.configuration(), existingParameter.key(), valueAsString);
 			assignId(parameter, parameterModel.getId());
 			return parameter;
 		}

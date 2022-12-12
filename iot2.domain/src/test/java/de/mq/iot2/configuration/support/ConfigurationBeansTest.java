@@ -17,7 +17,7 @@ class ConfigurationBeansTest {
 	private ConfigurationBeans configurationBeans = new ConfigurationBeans();
 
 	@Test
-	void conversionService() {
+	void conversionServiceString2LocalTime() {
 		assertEquals(LocalTime.of(11, 11), configurationBeans.conversionService().convert("11:11", LocalTime.class));
 		assertEquals(LocalTime.of(1, 1), configurationBeans.conversionService().convert("01:01", LocalTime.class));
 		assertEquals(LocalTime.of(1, 1), configurationBeans.conversionService().convert("1:1", LocalTime.class));
@@ -30,6 +30,13 @@ class ConfigurationBeansTest {
 	
 	}
 	
-	
-
+	@Test
+	void conversionServiceLocalTime2String() {
+		
+		assertEquals("11:11" , configurationBeans.conversionService().convert(LocalTime.of(11, 11), String.class));
+		assertEquals("01:01" , configurationBeans.conversionService().convert(LocalTime.of(1, 1), String.class));
+		assertEquals("23:59" , configurationBeans.conversionService().convert(LocalTime.of(23, 59), String.class));
+		
+	}
+		
 }

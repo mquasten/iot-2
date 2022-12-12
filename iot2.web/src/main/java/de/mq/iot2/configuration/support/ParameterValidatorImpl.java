@@ -19,15 +19,19 @@ class ParameterValidatorImpl implements ConstraintValidator<ValidParameter, Para
 	private final ConversionService conversionService;
 	
 	
-	private final Map<Key, Predicate<String>> additionalValidations = Map.of(Key.DaysBack, value -> Integer.parseInt(value) > 0 );
+	private final Map<Key, Predicate<String>> additionalValidations;
 	
 	
 	ParameterValidatorImpl(final ConversionService conversionService) {
 		this.conversionService=conversionService;
+		additionalValidations = Map.of(Key.DaysBack, value -> inRange(conversionService.convert(value, Integer.class), 1, 999) , Key.ShadowTemperature , value -> inRange(conversionService.convert(value, Double.class), 10d, 40d));
 	}
 	
 	
-	
+	private boolean inRange(final Number value , final Number min, final Number max) {
+		return value.doubleValue() <=max.doubleValue() && value.doubleValue() >= min.doubleValue() ;
+		
+	}
 	
 	
 
@@ -39,16 +43,19 @@ class ParameterValidatorImpl implements ConstraintValidator<ValidParameter, Para
 		final Key key = Key.valueOf(value.getName());
 		
 		context.disableDefaultConstraintViolation();
-		context.buildConstraintViolationWithTemplate(String.format("{parameter.value.%s.message}", key.type().getSimpleName().toLowerCase())).addPropertyNode("value").addConstraintViolation();
+		
 		try {
 		
 		   conversionService.convert(value.getValue(),key.type());
 		   
-		  return isValid(key, value.getValue());
-				
+		  final var result = isValid(key, value.getValue());
+		 if(!  result) {
+			 context.buildConstraintViolationWithTemplate(String.format("{parameter.value.%s.message}", key.name().toLowerCase())).addPropertyNode("value").addConstraintViolation();
+		 }
+		  return result;
 		} catch(final ConversionFailedException ex )	{
 			
-		
+			context.buildConstraintViolationWithTemplate(String.format("{parameter.value.%s.message}", key.type().getSimpleName().toLowerCase())).addPropertyNode("value").addConstraintViolation();
 			return false;
 		}
 		
