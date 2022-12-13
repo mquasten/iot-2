@@ -47,4 +47,11 @@ public interface IdUtil {
 		final var random = new Random();
 		return random.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
 	}
+	
+	public static void assignId(final Object entity, final String id) {
+		ReflectionUtils.doWithFields(entity.getClass(), field -> {
+			field.setAccessible(true);
+		    ReflectionUtils.setField(field, entity, id) ;	
+		}, field -> field.isAnnotationPresent(Id.class));
+	}
 }
