@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 @Component
 class ParameterMapper implements ModelMapper<Parameter, ParameterModel> {
 
+	static final String PARAMETER_NOT_FOUND_MESSAGE = "Parameter with id %s not found.";
 	private final ParameterRepository parameterRepository;
 	private final ConversionService conversionService;
 	
@@ -22,6 +23,7 @@ class ParameterMapper implements ModelMapper<Parameter, ParameterModel> {
 
 	@Override
 	public ParameterModel toWeb(final Parameter parameter) {
+		Assert.notNull(parameter, "Parameter is required.");
 		final var parameterModel= new ParameterModel();
 		parameterModel.setId(IdUtil.getId(parameter));
 		parameterModel.setName(parameter.key().name());
@@ -38,7 +40,7 @@ class ParameterMapper implements ModelMapper<Parameter, ParameterModel> {
 	@Override
 	public Parameter toDomain(final String id) {
 		idRequiredGuard(id);
-		return parameterRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format("Parameter with id %s not found.", id)));
+		return parameterRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format(PARAMETER_NOT_FOUND_MESSAGE, id)));
 		
 	}
 

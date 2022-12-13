@@ -1,27 +1,25 @@
 package de.mq.iot2.configuration.support;
 
-
 import jakarta.validation.constraints.NotBlank;
 
 @ValidParameter
 public class ParameterModel {
-	
+
 	private String id;
-	
+
 	private String name;
-	
+
 	@NotBlank
 	private String value;
-	
+
 	private String configuration;
-	
 
 	private String configurationId;
-	
+
 	private String cycle;
-	
+
 	private String cycleId;
-	
+
 	public String getCycleId() {
 		return cycleId;
 	}
@@ -69,7 +67,7 @@ public class ParameterModel {
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
+
 	public String getConfiguration() {
 		return configuration;
 	}
@@ -77,7 +75,5 @@ public class ParameterModel {
 	public void setConfiguration(String configuration) {
 		this.configuration = configuration;
 	}
-
-	
 
 }
