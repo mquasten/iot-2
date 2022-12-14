@@ -5,8 +5,9 @@ import java.util.stream.Collectors;
 
 public interface ModelMapper<Domain,Web> {
 	
-	Web toWeb(final Domain domain);
-	
+	static final String METHOD_NOT_IMPLEMENTED = "Method not implemented.";
+
+	Web toWeb(final Domain domain); 
 	default Web toWeb(final String id) {
 		return toWeb(toDomain(id));
 	}
@@ -16,11 +17,11 @@ public interface ModelMapper<Domain,Web> {
 	}
 	
 	default Domain toDomain(final Web web ) {
-		throw new UnsupportedOperationException("Method not implemented.");
+		throw new UnsupportedOperationException(METHOD_NOT_IMPLEMENTED);
 	}
 	
 	default Domain toDomain(final String id) {
-		throw new UnsupportedOperationException("Method not implemented.");
+		throw new UnsupportedOperationException(METHOD_NOT_IMPLEMENTED);
 	}
 
 }

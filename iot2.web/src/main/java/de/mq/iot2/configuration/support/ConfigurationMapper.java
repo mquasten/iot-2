@@ -7,7 +7,7 @@ import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.ModelMapper;
 
 @Component
-class ConvigurationMapper implements ModelMapper<Configuration, ConfigurationModel> {
+class ConfigurationMapper implements ModelMapper<Configuration, ConfigurationModel> {
 	
 	@Override
 	public ConfigurationModel toWeb(final Configuration configuration) {
