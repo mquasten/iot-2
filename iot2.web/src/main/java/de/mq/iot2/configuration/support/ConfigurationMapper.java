@@ -8,16 +8,13 @@ import de.mq.iot2.support.ModelMapper;
 
 @Component
 class ConfigurationMapper implements ModelMapper<Configuration, ConfigurationModel> {
-	
+
 	@Override
 	public ConfigurationModel toWeb(final Configuration configuration) {
-		final var  configurationModel = new ConfigurationModel();
+		final var configurationModel = new ConfigurationModel();
 		configurationModel.setId(IdUtil.getId(configuration));
 		configurationModel.setName(configuration.name());
 		return configurationModel;
 	}
-
-	
-	
 
 }

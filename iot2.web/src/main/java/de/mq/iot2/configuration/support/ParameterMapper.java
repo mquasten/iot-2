@@ -15,16 +15,16 @@ class ParameterMapper implements ModelMapper<Parameter, ParameterModel> {
 	static final String PARAMETER_NOT_FOUND_MESSAGE = "Parameter with id %s not found.";
 	private final ParameterRepository parameterRepository;
 	private final ConversionService conversionService;
-	
+
 	ParameterMapper(final ParameterRepository parameterRepository, final ConversionService conversionService) {
 		this.parameterRepository = parameterRepository;
-		this.conversionService=conversionService;
+		this.conversionService = conversionService;
 	}
 
 	@Override
 	public ParameterModel toWeb(final Parameter parameter) {
 		Assert.notNull(parameter, "Parameter is required.");
-		final var parameterModel= new ParameterModel();
+		final var parameterModel = new ParameterModel();
 		parameterModel.setId(IdUtil.getId(parameter));
 		parameterModel.setName(parameter.key().name());
 		parameterModel.setValue(parameter.value());
@@ -36,37 +36,33 @@ class ParameterMapper implements ModelMapper<Parameter, ParameterModel> {
 		}
 		return parameterModel;
 	}
-	
+
 	@Override
 	public Parameter toDomain(final String id) {
 		idRequiredGuard(id);
 		return parameterRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format(PARAMETER_NOT_FOUND_MESSAGE, id)));
-		
+
 	}
 
 	private void idRequiredGuard(final String id) {
 		Assert.hasText(id, "Id is required.");
 	}
-	
-	public Parameter toDomain(final ParameterModel parameterModel ) {
+
+	public Parameter toDomain(final ParameterModel parameterModel) {
 		Assert.notNull(parameterModel, "ParameterModel is required.");
 		idRequiredGuard(parameterModel.getId());
 		Assert.hasText(parameterModel.getValue(), "Value is required.");
 		final Parameter existingParameter = toDomain(parameterModel.getId());
 		final var valueAsString = conversionService.convert(conversionService.convert(parameterModel.getValue(), existingParameter.key().type()), String.class);
 		if (existingParameter instanceof CycleParameter) {
-			final var parameter =new CycleParameterImpl(existingParameter.configuration(), existingParameter.key(), valueAsString, ((CycleParameter)existingParameter).cycle());
+			final var parameter = new CycleParameterImpl(existingParameter.configuration(), existingParameter.key(), valueAsString, ((CycleParameter) existingParameter).cycle());
 			IdUtil.assignId(parameter, parameterModel.getId());
 			return parameter;
 		} else {
-			final var parameter  = new ParameterImpl(existingParameter.configuration(), existingParameter.key(), valueAsString);
+			final var parameter = new ParameterImpl(existingParameter.configuration(), existingParameter.key(), valueAsString);
 			IdUtil.assignId(parameter, parameterModel.getId());
 			return parameter;
 		}
 	}
-
-	
-
-	
 
 }

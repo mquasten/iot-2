@@ -32,14 +32,15 @@ class ConfigurationController implements ErrorController {
 	private final ModelMapper<Parameter, ParameterModel> parameterMapper;
 	private final ModelMapper<Configuration, ConfigurationModel> configurationMapper;
 
-	ConfigurationController(final ConfigurationService configurationService, final ModelMapper<Configuration, ConfigurationModel> configurationMapper, final ModelMapper<Parameter, ParameterModel> parameterMapper) {
+	ConfigurationController(final ConfigurationService configurationService, final ModelMapper<Configuration, ConfigurationModel> configurationMapper,
+			final ModelMapper<Parameter, ParameterModel> parameterMapper) {
 		this.configurationService = configurationService;
 		this.configurationMapper = configurationMapper;
 		this.parameterMapper = parameterMapper;
 	}
 
-	@RequestMapping(value="/configuration", method = {RequestMethod.GET, RequestMethod.POST})
-	String configuration(final Model model, @RequestAttribute(name="configurationId",required = false )final String configurationId) {
+	@RequestMapping(value = "/configuration", method = { RequestMethod.GET, RequestMethod.POST })
+	String configuration(final Model model, @RequestAttribute(name = "configurationId", required = false) final String configurationId) {
 		model.addAllAttributes(initModel(Optional.ofNullable(configurationId)));
 		return "configuration";
 	}
@@ -47,7 +48,7 @@ class ConfigurationController implements ErrorController {
 	@PostMapping(value = "/search")
 	String search(@ModelAttribute("configuration") @Valid final ConfigurationModel configurationModel, final BindingResult bindingResult, final Model model) {
 		Assert.hasText(configurationModel.getId(), CONFIGURATION_ID_REQUIRED_MESSAGE);
-		model.addAttribute("configurationId" ,configurationModel.getId() );
+		model.addAttribute("configurationId", configurationModel.getId());
 		return "forward:configuration";
 	}
 
@@ -75,6 +76,6 @@ class ConfigurationController implements ErrorController {
 	@RequestMapping("/error")
 	public String handleError() {
 		return "error";
-	} 
+	}
 
 }

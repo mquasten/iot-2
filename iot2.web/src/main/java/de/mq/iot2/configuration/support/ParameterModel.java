@@ -24,7 +24,7 @@ public class ParameterModel {
 		return cycleId;
 	}
 
-	public void setCycleId(String cycleId) {
+	public void setCycleId(final String cycleId) {
 		this.cycleId = cycleId;
 	}
 
@@ -32,7 +32,7 @@ public class ParameterModel {
 		return cycle;
 	}
 
-	public void setCycle(String cycle) {
+	public void setCycle(final String cycle) {
 		this.cycle = cycle;
 	}
 
@@ -40,7 +40,7 @@ public class ParameterModel {
 		return configurationId;
 	}
 
-	public void setConfigurationId(String configurationId) {
+	public void setConfigurationId(final String configurationId) {
 		this.configurationId = configurationId;
 	}
 
@@ -48,7 +48,7 @@ public class ParameterModel {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
 
@@ -56,7 +56,7 @@ public class ParameterModel {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -64,7 +64,7 @@ public class ParameterModel {
 		return value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -72,7 +72,7 @@ public class ParameterModel {
 		return configuration;
 	}
 
-	public void setConfiguration(String configuration) {
+	public void setConfiguration(final String configuration) {
 		this.configuration = configuration;
 	}
 

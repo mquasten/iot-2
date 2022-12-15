@@ -9,23 +9,23 @@ public class ConfigurationModel {
 
 	private String id;
 
+	private String name;
+
+	private Collection<ParameterModel> parameters = new ArrayList<>();
+
 	public String getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
-
-	private String name;
-
-	private Collection<ParameterModel> parameters = new ArrayList<>();
 
 	public Collection<ParameterModel> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Collection<ParameterModel> parameters) {
+	public void setParameters(final Collection<ParameterModel> parameters) {
 		this.parameters.clear();
 		if (CollectionUtils.isEmpty(parameters)) {
 			return;
@@ -37,10 +37,8 @@ public class ConfigurationModel {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
-
-	
 
 }

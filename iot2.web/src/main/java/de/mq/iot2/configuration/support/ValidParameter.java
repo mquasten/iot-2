@@ -13,10 +13,10 @@ import jakarta.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidParameter {
 
-	    String message() default "{error.address}";
-	    Class<?>[] groups() default { };
-	    Class<? extends Payload>[] payload() default { };
+	String message() default "{error.address}";
 
-	
+	Class<?>[] groups() default {};
+
+	Class<? extends Payload>[] payload() default {};
 
 }

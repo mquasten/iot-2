@@ -13,15 +13,15 @@ import jakarta.validation.Valid;
 
 @Controller
 class ParameterController {
-	
+
 	private final ConfigurationService configurationService;
 	private final ModelMapper<Parameter, ParameterModel> parameterMapper;
-	
+
 	ParameterController(final ConfigurationService configurationService, final ModelMapper<Parameter, ParameterModel> parameterMapper) {
 		this.configurationService = configurationService;
 		this.parameterMapper = parameterMapper;
 	}
-	
+
 	@PostMapping(value = "/showParameter")
 	String showParameter(@ModelAttribute("parameter") final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
 		model.addAttribute("parameter", parameterMapper.toWeb(parameterModel.getId()));
@@ -38,16 +38,15 @@ class ParameterController {
 		}
 
 		configurationService.save(parameterMapper.toDomain(parameterModel));
-		model.addAttribute("configurationId" , parameterModel.getConfigurationId());
+		model.addAttribute("configurationId", parameterModel.getConfigurationId());
 		return "forward:configuration";
 	}
 
 	@PostMapping(value = "/updateParameter", params = "cancel")
 	String cancelUpdateParameter(@ModelAttribute("parameter") final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
 		Assert.hasText(parameterModel.getConfigurationId(), ConfigurationController.CONFIGURATION_ID_REQUIRED_MESSAGE);
-		model.addAttribute("configurationId" , parameterModel.getConfigurationId());
+		model.addAttribute("configurationId", parameterModel.getConfigurationId());
 		return "forward:configuration";
 	}
-
 
 }
