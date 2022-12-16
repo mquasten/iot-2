@@ -4,19 +4,8 @@
 <meta charset="UTF-8">
 
 <title th:text="Ger&auml;teVerwaltung"></title>
-<style>
-.error {
-	color: red;
-}
-li {
-    display: inline;
-    list-style-type: none;
-}
-li:not(:first-child)::before {
-    content: '» ';
-}
+<link th:href="@{/css/min.css}" rel="stylesheet" />
 
-</style>
 </head>
 <body>
 	<div align="center">
@@ -50,7 +39,7 @@ li:not(:first-child)::before {
 
 		<div th:if="${configuration.id != null}">
 			<h3 th:text="#{configuration.parametertable.headline} + '&nbsp;'+ ${configuration.name}"></h3>
-			<table>
+			<table class="result-table">
 				<thead>
 					<tr>
 						<th th:text="#{configuration.parametertable.name}"></th>
