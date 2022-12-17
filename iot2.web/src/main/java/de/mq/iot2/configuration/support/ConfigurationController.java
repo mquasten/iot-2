@@ -27,7 +27,9 @@ import jakarta.validation.Valid;
 
 @Controller
 class ConfigurationController implements ErrorController {
+	static final String  CONFIGURATION_MODEL_AND_VIEW_NAME="configuration";
 	static final String CONFIGURATION_ID_REQUIRED_MESSAGE = "ConfigurationId is required.";
+	
 	private final ConfigurationService configurationService;
 	private final ModelMapper<Parameter, ParameterModel> parameterMapper;
 	private final ModelMapper<Configuration, ConfigurationModel> configurationMapper;
