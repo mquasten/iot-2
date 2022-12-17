@@ -13,11 +13,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.ConfigurationService;
@@ -27,9 +27,10 @@ import jakarta.validation.Valid;
 
 @Controller
 class ConfigurationController implements ErrorController {
-	static final String  CONFIGURATION_MODEL_AND_VIEW_NAME="configuration";
+	static final String CONFIGURATION_MODEL_AND_VIEW_NAME = "configuration";
+	static final String REDIRECT_CONFIGURATION_PATTERN = "redirect:"+CONFIGURATION_MODEL_AND_VIEW_NAME+"?configurationId=%s";
 	static final String CONFIGURATION_ID_REQUIRED_MESSAGE = "ConfigurationId is required.";
-	
+
 	private final ConfigurationService configurationService;
 	private final ModelMapper<Parameter, ParameterModel> parameterMapper;
 	private final ModelMapper<Configuration, ConfigurationModel> configurationMapper;
@@ -41,17 +42,21 @@ class ConfigurationController implements ErrorController {
 		this.parameterMapper = parameterMapper;
 	}
 
-	@RequestMapping(value = "/configuration", method = { RequestMethod.GET, RequestMethod.POST })
-	String configuration(final Model model, @RequestAttribute(name = "configurationId", required = false) final String configurationId) {
+	@GetMapping(value = "/configuration")
+	String configuration(final Model model, @RequestParam(name = "configurationId", required = false) final String configurationId) {
+
 		model.addAllAttributes(initModel(Optional.ofNullable(configurationId)));
+
 		return "configuration";
 	}
 
 	@PostMapping(value = "/search")
 	String search(@ModelAttribute("configuration") @Valid final ConfigurationModel configurationModel, final BindingResult bindingResult, final Model model) {
-		Assert.hasText(configurationModel.getId(), CONFIGURATION_ID_REQUIRED_MESSAGE);
-		model.addAttribute("configurationId", configurationModel.getId());
-		return "forward:configuration";
+		if (bindingResult.hasErrors()) {
+			return "configuration";
+		}
+
+		return String.format(REDIRECT_CONFIGURATION_PATTERN, configurationModel.getId());
 	}
 
 	private Map<String, Object> initModel(final Optional<String> configurationId) {
@@ -62,10 +67,17 @@ class ConfigurationController implements ErrorController {
 		final Collection<ConfigurationModel> configurations = configurationMap.values().stream().sorted((c1, c2) -> c1.getName().compareTo(c2.getName())).collect(Collectors.toList());
 		attributes.put("configurations", configurations);
 
-		configurationId.ifPresentOrElse(id -> attributes.put("configuration", mapParameterInto(configurationMap.get(id))), () -> configurations.stream().findFirst()
-				.ifPresentOrElse(configuration -> attributes.put("configuration", mapParameterInto(configuration)), () -> attributes.put("configuration", new ConfigurationModel())));
+		configurationId.ifPresentOrElse(
+				id -> attributes.put("configuration", configurationMap.containsKey(id) ? mapParameterInto(configurationMap.get(id)) : firstConfigurationIfExistsOrNew(configurations)),
+				() -> attributes.put("configuration", firstConfigurationIfExistsOrNew(configurations)));
 
 		return Collections.unmodifiableMap(attributes);
+	}
+
+	private ConfigurationModel firstConfigurationIfExistsOrNew(final Collection<ConfigurationModel> configurations) {
+		
+		return configurations.stream().findFirst().map(x -> mapParameterInto(x)).orElse(new ConfigurationModel());
+	
 	}
 
 	private ConfigurationModel mapParameterInto(final ConfigurationModel configuration) {

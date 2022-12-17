@@ -1,9 +1,8 @@
 package de.mq.iot2.configuration.support;
 
-import static de.mq.iot2.configuration.support.ConfigurationController.CONFIGURATION_MODEL_AND_VIEW_NAME;
-import static de.mq.iot2.configuration.support.ParameterController.CONFIGURATION_ID;
+import static de.mq.iot2.configuration.support.ConfigurationController.REDIRECT_CONFIGURATION_PATTERN;
 import static de.mq.iot2.configuration.support.ParameterController.PARAMETER_MODEL_AND_VIEW_NAME;
-import static de.mq.iot2.support.Constants.FORWARD_VIEW_PATTERN;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -51,9 +50,8 @@ class ParameterControllerTest {
 		final var parameterModel = newParameterModelWithIdAndConfigurationId();
 		when(parameterMapper.toDomain(parameterModel)).thenReturn(parameter);
 
-		assertEquals(String.format(FORWARD_VIEW_PATTERN, CONFIGURATION_MODEL_AND_VIEW_NAME), parameterController.updateParameter(parameterModel, mock(BindingResult.class), model));
+		assertEquals(String.format(REDIRECT_CONFIGURATION_PATTERN, parameterModel.getConfigurationId()), parameterController.updateParameter(parameterModel, mock(BindingResult.class)));
 
-		assertEquals(parameterModel.getConfigurationId(), model.getAttribute(CONFIGURATION_ID));
 		verify(configurationService).save(parameter);
 	}
 
@@ -70,7 +68,7 @@ class ParameterControllerTest {
 		final var bindingResult = mock(BindingResult.class);
 		when(bindingResult.hasErrors()).thenReturn(true);
 
-		assertEquals(PARAMETER_MODEL_AND_VIEW_NAME, parameterController.updateParameter(parameterModel, bindingResult, model));
+		assertEquals(PARAMETER_MODEL_AND_VIEW_NAME, parameterController.updateParameter(parameterModel, bindingResult));
 
 		verify(configurationService, never()).save(Mockito.any());
 	}
@@ -79,8 +77,9 @@ class ParameterControllerTest {
 	void cancelUpdateParameter() {
 		final ParameterModel parameterModel = newParameterModelWithIdAndConfigurationId();
 
-		assertEquals(String.format(FORWARD_VIEW_PATTERN, CONFIGURATION_MODEL_AND_VIEW_NAME), parameterController.cancelUpdateParameter(parameterModel, model));
-		assertEquals(parameterModel.getConfigurationId(), model.getAttribute(CONFIGURATION_ID));
+		assertEquals(String.format(REDIRECT_CONFIGURATION_PATTERN, parameterModel.getConfigurationId()), parameterController.cancelUpdateParameter(parameterModel));
+
+		verify(configurationService, never()).save(Mockito.any());
 	}
 
 }

@@ -5,8 +5,11 @@ import java.util.Collection;
 
 import org.springframework.util.CollectionUtils;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class ConfigurationModel {
 
+	@NotBlank
 	private String id;
 
 	private String name;

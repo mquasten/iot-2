@@ -8,17 +8,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter;
-import de.mq.iot2.support.Constants;
 import de.mq.iot2.support.ModelMapper;
 import jakarta.validation.Valid;
 
 @Controller
 class ParameterController {
-	static final String PARAMETER_MODEL_AND_VIEW_NAME =  "parameter";
-	static final String CONFIGURATION_ID = "configurationId";
+	static final String PARAMETER_MODEL_AND_VIEW_NAME = "parameter";
 	private final ConfigurationService configurationService;
 	private final ModelMapper<Parameter, ParameterModel> parameterMapper;
-	
+
 	ParameterController(final ConfigurationService configurationService, final ModelMapper<Parameter, ParameterModel> parameterMapper) {
 		this.configurationService = configurationService;
 		this.parameterMapper = parameterMapper;
@@ -31,7 +29,7 @@ class ParameterController {
 	}
 
 	@PostMapping(value = "/updateParameter", params = "save")
-	String updateParameter(@ModelAttribute(PARAMETER_MODEL_AND_VIEW_NAME) @Valid final ParameterModel parameterModel, final BindingResult bindingResult, final Model model) {
+	String updateParameter(@ModelAttribute(PARAMETER_MODEL_AND_VIEW_NAME) @Valid final ParameterModel parameterModel, final BindingResult bindingResult) {
 		Assert.hasText(parameterModel.getConfigurationId(), ConfigurationController.CONFIGURATION_ID_REQUIRED_MESSAGE);
 		Assert.hasText(parameterModel.getId(), "Id is required.");
 
@@ -40,19 +38,17 @@ class ParameterController {
 		}
 
 		configurationService.save(parameterMapper.toDomain(parameterModel));
-		model.addAttribute(CONFIGURATION_ID, parameterModel.getConfigurationId());
-		return forwardConfiguration();
+		return redirectConfiguration(parameterModel.getConfigurationId());
 	}
 
-	private String forwardConfiguration() {
-		return String.format(Constants.FORWARD_VIEW_PATTERN, ConfigurationController.CONFIGURATION_MODEL_AND_VIEW_NAME);
+	private String redirectConfiguration(final String configurationId) {
+		return String.format(ConfigurationController.REDIRECT_CONFIGURATION_PATTERN, configurationId);
 	}
 
 	@PostMapping(value = "/updateParameter", params = "cancel")
-	String cancelUpdateParameter(@ModelAttribute("parameter") final ParameterModel parameterModel, final Model model) {
+	String cancelUpdateParameter(@ModelAttribute("parameter") final ParameterModel parameterModel) {
 		Assert.hasText(parameterModel.getConfigurationId(), ConfigurationController.CONFIGURATION_ID_REQUIRED_MESSAGE);
-		model.addAttribute(CONFIGURATION_ID, parameterModel.getConfigurationId());
-		return  forwardConfiguration();
+		return redirectConfiguration(parameterModel.getConfigurationId());
 	}
 
 }
