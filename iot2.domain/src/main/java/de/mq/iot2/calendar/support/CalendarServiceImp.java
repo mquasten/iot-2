@@ -200,6 +200,7 @@ class CalendarServiceImp implements CalendarService {
 	}
 
 	@Override
+	@Transactional
 	public int deleteLocalDateDays(final int daysBack) {
 		Assert.isTrue(daysBack > 0, DAYS_BACK_INVALID_MESSAGE);
 		final var deleteDate = LocalDate.now().minusDays(daysBack);
@@ -210,6 +211,13 @@ class CalendarServiceImp implements CalendarService {
 
 	private boolean beforeEquals(final LocalDate date, final LocalDate otherDate) {
 		return date.isBefore(otherDate) || date.isEqual(otherDate);
+	}
+
+	@Override
+	@Transactional
+	public Collection<DayGroup> dayGroups() {
+		return dayGroupRepository.findAll();
+		
 	}
 
 }

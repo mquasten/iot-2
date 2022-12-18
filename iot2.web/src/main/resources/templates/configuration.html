@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 
-<title th:text="Ger&auml;teVerwaltung"></title>
+<title th:text="#{title}"></title>
 <link th:href="@{/css/min.css}" rel="stylesheet" />
 
 </head>
@@ -12,11 +12,12 @@
 	<ol>
 	<li><a href="/">Home</a></li>
 	<li th:text="#{configuration.headline}"></li>
+	<li><a href="/calendar"  th:text="#{calendar.headline}" ></a></li>
 	</ol>
 	</div>
 	<div align="center">
 		<h1 th:text="#{configuration.headline}"></h1>
-		<form action="#" th:action="@{/search}" method="post"
+		<form action="#" th:action="@{/searchConfiguration}" method="post"
 			th:object="${configuration}">
 			<table>
 				<tr>

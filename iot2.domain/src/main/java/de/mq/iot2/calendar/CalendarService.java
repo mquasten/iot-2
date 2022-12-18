@@ -2,6 +2,7 @@ package de.mq.iot2.calendar;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collection;
 import java.util.Optional;
 
 public interface CalendarService {
@@ -57,6 +58,8 @@ public interface CalendarService {
 	int deleteLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate);
 
 	int deleteLocalDateDays(final int days);
+	
+	Collection<DayGroup> dayGroups();
 
 
 

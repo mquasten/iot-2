@@ -53,7 +53,7 @@ class ConfigurationController implements ErrorController {
 		return CONFIGURATION_MODEL_AND_VIEW_NAME;
 	}
 
-	@PostMapping(value = "/search")
+	@PostMapping(value = "/searchConfiguration")
 	String search(@ModelAttribute(CONFIGURATION_MODEL_AND_VIEW_NAME) @Valid final ConfigurationModel configurationModel, final BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return CONFIGURATION_MODEL_AND_VIEW_NAME;

@@ -1,5 +1,6 @@
 package de.mq.iot2.calendar.support;
 
+import java.util.Collection;
 import java.util.Optional;
 
 import org.springframework.data.repository.RepositoryDefinition;
@@ -14,5 +15,7 @@ public interface DayGroupRepository {
 	Optional<DayGroup> findById(final String id);
 	
 	Optional<DayGroup> findByName(final String name);
+	
+	Collection<DayGroup> findAll();
 
 }
