@@ -27,8 +27,11 @@ import jakarta.validation.Valid;
 
 @Controller
 class ConfigurationController implements ErrorController {
+	static final String ERROR_VIEW_NAME = "error";
 	static final String CONFIGURATION_MODEL_AND_VIEW_NAME = "configuration";
-	static final String REDIRECT_CONFIGURATION_PATTERN = "redirect:"+CONFIGURATION_MODEL_AND_VIEW_NAME+"?configurationId=%s";
+	static final String CONFIGURATION_LIST_NAME = "configurations";
+	private static final String CONFIGURATION_ID_PARAMETER_NAME = "configurationId";
+	static final String REDIRECT_CONFIGURATION_PATTERN = "redirect:" + CONFIGURATION_MODEL_AND_VIEW_NAME + "?" + CONFIGURATION_ID_PARAMETER_NAME + "=%s";
 	static final String CONFIGURATION_ID_REQUIRED_MESSAGE = "ConfigurationId is required.";
 
 	private final ConfigurationService configurationService;
@@ -43,17 +46,17 @@ class ConfigurationController implements ErrorController {
 	}
 
 	@GetMapping(value = "/configuration")
-	String configuration(final Model model, @RequestParam(name = "configurationId", required = false) final String configurationId) {
+	String configuration(final Model model, @RequestParam(name = CONFIGURATION_ID_PARAMETER_NAME, required = false) final String configurationId) {
 
 		model.addAllAttributes(initModel(Optional.ofNullable(configurationId)));
 
-		return "configuration";
+		return CONFIGURATION_MODEL_AND_VIEW_NAME;
 	}
 
 	@PostMapping(value = "/search")
-	String search(@ModelAttribute("configuration") @Valid final ConfigurationModel configurationModel, final BindingResult bindingResult, final Model model) {
+	String search(@ModelAttribute(CONFIGURATION_MODEL_AND_VIEW_NAME) @Valid final ConfigurationModel configurationModel, final BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			return "configuration";
+			return CONFIGURATION_MODEL_AND_VIEW_NAME;
 		}
 
 		return String.format(REDIRECT_CONFIGURATION_PATTERN, configurationModel.getId());
@@ -65,19 +68,20 @@ class ConfigurationController implements ErrorController {
 				.collect(Collectors.toMap(ConfigurationModel::getId, Function.identity()));
 
 		final Collection<ConfigurationModel> configurations = configurationMap.values().stream().sorted((c1, c2) -> c1.getName().compareTo(c2.getName())).collect(Collectors.toList());
-		attributes.put("configurations", configurations);
+		attributes.put(CONFIGURATION_LIST_NAME, configurations);
 
 		configurationId.ifPresentOrElse(
-				id -> attributes.put("configuration", configurationMap.containsKey(id) ? mapParameterInto(configurationMap.get(id)) : firstConfigurationIfExistsOrNew(configurations)),
-				() -> attributes.put("configuration", firstConfigurationIfExistsOrNew(configurations)));
+				id -> attributes.put(CONFIGURATION_MODEL_AND_VIEW_NAME,
+						configurationMap.containsKey(id) ? mapParameterInto(configurationMap.get(id)) : firstConfigurationIfExistsOrNew(configurations)),
+				() -> attributes.put(CONFIGURATION_MODEL_AND_VIEW_NAME, firstConfigurationIfExistsOrNew(configurations)));
 
 		return Collections.unmodifiableMap(attributes);
 	}
 
 	private ConfigurationModel firstConfigurationIfExistsOrNew(final Collection<ConfigurationModel> configurations) {
-		
+
 		return configurations.stream().findFirst().map(x -> mapParameterInto(x)).orElse(new ConfigurationModel());
-	
+
 	}
 
 	private ConfigurationModel mapParameterInto(final ConfigurationModel configuration) {
@@ -89,7 +93,7 @@ class ConfigurationController implements ErrorController {
 
 	@RequestMapping("/error")
 	public String handleError() {
-		return "error";
+		return ERROR_VIEW_NAME;
 	}
 
 }
