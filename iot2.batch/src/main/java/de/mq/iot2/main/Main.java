@@ -22,7 +22,7 @@ import de.mq.iot2.main.support.ReflectionCommandLineRunnerArgumentsImpl;
 import de.mq.iot2.main.support.ScanUtil;
 import de.mq.iot2.main.support.SimpleReflectionCommandLineRunner;
 
-public abstract class AbstractSpringBootConsoleApplication {
+public abstract class Main {
 
 	public static final void main(final String[] args) throws Exception {
 		process(args, SimpleReflectionCommandLineRunner.class);

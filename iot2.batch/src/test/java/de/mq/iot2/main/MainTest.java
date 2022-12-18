@@ -21,7 +21,7 @@ import org.springframework.util.Base64Utils;
 import de.mq.iot2.main.support.EndOfDayBatchImpl;
 import de.mq.iot2.main.support.ReflectionCommandLineRunnerArgumentsImpl;
 
-class AbstractSpringBootConsoleApplicationTest {
+class MainTest {
 
 	private final static List<String> ARGUMENTS = new ArrayList<>();
 
@@ -34,7 +34,7 @@ class AbstractSpringBootConsoleApplicationTest {
 	@Test
 	void main() throws Exception {
 
-		AbstractSpringBootConsoleApplication.process(new String[] { "-cend-of-day", "13.06.1831" }, ((CommandLineRunner) args -> ARGUMENTS.add(args[0])).getClass());
+		Main.process(new String[] { "-cend-of-day", "13.06.1831" }, ((CommandLineRunner) args -> ARGUMENTS.add(args[0])).getClass());
 
 		assertEquals(1, ARGUMENTS.size());
 		final var reflectionCommandLineRunnerArguments = (ReflectionCommandLineRunnerArgumentsImpl) SerializationUtils.deserialize(Base64Utils.decodeFromString(ARGUMENTS.stream().findFirst().get()));
@@ -47,19 +47,19 @@ class AbstractSpringBootConsoleApplicationTest {
 
 	@Test
 	void mainUnkownCommandOption() throws Exception {
-		AbstractSpringBootConsoleApplication.main(new String[] { "-cunkown", "xxx" });
+		Main.main(new String[] { "-cunkown", "xxx" });
 		assertEquals(0, ARGUMENTS.size());
 	}
 
 	@Test
 	void mainMissingCommandOptionValue() throws Exception {
-		AbstractSpringBootConsoleApplication.main(new String[] { "-c", "xxx" });
+		Main.main(new String[] { "-c", "xxx" });
 		assertEquals(0, ARGUMENTS.size());
 	}
 
 	@Test
 	void coverage() {
-		AbstractSpringBootConsoleApplication consoleApplication = Mockito.mock(AbstractSpringBootConsoleApplication.class);
+		Main consoleApplication = Mockito.mock(Main.class);
 		assertNotNull(BeanUtils.instantiateClass(consoleApplication.getClass()));
 	}
 
