@@ -11,10 +11,11 @@ class DayGroupMapper implements ModelMapper<DayGroup, DayGroupModel> {
 
 	@Override
 	public DayGroupModel toWeb(final DayGroup dayGroup) {
-		
 		final var dayGroupModel = new DayGroupModel();
 		dayGroupModel.setName(dayGroup.name());
 		dayGroupModel.setId(IdUtil.getId(dayGroup));
+		dayGroupModel.setReadonly(dayGroup.readOnly());
+		dayGroupModel.setCycleId(IdUtil.getId(dayGroup.cycle()));
 		return dayGroupModel;
 	}
 

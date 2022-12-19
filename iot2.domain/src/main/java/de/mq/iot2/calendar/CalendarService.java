@@ -59,7 +59,11 @@ public interface CalendarService {
 
 	int deleteLocalDateDays(final int days);
 	
+	
+	/* ab  hier ungetestet */
 	Collection<DayGroup> dayGroups();
+
+	Collection<Cycle> cycles();
 
 
 

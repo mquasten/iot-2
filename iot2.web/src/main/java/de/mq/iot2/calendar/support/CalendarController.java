@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.mq.iot2.calendar.CalendarService;
+import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.DayGroup;
 import de.mq.iot2.support.ModelMapper;
 import jakarta.validation.Valid;
@@ -28,10 +29,12 @@ class CalendarController {
 	
 	private  final CalendarService calendarService ;
 	private final ModelMapper<DayGroup, DayGroupModel> dayGroupMapper;
+	private final ModelMapper<Cycle, CycleModel> cycleMapper;
 	
-	CalendarController(CalendarService calendarService, final ModelMapper<DayGroup, DayGroupModel> dayGroupMapper) {
+	CalendarController(CalendarService calendarService, final ModelMapper<DayGroup, DayGroupModel> dayGroupMapper, final ModelMapper<Cycle, CycleModel> cycleMapper) {
 		this.calendarService = calendarService;
 		this.dayGroupMapper=dayGroupMapper;
+		this.cycleMapper=cycleMapper;
 	}
 
 	
@@ -51,8 +54,10 @@ class CalendarController {
 		final Map<String, DayGroupModel> dayGroupMap = calendarService.dayGroups().stream().map(dayGroup -> dayGroupMapper.toWeb(dayGroup)).collect(Collectors.toMap(DayGroupModel::getId, Function.identity()));
 
 		final Collection<DayGroupModel> dayGroups = dayGroupMap.values().stream().sorted((c1, c2) -> c1.getName().compareTo(c2.getName())).collect(Collectors.toList());
+		
+		final Collection<CycleModel> cycles= calendarService.cycles().stream().map(cycle -> cycleMapper.toWeb(cycle)).sorted((c1, c2) -> c1.getName().compareTo(c2.getName())).collect(Collectors.toList());
 		attributes.put("dayGroups", dayGroups);
-
+		attributes.put("cycles", cycles);
 		
 		dayGroupId.ifPresentOrElse(
 				id -> attributes.put("dayGroup",

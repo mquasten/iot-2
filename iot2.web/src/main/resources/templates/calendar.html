@@ -43,7 +43,34 @@
 		</form>
 
 		<div th:if="${dayGroup.id != null}">
-			<h3 th:text="#{calenbar.daytable.headline} + '&nbsp;'+ ${dayGroup.name}"></h3>
+		<form action="#" th:action="@{/updateDayGroup}" method="post" th:object="${dayGroup}">
+			<table>
+			<thead>
+			<tr>
+			<th colspan="2" th:text="#{calendar.daygroup.headline}"></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr> 
+			<td  th:text="#{calendar.daygroup.name}"></td> <td> <input type="text" th:field="*{name}"  disabled size="30"/> </td>
+			</tr>
+			<tr>
+				<td  th:text="#{calendar.daygroup.readonly}"></td> <td> <input type="checkbox" name="readonly" th:checked="*{readonly}"  disabled /> </td>
+			</tr>
+			
+			<tr>
+			<td  th:text="#{calendar.daygroup.cycle}"></td>
+			<td><select th:field="*{cycleId}">
+							<option th:each="cycle : ${cycles}"
+								th:value="${cycle.id}" th:utext="${cycle.name}"
+								th:selected=${cycleId==cycle.id}  disabled></option>
+					</select>
+					</td>
+			</tr>
+			</tbody>
+			</table>
+		</form>	
+			<h3 th:text="#{calenbar.daytable.headline}"></h3>
 			<table class="result-table">
 				<thead>
 					<tr>
@@ -57,7 +84,7 @@
 						
 						<td><form th:action="@{/deleteDay}"
 								th:object="${day}" method="post">
-								<input type="hidden" name="id" th:value="${day.id}" /> 
+								<input type="hidden" name="id" th:value="${day.id}"  /> 
 								<button type="submit" th:text="#{calendar.daytable.delete}"></button>
 							</form></td>
 					</tr>
