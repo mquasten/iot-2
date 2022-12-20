@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.Cycle;
+import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
 import de.mq.iot2.support.ModelMapper;
 import jakarta.validation.Valid;
@@ -30,11 +31,13 @@ class CalendarController {
 	private  final CalendarService calendarService ;
 	private final ModelMapper<DayGroup, DayGroupModel> dayGroupMapper;
 	private final ModelMapper<Cycle, CycleModel> cycleMapper;
+	private final ModelMapper<Day<?>, DayModel> dayModelMapper;
 	
-	CalendarController(CalendarService calendarService, final ModelMapper<DayGroup, DayGroupModel> dayGroupMapper, final ModelMapper<Cycle, CycleModel> cycleMapper) {
+	CalendarController(CalendarService calendarService, final ModelMapper<DayGroup, DayGroupModel> dayGroupMapper, final ModelMapper<Cycle, CycleModel> cycleMapper, final ModelMapper<Day<?>, DayModel> dayModelMapper) {
 		this.calendarService = calendarService;
 		this.dayGroupMapper=dayGroupMapper;
 		this.cycleMapper=cycleMapper;
+		this.dayModelMapper=dayModelMapper;
 	}
 
 	
@@ -78,7 +81,7 @@ class CalendarController {
 	private DayGroupModel mapDaysInto(final DayGroupModel dayGroup) {
 		Assert.notNull(dayGroup, "DayGroup required");
 		Assert.hasText(dayGroup.getId(), "Id is required.");
-		//configuration.setParameters(parameterMapper.toWeb(configurationService.parameters(configuration.getId())));
+		dayGroup.setDays(dayModelMapper.toWeb(calendarService.days(dayGroupMapper.toDomain(dayGroup.getId()))));
 		return dayGroup;
 	}
 	

@@ -65,6 +65,8 @@ public interface CalendarService {
 
 	Collection<Cycle> cycles();
 
+	Collection<Day<?>> days(final DayGroup dayGroup);
+
 
 
 

@@ -224,5 +224,10 @@ class CalendarServiceImp implements CalendarService {
 	public Collection<Cycle> cycles() {
 		return cycleRepository.findAll();
 	}
+	@Override
+	@Transactional
+	public Collection<Day<?>> days(DayGroup dayGroup) {
+		return dayRepository.findByDayGroup(dayGroup);
+	}
 
 }
