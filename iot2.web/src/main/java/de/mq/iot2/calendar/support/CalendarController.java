@@ -52,7 +52,6 @@ class CalendarController {
 	
 	private Map<String, Object> initModel(final Optional<String> dayGroupId) {
 		
-		
 		final Map<String, Object> attributes = new HashMap<>();
 		final Map<String, DayGroupModel> dayGroupMap = calendarService.dayGroups().stream().map(dayGroup -> dayGroupMapper.toWeb(dayGroup)).collect(Collectors.toMap(DayGroupModel::getId, Function.identity()));
 

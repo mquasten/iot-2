@@ -5,6 +5,9 @@ import java.util.Locale;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.i18n.LocaleContext;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -42,6 +45,12 @@ public class SpringConfiguration implements WebMvcConfigurer {
 		final var localeResolver = new SessionLocaleResolver();
 		localeResolver.setDefaultLocale(Locale.GERMAN);
 		return localeResolver;
+	}
+	
+	@Bean()
+	@Scope("request")
+	LocaleContext localeContext() {
+		return LocaleContextHolder.getLocaleContext();
 	}
 
 }

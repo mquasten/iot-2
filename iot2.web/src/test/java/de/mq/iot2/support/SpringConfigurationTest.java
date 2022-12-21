@@ -7,6 +7,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -43,6 +44,12 @@ public class SpringConfigurationTest {
 	void localeResolver() {
 		final var localeResolver = (springConfiguration.localeResolver());
 		assertEquals(Locale.GERMAN, ReflectionTestUtils.getField(localeResolver, "defaultLocale"));
+	}
+
+	@Test
+	void localeContext() {
+		LocaleContextHolder.setLocale(Locale.CHINESE);
+		assertEquals(Locale.CHINESE, springConfiguration.localeContext().getLocale());
 	}
 
 }
