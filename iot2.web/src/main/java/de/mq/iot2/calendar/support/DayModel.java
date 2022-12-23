@@ -1,9 +1,19 @@
 package de.mq.iot2.calendar.support;
 
-public class DayModel {
+import java.util.Objects;
+
+import org.apache.logging.log4j.util.Strings;
+
+public class DayModel  implements Comparable<DayModel>{
 
 	private String id;
-	private Object value;
+	private String value;
+	private String valueSorted;
+
+	public void setValueSorted(String valueSorted) {
+		this.valueSorted = valueSorted;
+	}
+
 	private String description;
 
 	public String getId() {
@@ -22,12 +32,19 @@ public class DayModel {
 		this.description = description;
 	}
 
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 
-	public void setValue(final Object value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
+
+	@Override
+	public int compareTo(final DayModel other) {
+		return Objects.requireNonNullElse(valueSorted, Strings.EMPTY).compareTo(Objects.requireNonNullElse(other.valueSorted, Strings.EMPTY));
+	}
+
+	
 
 }
