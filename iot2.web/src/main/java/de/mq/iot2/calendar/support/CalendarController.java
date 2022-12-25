@@ -3,6 +3,7 @@ package de.mq.iot2.calendar.support;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -27,17 +28,19 @@ import jakarta.validation.Valid;
 @Controller
 class CalendarController {
 
+	private static final String CALENDAR_VIEW_NAME = "calendar";
+	static final String REDIRECT_CALENDAR_PATTERN = "redirect:"+ CALENDAR_VIEW_NAME+"?dayGroupId=%s";
 	private final CalendarService calendarService;
 	private final ModelMapper<DayGroup, DayGroupModel> dayGroupMapper;
 	private final ModelMapper<Cycle, CycleModel> cycleMapper;
-	private final ModelMapper<Day<?>, DayModel> dayModelMapper;
+	private final ModelMapper<Day<?>, DayModel> dayMapper;
 
 	CalendarController(CalendarService calendarService, final ModelMapper<DayGroup, DayGroupModel> dayGroupMapper, final ModelMapper<Cycle, CycleModel> cycleMapper,
-			final ModelMapper<Day<?>, DayModel> dayModelMapper) {
+			final ModelMapper<Day<?>, DayModel> dayMapper) {
 		this.calendarService = calendarService;
 		this.dayGroupMapper = dayGroupMapper;
 		this.cycleMapper = cycleMapper;
-		this.dayModelMapper = dayModelMapper;
+		this.dayMapper = dayMapper;
 	}
 
 	@GetMapping(value = "/calendar")
@@ -45,7 +48,7 @@ class CalendarController {
 
 		model.addAllAttributes(initModel(Optional.ofNullable(dayGroupId)));
 
-		return "calendar";
+		return CALENDAR_VIEW_NAME;
 	}
 
 	private Map<String, Object> initModel(final Optional<String> dayGroupId) {
@@ -76,17 +79,18 @@ class CalendarController {
 	private DayGroupModel mapDaysInto(final DayGroupModel dayGroup) {
 		Assert.notNull(dayGroup, "DayGroup required");
 		Assert.hasText(dayGroup.getId(), "Id is required.");
-		dayGroup.setDays(dayModelMapper.toWeb(calendarService.days(dayGroupMapper.toDomain(dayGroup.getId()))).stream().sorted().collect(Collectors.toList()));
+		dayGroup.setDays(dayMapper.toWeb(calendarService.days(dayGroupMapper.toDomain(dayGroup.getId()))).stream().sorted().collect(Collectors.toList()));
 		return dayGroup;
 	}
 
 	@PostMapping(value = "/searchDayGroup")
 	String search(@ModelAttribute("dayGroup") @Valid final DayGroupModel dayGroupModel, final BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			return "calendar";
+			return CALENDAR_VIEW_NAME;
 		}
 
-		return String.format("redirect:calendar?dayGroupId=%s", dayGroupModel.getId());
+		return String.format(REDIRECT_CALENDAR_PATTERN, dayGroupModel.getId());
 	}
+	
 
 }

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title th:text="#{title}"></title>
+<link th:href="@{/css/min.css}" rel="stylesheet" />
+</head>
+<body>
+	<div align="center">
+		<h1 th:text="#{localdate.headline}"></h1>
+		<form action="#" th:action="@{/editLocalDate}" method="post"
+			th:object="${localDate}">
+			<input type="hidden" th:field="*{dayGroupId}" />
+			<input type="hidden" th:field="*{dayGroupName}" />
+			<table>
+
+				<tr>
+					<td><label th:text="#{localdate.from}"></label></td>
+					<td><input type="text" th:field="*{from}"  size="10"/></td>
+					<td th:if="${#fields.hasErrors('from')}" th:errors="*{from}"
+						th:errorclass="error"></td>
+				</tr>
+				<tr>
+					<td><label th:text="#{localdate.to}"></label></td>
+					<td><input type="text" th:field="*{to}"  size="10" /></td>
+					<td th:if="${#fields.hasErrors('to')}" th:errors="*{to}"
+						th:errorclass="error"></td>
+				</tr>
+
+				<tr>
+					<th colspan="3">
+						<div th:if="${#fields.hasErrors('global')}">
+							<p th:each="err : ${#fields.errors('global')}" th:text="${err}"
+								class="error" />
+						</div>
+
+
+					</th>
+				</tr>
+
+				<tr>
+					<th colspan="3">
+						<button type="submit" name="operation" value="add"   th:text="#{localdate.add}"></button>
+						<button type="submit" name="operation" value="delete"    th:text="#{localdate.delete}"></button>
+					</th>
+				</tr>
+			</table>
+		</form>
+	</div>
+</body>
+</html>

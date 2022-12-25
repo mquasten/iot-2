@@ -230,4 +230,13 @@ class CalendarServiceImp implements CalendarService {
 		return dayRepository.findByDayGroup(dayGroup);
 	}
 
+	@Override
+	public void deleteDay(final Day<?> day) {
+		Assert.notNull(day, "Day is required.");
+		Assert.notNull(day.dayGroup(), "DayGroup is required.");
+		Assert.isTrue( ! day.dayGroup().readOnly(), DAY_GROUP_READONLY_MESSAGE);
+		
+		dayRepository.delete(day);
+	}
+
 }

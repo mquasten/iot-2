@@ -57,7 +57,7 @@ public interface CalendarService {
 
 	int deleteLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate);
 
-	int deleteLocalDateDays(final int days);
+	int deleteLocalDateDays(final int daysBack);
 	
 	
 	/* ab  hier ungetestet */
@@ -67,7 +67,7 @@ public interface CalendarService {
 
 	Collection<Day<?>> days(final DayGroup dayGroup);
 
-
+    void deleteDay(final Day<?> day);
 
 
 }

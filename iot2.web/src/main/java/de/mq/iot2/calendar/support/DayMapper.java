@@ -18,21 +18,27 @@ import de.mq.iot2.calendar.Day;
 import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.LocaleContextRepository;
 import de.mq.iot2.support.ModelMapper;
+import jakarta.persistence.EntityNotFoundException;
 
 @Component
 class DayMapper implements ModelMapper<Day<?>, DayModel> {
+
+	static final String DAY_NOT_FOUND_MESSAGE = "Day with id %s not found.";
 
 	private final Map<Class<?>, BiFunction<Object, Locale, String>> valueConverters = Map.of(LocalDate.class,
 			(date, locale) -> ((LocalDate) date).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)), MonthDay.class,
 			(date, locale) -> ((MonthDay) date).atYear(Year.now().getValue()).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)), DayOfWeek.class,
 			(day, locale) -> ((DayOfWeek) day).getDisplayName(TextStyle.SHORT_STANDALONE, locale));
 
-	private final Map<Class<?>, Converter<Object, String>> sortedValueConverters = Map.of(LocalDate.class, date -> ((LocalDate) date).format(DateTimeFormatter.ofPattern("YYYYMMdd")), MonthDay.class,
-			date -> ((MonthDay) date).atYear(Year.now().getValue()).format(DateTimeFormatter.ofPattern("YYYYMMdd")));
+	private final Map<Class<?>, Converter<Object, String>> sortedValueConverters = Map.of(LocalDate.class, date -> ((LocalDate) date).format(DateTimeFormatter.ofPattern("yyyyMMdd")), MonthDay.class,
+			date -> ((MonthDay) date).atYear(Year.now().getValue()).format(DateTimeFormatter.ofPattern("yyyyMMdd")));
 
 	private final LocaleContextRepository localeContextRepository;
 
-	DayMapper(final LocaleContextRepository localeContextRepository) {
+	private final DayRepository dayRepository;
+
+	DayMapper(final DayRepository dayRepository, final LocaleContextRepository localeContextRepository) {
+		this.dayRepository = dayRepository;
 		this.localeContextRepository = localeContextRepository;
 	}
 
@@ -54,4 +60,9 @@ class DayMapper implements ModelMapper<Day<?>, DayModel> {
 		return sortedValueConverters.containsKey(value.getClass()) ? sortedValueConverters.get(value.getClass()).convert(value) : value.toString();
 	}
 
+	@Override
+	public Day<?> toDomain(final String id) {
+		return dayRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format(DAY_NOT_FOUND_MESSAGE, id)));
+
+	}
 }
