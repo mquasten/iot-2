@@ -1,15 +1,39 @@
 package de.mq.iot2.calendar.support;
 
-import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDate;
+
+import org.springframework.util.Assert;
 
 @ValidLocalDateModel
 public class LocalDateModel {
-	@NotBlank
 	private String from;
 	private String to;
 	private String dayGroupId;
 	private String dayGroupName;
 	
+	private LocalDate fromDate;
+
+	private LocalDate toDate;
+	
+	
+	public LocalDate getFromDate() {
+		Assert.notNull(fromDate, "FromDate is required.");
+		return fromDate;
+	}
+
+	public void setFromDate(final LocalDate fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public LocalDate getToDate() {
+		Assert.notNull(toDate, "ToDate is required.");
+		return toDate;
+	}
+
+	public void setToDate(final LocalDate toDate) {
+		this.toDate = toDate;
+	}
+
 	public String getDayGroupId() {
 		return dayGroupId;
 	}

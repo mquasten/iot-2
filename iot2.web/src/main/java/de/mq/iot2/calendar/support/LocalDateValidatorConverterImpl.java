@@ -14,12 +14,12 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 @Component
-class DateValidatorImpl implements ConstraintValidator<ValidLocalDateModel, LocalDateModel>{
+class LocalDateValidatorConverterImpl implements ConstraintValidator<ValidLocalDateModel, LocalDateModel>{
 
 	private final LocaleContextRepository localeContextRepository;
 	private final long dayLimit; 
 	
-	DateValidatorImpl(final LocaleContextRepository localeContextRepository, @Value("${iot2.calendar.dayslimit:30}") final long dayLimit) {
+	LocalDateValidatorConverterImpl(final LocaleContextRepository localeContextRepository, @Value("${iot2.calendar.dayslimit:30}") final long dayLimit) {
 		this.localeContextRepository = localeContextRepository;
 		this.dayLimit=dayLimit;
 	}
@@ -47,6 +47,8 @@ class DateValidatorImpl implements ConstraintValidator<ValidLocalDateModel, Loca
 	@Override
 	public boolean isValid(final LocalDateModel localDateModel, final ConstraintValidatorContext context) {
 		context.disableDefaultConstraintViolation();
+		localDateModel.setFromDate(null);
+		localDateModel.setToDate(null);
 		final boolean fromValid = isValid(localDateModel.getFrom());
 		final boolean toValid = isValid(localDateModel.getTo());
 		
@@ -58,13 +60,16 @@ class DateValidatorImpl implements ConstraintValidator<ValidLocalDateModel, Loca
 			context.buildConstraintViolationWithTemplate("{error.date}").addPropertyNode("to").addConstraintViolation();	
 		}
 		
-		if( !fromValid||!toValid) {
+
+	    final boolean  fromAware = StringUtils.hasText(localDateModel.getFrom());
+		if(! fromAware) {
+			context.buildConstraintViolationWithTemplate("{error.mandatory}").addPropertyNode("from").addConstraintViolation();	 
+		}
+		
+		if( !fromValid||!toValid||!fromAware) {
 			return false;
 		}
-	
-		if(!StringUtils.hasText(localDateModel.getFrom())) {
-			return true;
-		}
+		
 		final var locale = localeContextRepository.localeContext().getLocale();
 		final DateTimeFormatter  formatter =   DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale);
 	    final LocalDate from=  LocalDate.parse(localDateModel.getFrom(), formatter);
@@ -87,7 +92,14 @@ class DateValidatorImpl implements ConstraintValidator<ValidLocalDateModel, Loca
 		
 		}
 		
-		return fromInFuture&&numberOfDaysInRange&&toAfterOrEqualsFrom;
+		
+		if( !fromInFuture||!numberOfDaysInRange||!toAfterOrEqualsFrom) {
+			return false;
+		}
+	
+		localDateModel.setFromDate(from);
+		localDateModel.setToDate(to);
+		return true;
 	}
 	
 

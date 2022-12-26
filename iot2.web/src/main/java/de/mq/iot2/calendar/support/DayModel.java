@@ -4,11 +4,32 @@ import java.util.Objects;
 
 import org.apache.logging.log4j.util.Strings;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class DayModel  implements Comparable<DayModel>{
 
 	private String id;
+	@NotBlank
 	private String value;
 	private String valueSorted;
+	private String dayGroupId;
+    private Class<?> valueType;	
+
+	public Class<?> getValueType() {
+		return valueType;
+	}
+
+	public void setValueType(Class<?> valueType) {
+		this.valueType = valueType;
+	}
+
+	public String getDayGroupId() {
+		return dayGroupId;
+	}
+
+	public void setDayGroupId(String dayGroupId) {
+		this.dayGroupId = dayGroupId;
+	}
 
 	public void setValueSorted(String valueSorted) {
 		this.valueSorted = valueSorted;
@@ -44,6 +65,8 @@ public class DayModel  implements Comparable<DayModel>{
 	public int compareTo(final DayModel other) {
 		return Objects.requireNonNullElse(valueSorted, Strings.EMPTY).compareTo(Objects.requireNonNullElse(other.valueSorted, Strings.EMPTY));
 	}
+
+	
 
 	
 

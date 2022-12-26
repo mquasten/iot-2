@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title th:text="#{title}"></title>
+<link th:href="@{/css/min.css}" rel="stylesheet" />
+</head>
+<body>
+	<div align="center">
+		<h1 th:text="#{daymonth.headline}"></h1>
+		<form action="#" th:action="@{/addDayMonth}" method="post"
+			th:object="${dayMonth}">
+			<input type="hidden" th:field="*{dayGroupId}" /> 
+			<table>
+				<tr>
+					<td><label th:text="#{daymonth.value}"></label></td>
+				<td><input type="text" th:field="*{value}" size="30" />
+				</tr>
+				<tr>
+				<td><label th:text="#{daymonth.description}"></label></td>
+				<td><input type="text" th:field="*{description}" size="30" />
+				</tr>
+				<tr>
+					<th colspan="3">
+						<div th:if="${#fields.hasErrors('global')}">
+							<p th:each="err : ${#fields.errors('global')}" th:text="${err}"
+								class="error" />
+						</div>
+					</th>
+				</tr>
+
+				<tr>
+					<th colspan="3">
+						<button type="submit" name="cancel" th:text="#{daymonth.cancel}"></button>
+						<button type="submit" name="add" th:text="#{daymonth.add}"  ></button>
+						
+					</th>
+				</tr>
+			</table>
+		</form>
+	</div>
+</body>
+</html>

@@ -10,19 +10,19 @@
 		<h1 th:text="#{localdate.headline}"></h1>
 		<form action="#" th:action="@{/editLocalDate}" method="post"
 			th:object="${localDate}">
-			<input type="hidden" th:field="*{dayGroupId}" />
-			<input type="hidden" th:field="*{dayGroupName}" />
+			<input type="hidden" th:field="*{dayGroupId}" /> <input
+				type="hidden" th:field="*{dayGroupName}" />
 			<table>
 
 				<tr>
 					<td><label th:text="#{localdate.from}"></label></td>
-					<td><input type="text" th:field="*{from}"  size="10"/></td>
+					<td><input type="text" th:field="*{from}" size="10" /></td>
 					<td th:if="${#fields.hasErrors('from')}" th:errors="*{from}"
 						th:errorclass="error"></td>
 				</tr>
 				<tr>
 					<td><label th:text="#{localdate.to}"></label></td>
-					<td><input type="text" th:field="*{to}"  size="10" /></td>
+					<td><input type="text" th:field="*{to}" size="10" /></td>
 					<td th:if="${#fields.hasErrors('to')}" th:errors="*{to}"
 						th:errorclass="error"></td>
 				</tr>
@@ -40,8 +40,9 @@
 
 				<tr>
 					<th colspan="3">
-						<button type="submit" name="operation" value="add"   th:text="#{localdate.add}"></button>
-						<button type="submit" name="operation" value="delete"    th:text="#{localdate.delete}"></button>
+						<button type="submit" name="cancel" th:text="#{localdate.cancel}"></button>
+						<button type="submit" name="add" th:text="#{localdate.add}"></button>
+						<button type="submit" name="delete" th:text="#{localdate.delete}"></button>
 					</th>
 				</tr>
 			</table>

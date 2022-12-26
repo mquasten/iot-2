@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -231,12 +232,32 @@ class CalendarServiceImp implements CalendarService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteDay(final Day<?> day) {
 		Assert.notNull(day, "Day is required.");
 		Assert.notNull(day.dayGroup(), "DayGroup is required.");
 		Assert.isTrue( ! day.dayGroup().readOnly(), DAY_GROUP_READONLY_MESSAGE);
 		
 		dayRepository.delete(day);
+	}
+	
+	@Override
+	@Transactional
+	public Collection<DayOfWeek> unUsedDaysOfWeek(){
+		final Collection<DayOfWeek> used = dayRepository.findAllDayOfWeekDays().stream().map(day -> day.value()).collect(Collectors.toList());
+		return List.of(DayOfWeek.values()).stream().filter(day ->  ! used.contains(day)).sorted().collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional
+	public void createDayIfNotExists(final Day<?> day) {
+		final var id = IdUtil.getId(day);
+		Assert.hasText(id, "Id is required.");
+		
+		if ( dayRepository.findById(id).isPresent() ) {
+			return;
+		}
+		dayRepository.save(day);
 	}
 
 }
