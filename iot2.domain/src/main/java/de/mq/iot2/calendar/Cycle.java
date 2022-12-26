@@ -9,5 +9,4 @@ public interface Cycle {
 
 	boolean isDeaultCycle();
 
-
 }
