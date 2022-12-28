@@ -1,12 +1,11 @@
 package de.mq.iot2.calendar.support;
 
 public class CycleModel {
-	
+
 	private String id;
 
 	private String name;
-	
-	
+
 	public String getId() {
 		return id;
 	}
@@ -22,7 +21,5 @@ public class CycleModel {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-
 
 }

@@ -8,7 +8,7 @@ import de.mq.iot2.support.ModelMapper;
 
 @Component
 class CycleMapper implements ModelMapper<Cycle, CycleModel> {
-	
+
 	@Override
 	public CycleModel toWeb(final Cycle cycle) {
 		final var cycleModel = new CycleModel();

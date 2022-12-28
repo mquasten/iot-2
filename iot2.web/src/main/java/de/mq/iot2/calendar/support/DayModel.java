@@ -3,24 +3,42 @@ package de.mq.iot2.calendar.support;
 import java.util.Objects;
 
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.util.Assert;
 
-import jakarta.validation.constraints.NotBlank;
-
-public class DayModel  implements Comparable<DayModel>{
+@ValidDayModel
+public class DayModel implements Comparable<DayModel> {
 
 	private String id;
-	@NotBlank
+	// @NotBlank
 	private String value;
 	private String valueSorted;
 	private String dayGroupId;
-    private Class<?> valueType;	
+	private String type;
+	private Object targetValue;
 
-	public Class<?> getValueType() {
-		return valueType;
+	Class<?> targetEntity() {
+		Assert.hasText(type, "Type is required.");
+		try {
+			return Class.forName(this.getType());
+		} catch (final ClassNotFoundException ex) {
+			throw new IllegalStateException(ex);
+		}
 	}
 
-	public void setValueType(Class<?> valueType) {
-		this.valueType = valueType;
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Object getTargetValue() {
+		return targetValue;
+	}
+
+	public void setTargetValue(Object targetValue) {
+		this.targetValue = targetValue;
 	}
 
 	public String getDayGroupId() {
@@ -65,9 +83,5 @@ public class DayModel  implements Comparable<DayModel>{
 	public int compareTo(final DayModel other) {
 		return Objects.requireNonNullElse(valueSorted, Strings.EMPTY).compareTo(Objects.requireNonNullElse(other.valueSorted, Strings.EMPTY));
 	}
-
-	
-
-	
 
 }

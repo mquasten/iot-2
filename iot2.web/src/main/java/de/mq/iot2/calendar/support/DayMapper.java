@@ -11,7 +11,6 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.converter.Converter;
@@ -30,35 +29,23 @@ class DayMapper implements ModelMapper<Day<?>, DayModel> {
 
 	static final String DAY_NOT_FOUND_MESSAGE = "Day with id %s not found.";
 
-	private final Map<Class<?>, BiFunction<Object, Locale, String>> valueConverters = Map
-			.of(LocalDate.class,
-					(date, locale) -> ((LocalDate) date)
-							.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)),
-					MonthDay.class,
-					(date, locale) -> ((MonthDay) date).atYear(Year.now().getValue())
-							.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)),
-					DayOfWeek.class,
-					(day, locale) -> ((DayOfWeek) day).getDisplayName(TextStyle.SHORT_STANDALONE, locale));
+	private final Map<Class<?>, BiFunction<Object, Locale, String>> valueConverters = Map.of(LocalDate.class,
+			(date, locale) -> ((LocalDate) date).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)), MonthDay.class,
+			(date, locale) -> ((MonthDay) date).atYear(Year.now().getValue()).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)).substring(0, 5),
+			DayOfWeek.class, (day, locale) -> ((DayOfWeek) day).getDisplayName(TextStyle.SHORT_STANDALONE, locale));
 
 	private final Map<Class<?>, Converter<Object, String>> sortedValueConverters = Map.of(LocalDate.class,
 			date -> ((LocalDate) date).format(DateTimeFormatter.ofPattern("yyyyMMdd")), MonthDay.class,
-			date -> ((MonthDay) date).atYear(Year.now().getValue()).format(DateTimeFormatter.ofPattern("yyyyMMdd")),
-			DayOfWeek.class, day -> ""+((DayOfWeek)day).getValue()
-			
-			);
+			date -> ((MonthDay) date).atYear(Year.now().getValue()).format(DateTimeFormatter.ofPattern("yyyyMMdd")), DayOfWeek.class, day -> "" + ((DayOfWeek) day).name()
+
+	);
 
 	private final LocaleContextRepository localeContextRepository;
 
 	private final DayRepository dayRepository;
 	private final DayGroupRepository dayGroupRepository;
 
-	private Map<Class<?>, Class<?>> types = Map.of(DayOfWeek.class, DayOfWeekDayImpl.class);
-
-	private Map<Class<?>, Function<String, Object>> converters = Map.of(DayOfWeek.class,
-			value -> DayOfWeek.of(Integer.parseInt(value)));
-
-	DayMapper(final DayGroupRepository dayGroupRepository, final DayRepository dayRepository,
-			final LocaleContextRepository localeContextRepository) {
+	DayMapper(final DayGroupRepository dayGroupRepository, final DayRepository dayRepository, final LocaleContextRepository localeContextRepository) {
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
 		this.localeContextRepository = localeContextRepository;
@@ -75,43 +62,37 @@ class DayMapper implements ModelMapper<Day<?>, DayModel> {
 	}
 
 	private String value(final Object value) {
-		return valueConverters.containsKey(value.getClass()) ? valueConverters.get(value.getClass()).apply(value,
-				localeContextRepository.localeContext().getLocale()) : value.toString();
+		return valueConverters.containsKey(value.getClass()) ? valueConverters.get(value.getClass()).apply(value, localeContextRepository.localeContext().getLocale())
+				: value.toString();
 	}
 
 	private String valueSorted(final Object value) {
-		return sortedValueConverters.containsKey(value.getClass())
-				? sortedValueConverters.get(value.getClass()).convert(value)
-				: value.toString();
+		return sortedValueConverters.containsKey(value.getClass()) ? sortedValueConverters.get(value.getClass()).convert(value) : value.toString();
 	}
 
 	@Override
 	public Day<?> toDomain(final String id) {
-		return dayRepository.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException(String.format(DAY_NOT_FOUND_MESSAGE, id)));
+		return dayRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format(DAY_NOT_FOUND_MESSAGE, id)));
 
 	}
 
 	@Override
 	public Day<?> toDomain(final DayModel dayModel) {
 		Assert.notNull(dayModel, "DayModel is redired.");
-		Assert.hasText(dayModel.getDayGroupId(), "DayGroup is required");
-		Assert.notNull(dayModel.getValueType(), "ValueType is required.");
-		Assert.isTrue(types.containsKey(dayModel.getValueType()), "Type not defined.");
+		Assert.hasText(dayModel.getDayGroupId(), "DayGroup is required.");
+		Assert.notNull(dayModel.getType(), "Type is required.");
 		final DayGroup dayGroup = dayGroupRepository.findById(dayModel.getDayGroupId())
-				.orElseThrow(() -> new EntityNotFoundException(
-						String.format(CalendarServiceImp.DAY_GROUP_NOT_FOUND_MESSAGE, dayModel.getId())));
-
+				.orElseThrow(() -> new EntityNotFoundException(String.format(CalendarServiceImp.DAY_GROUP_NOT_FOUND_MESSAGE, dayModel.getId())));
+		final Class<?> targetEntity = dayModel.targetEntity();
 		try {
 			@SuppressWarnings("unchecked")
-			final Constructor<Day<?>> c = (Constructor<Day<?>>) types.get(dayModel.getValueType())
-					.getDeclaredConstructor(DayGroup.class, dayModel.getValueType(), String.class);
-			return BeanUtils.instantiateClass(c, new Object[] { dayGroup,
-					converters.get(dayModel.getValueType()).apply(dayModel.getValue()), dayModel.getDescription() });
+			final Constructor<Day<?>> c = (Constructor<Day<?>>) targetEntity.getDeclaredConstructor(DayGroup.class, dayModel.getTargetValue().getClass(), String.class);
+			return BeanUtils.instantiateClass(c, new Object[] { dayGroup, dayModel.getTargetValue(), dayModel.getDescription() });
 
 		} catch (final Exception ex) {
 			throw new IllegalStateException(ex);
 		}
 
 	}
+
 }

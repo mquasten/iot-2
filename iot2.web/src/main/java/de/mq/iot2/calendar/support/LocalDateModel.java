@@ -10,12 +10,11 @@ public class LocalDateModel {
 	private String to;
 	private String dayGroupId;
 	private String dayGroupName;
-	
+
 	private LocalDate fromDate;
 
 	private LocalDate toDate;
-	
-	
+
 	public LocalDate getFromDate() {
 		Assert.notNull(fromDate, "FromDate is required.");
 		return fromDate;
@@ -65,7 +64,5 @@ public class LocalDateModel {
 	public void setTo(String to) {
 		this.to = to;
 	}
-
-	
 
 }
