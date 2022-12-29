@@ -85,8 +85,7 @@ class DayValidatorConverterImpl implements ConstraintValidator<ValidDayModel, Da
 		try {
 			dayModel.setTargetValue(MonthDay.of(Integer.parseInt(values[1]), Integer.parseInt(values[0])));
 			return true;
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (final Exception ex) {
 			context.buildConstraintViolationWithTemplate("{error.dayofmonth}").addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
 			return false;
 		}

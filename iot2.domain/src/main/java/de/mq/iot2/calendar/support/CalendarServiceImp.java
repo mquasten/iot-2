@@ -250,14 +250,15 @@ class CalendarServiceImp implements CalendarService {
 
 	@Override
 	@Transactional
-	public void createDayIfNotExists(final Day<?> day) {
+	public boolean createDayIfNotExists(final Day<?> day) {
 		final var id = IdUtil.getId(day);
 		Assert.hasText(id, "Id is required.");
 		
 		if ( dayRepository.findById(id).isPresent() ) {
-			return;
+			return false;
 		}
 		dayRepository.save(day);
+		return true;
 	}
 
 }

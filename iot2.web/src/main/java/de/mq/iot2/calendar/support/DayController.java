@@ -1,6 +1,7 @@
 package de.mq.iot2.calendar.support;
 
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Locale;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -86,7 +88,15 @@ class DayController {
 		if (bindingResult.hasErrors()) {
 			return LOCAL_DATE_MODEL_AND_VIEW_NAME;
 		}
-		calendarService.addLocalDateDays(localDateModel.getDayGroupName(), localDateModel.getFromDate(), localDateModel.getToDate());
+		final Long expectedNumberOfDays = 1+ localDateModel.getFromDate().until(localDateModel.getToDate(), ChronoUnit.DAYS);
+		
+		final int numberOfDays= calendarService.addLocalDateDays(localDateModel.getDayGroupName(), localDateModel.getFromDate(), localDateModel.getToDate());
+		
+		if( expectedNumberOfDays.intValue() != numberOfDays) {
+			bindingResult.addError(new ObjectError(DAY_MODEL_AND_VIEW_NAME, new String[] {"error.date.exists"}, new Integer[] {numberOfDays, expectedNumberOfDays.intValue()}, "{error.date.exists}"));
+			return LOCAL_DATE_MODEL_AND_VIEW_NAME;
+		}
+		
 		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, localDateModel.getDayGroupId());
 	}
 
@@ -105,18 +115,22 @@ class DayController {
 	}
 
 	@PostMapping(value = "/addDay", params = "cancel")
-	String cancelDayOfWeek(@ModelAttribute(DAY_MODEL_AND_VIEW_NAME) final DayModel dayOfWeekModel) {
+	String cancelAdd(@ModelAttribute(DAY_MODEL_AND_VIEW_NAME) final DayModel dayOfWeekModel) {
 		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, dayOfWeekModel.getDayGroupId());
 	}
 
 	@PostMapping(value = "/addDay", params = "add")
-	String addDayOfWeek(@ModelAttribute(DAY_MODEL_AND_VIEW_NAME) @Valid() final DayModel dayModel, final BindingResult bindingResult, final Model model, final Locale locale) {
+	String addDay(@ModelAttribute(DAY_MODEL_AND_VIEW_NAME) @Valid() final DayModel dayModel, final BindingResult bindingResult, final Model model, final Locale locale) {
 		if (bindingResult.hasErrors()) {
 			addDaysIfDayOfWeek(dayModel, model, locale);
 			return DAY_MODEL_AND_VIEW_NAME;
 		}
 
-		calendarService.createDayIfNotExists(dayMapper.toDomain(dayModel));
+		if(! calendarService.createDayIfNotExists(dayMapper.toDomain(dayModel))) {
+			addDaysIfDayOfWeek(dayModel, model, locale);
+			bindingResult.addError(new ObjectError(DAY_MODEL_AND_VIEW_NAME, new String[] {"error.day.exists"}, null, "{error.day.exists}"));
+			return DAY_MODEL_AND_VIEW_NAME;
+		}
 		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, dayModel.getDayGroupId());
 	}
 

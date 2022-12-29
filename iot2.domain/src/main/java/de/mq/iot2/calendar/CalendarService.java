@@ -72,6 +72,6 @@ public interface CalendarService {
 
 	Collection<DayOfWeek> unUsedDaysOfWeek();
 
-	void createDayIfNotExists(final Day<?> day);
+	boolean createDayIfNotExists(final Day<?> day);
 
 }
