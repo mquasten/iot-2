@@ -1,5 +1,6 @@
 package de.mq.iot2.calendar;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
@@ -69,5 +70,8 @@ public interface CalendarService {
 
     void deleteDay(final Day<?> day);
 
+	Collection<DayOfWeek> unUsedDaysOfWeek();
+
+	boolean createDayIfNotExists(final Day<?> day);
 
 }

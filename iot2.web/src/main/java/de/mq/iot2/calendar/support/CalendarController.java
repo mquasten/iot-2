@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 class CalendarController {
 
 	private static final String CALENDAR_VIEW_NAME = "calendar";
-	static final String REDIRECT_CALENDAR_PATTERN = "redirect:"+ CALENDAR_VIEW_NAME+"?dayGroupId=%s";
+	static final String REDIRECT_CALENDAR_PATTERN = "redirect:" + CALENDAR_VIEW_NAME + "?dayGroupId=%s";
 	private final CalendarService calendarService;
 	private final ModelMapper<DayGroup, DayGroupModel> dayGroupMapper;
 	private final ModelMapper<Cycle, CycleModel> cycleMapper;
@@ -91,6 +91,5 @@ class CalendarController {
 
 		return String.format(REDIRECT_CALENDAR_PATTERN, dayGroupModel.getId());
 	}
-	
 
 }

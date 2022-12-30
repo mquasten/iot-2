@@ -1,5 +1,6 @@
 package de.mq.iot2.calendar.support;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
@@ -18,6 +19,9 @@ public interface DayRepository {
 	Collection<Day<?>> findAll();
 	@Query("select d from LocaldateDay d")
 	Collection<Day<LocalDate>> findAllLocalDateDays(); 
+	
+	@Query("select d from DayOfWeekDay d")
+	Collection<Day<DayOfWeek>> findAllDayOfWeekDays(); 
 
 	Collection<Day<?>> findByDayGroup(final DayGroup dayGroup);
 

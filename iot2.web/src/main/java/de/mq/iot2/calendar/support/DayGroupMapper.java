@@ -12,7 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 class DayGroupMapper implements ModelMapper<DayGroup, DayGroupModel> {
 
 	private final DayGroupRepository dayGroupRepository;
-	
+
 	DayGroupMapper(final DayGroupRepository dayGroupRepository) {
 		this.dayGroupRepository = dayGroupRepository;
 	}
@@ -27,9 +27,10 @@ class DayGroupMapper implements ModelMapper<DayGroup, DayGroupModel> {
 		dayGroupModel.setCycleId(IdUtil.getId(dayGroup.cycle()));
 		return dayGroupModel;
 	}
+
 	@Override
 	public DayGroup toDomain(final String id) {
-		Assert.notNull(id , "Id is required.");
+		Assert.notNull(id, "Id is required.");
 		return dayGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format(CalendarServiceImp.DAY_GROUP_NOT_FOUND_MESSAGE, id)));
 	}
 

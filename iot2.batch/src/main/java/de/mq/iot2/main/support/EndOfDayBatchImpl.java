@@ -22,7 +22,7 @@ import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.rules.RuleService;
 import de.mq.iot2.sysvars.SystemVariable;
 import de.mq.iot2.sysvars.SystemVariableService;
-import de.mq.iot2.weather.support.WeatherService;
+import de.mq.iot2.weather.WeatherService;
 
 @Service
 public class EndOfDayBatchImpl {
@@ -53,6 +53,7 @@ public class EndOfDayBatchImpl {
 	}
 
 	private void execute(final LocalDate date, Optional<LocalTime> uptateTime) {
+		
 		final Cycle cycle = calendarService.cycle(date);
 
 		final var parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);

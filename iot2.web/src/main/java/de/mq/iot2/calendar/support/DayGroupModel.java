@@ -27,7 +27,6 @@ public class DayGroupModel {
 		this.readonly = readonly;
 	}
 
-
 	public String getCycleId() {
 		return cycleId;
 	}

@@ -23,7 +23,7 @@ import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.rules.RuleService;
 import de.mq.iot2.sysvars.SystemVariable;
 import de.mq.iot2.sysvars.SystemVariableService;
-import de.mq.iot2.weather.support.WeatherService;
+import de.mq.iot2.weather.WeatherService;
 
 class EndOfDayBatchImplTest {
 
@@ -66,6 +66,7 @@ class EndOfDayBatchImplTest {
 		assertEquals(Optional.of(sunDownTime), argumentCaptor.getValue().get(EndOfDayArguments.SunDownTime));
 		assertEquals(cycle, argumentCaptor.getValue().get(EndOfDayArguments.Cycle));
 		assertEquals(maxForecastTemperature, argumentCaptor.getValue().get(EndOfDayArguments.MaxForecastTemperature));
+		assertEquals(Optional.empty(),argumentCaptor.getValue().get(EndOfDayArguments.UpdateTime));
 
 		Mockito.verify(systemVariableService).update(systemVariables);
 	}
@@ -85,6 +86,41 @@ class EndOfDayBatchImplTest {
 
 		endOfDayBatch.execute(date);
 		
+		Mockito.verify(systemVariableService).update(systemVariables);
+	}
+	
+	@Test
+	final void executeUpdate() {
+		final var date = LocalDate.now();
+		final var time = LocalTime.of(11, 11);
+		final var sunUpTime = LocalTime.of(8, 0);
+		final var sunDownTime = LocalTime.of(17, 0);
+		final var maxForecastTemperature = Optional.of( 11.11d);;
+		Mockito.when(calendarService.cycle(date)).thenReturn(cycle);
+		final Map<Key, Object> parameters = Map.of(Key.SunUpDownType, TwilightType.Civil);
+		Mockito.when(calendarService.timeType(date)).thenReturn(TimeType.Winter);
+		Mockito.when(configurationService.parameters(RuleKey.EndOfDay, cycle)).thenReturn(parameters);
+		Mockito.when(calendarService.sunUpTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunUpTime));
+		Mockito.when(calendarService.sunDownTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunDownTime));
+		Mockito.when(weatherService.maxForecastTemperature(date)).thenReturn(maxForecastTemperature);
+		@SuppressWarnings("unchecked")
+		ArgumentCaptor<Map<Key, Object>> parameterCapture = ArgumentCaptor.forClass(Map.class);
+		@SuppressWarnings("unchecked")
+		ArgumentCaptor<Map<? extends Enum<?>, Object>> argumentCaptor = ArgumentCaptor.forClass(Map.class);
+		final var systemVariables = List.of(new SystemVariable());
+		Mockito.when(ruleService.process(parameterCapture.capture(), argumentCaptor.capture())).thenReturn(Map.of(EndOfDayArguments.SystemVariables.name(), systemVariables));
+
+		endOfDayBatch.executeUpdate(time);
+
+		assertEquals(parameters, parameterCapture.getValue());
+		assertEquals(TimeType.Winter, argumentCaptor.getValue().get(EndOfDayArguments.TimeType));
+		assertEquals(date, argumentCaptor.getValue().get(EndOfDayArguments.Date));
+		assertEquals(Optional.of(sunUpTime), argumentCaptor.getValue().get(EndOfDayArguments.SunUpTime));
+		assertEquals(Optional.of(sunDownTime), argumentCaptor.getValue().get(EndOfDayArguments.SunDownTime));
+		assertEquals(cycle, argumentCaptor.getValue().get(EndOfDayArguments.Cycle));
+		assertEquals(maxForecastTemperature, argumentCaptor.getValue().get(EndOfDayArguments.MaxForecastTemperature));
+		assertEquals(Optional.of(time),argumentCaptor.getValue().get(EndOfDayArguments.UpdateTime));
+
 		Mockito.verify(systemVariableService).update(systemVariables);
 	}
 	

@@ -8,12 +8,12 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-@Constraint(validatedBy = LocalDateValidatorConverterImpl.class)
+@Constraint(validatedBy = DayValidatorConverterImpl.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidLocalDateModel {
+public @interface ValidDayModel {
 
-	String message() default "{error.date}";
+	String message() default "{error.daymonth}";
 
 	Class<?>[] groups() default {};
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title th:text="#{title}"></title>
+<link th:href="@{/css/min.css}" rel="stylesheet" />
+</head>
+<body>
+	<div  align="center">
+	<div
+	th:switch="${#strings.contains(day.type, 'DayOfWeekDay')}">
+		<h1 th:case="true" th:text="#{day.dayofweek.headline}"></h1>
+		<h1 th:case="false" th:text="#{day.dayofmonth.headline}"></h1>
+	</div>
+	
+		<form action="#" th:action="@{/addDay}" method="post"
+			th:object="${day}">
+			<input type="hidden" th:field="*{dayGroupId}" /> <input
+				type="hidden" name="type" th:field="*{type}" />
+			<table>
+				<tr>
+					<td th:switch="${#strings.contains(day.type, 'DayOfWeekDay')}">
+						<label th:case="true" th:text="#{day.dayofweek.value}"></label>
+						<label th:case="false" th:text="#{day.dayofmonth.value}"></label>
+					</td>
+					<td
+						th:switch="${#strings.contains(day.type, 'DayOfWeekDay')}">
+						<select th:case="true" th:field="*{value}">
+							<option value="" th:text="#{day.choose}"></option>
+							<option th:each="dayOfWeek : ${days}" th:value="${dayOfWeek.key}"
+								th:utext="${dayOfWeek.value}" th:selected=${value==dayOfWeek.key}></option>
+					</select> <input th:case="false" type="text" th:field="*{value}" size="5" />
+					</td>
+
+					<td th:if="${#fields.hasErrors('value')}" th:errors="*{value}"
+						th:errorclass="error"></td>
+				</tr>
+				<tr>
+					<td><label th:text="#{day.description}"></label></td>
+					<td><input type="text" th:field="*{description}" size="30" maxlength="25"/>
+				</tr>
+				<tr>
+					<th  th:switch="${#strings.contains(day.type, 'DayOfWeekDay')}" colspan="3">
+						<div th:if="${#fields.hasErrors('global')}">
+							<p th:each="err : ${#fields.errors('global')}" th:text="${err}"
+								class="error" />
+						</div>
+						<div th:case="true" th:if="${days.size==0}">
+
+							<p th:text="#{error.dayofweek.used}" class=error></p>
+						</div>
+
+					</th>
+				</tr>
+
+				<tr>
+					<th th:switch="${#strings.contains(day.type, 'DayOfWeekDay')}" colspan="3">
+						<button type="submit" name="cancel" th:text="#{day.cancel}"></button>
+						<button th:case="true" type="submit" name="add" th:text="#{day.add}" th:disabled="${days.size==0}"></button>
+						<button th:case="false" type="submit" name="add" th:text="#{day.add}" ></button>
+					</th>
+				</tr>
+			</table>
+		</form>
+	</div>
+</body>
+</html>
