@@ -54,13 +54,15 @@ class CalendarServiceImp implements CalendarService {
 	private final Collection<Entry<Integer, String>> gaussDays = Set.of(new SimpleImmutableEntry<>(-2, "Karfreitag"), new SimpleImmutableEntry<>(0, "Ostersonntag"),
 			new SimpleImmutableEntry<>(1, "Ostermontag"), new SimpleImmutableEntry<>(39, "Christi Himmelfahrt"), new SimpleImmutableEntry<>(49, "Pfingstsonntag"),
 			new SimpleImmutableEntry<>(50, "Pfingstmontag"), new SimpleImmutableEntry<>(60, "Fronleichnam"));
-	private final Collection<Entry<MonthDay, String>> publicHolidays = Set.of(new SimpleImmutableEntry<>(MonthDay.of(1, 1), "Neujahr"), new SimpleImmutableEntry<>(MonthDay.of(5, 1), "Tag der Arbeit"),
-			new SimpleImmutableEntry<>(MonthDay.of(10, 3), "Tag der Deutschen Einheit"), new SimpleImmutableEntry<>(MonthDay.of(11, 1), "Allerheiligen"),
-			new SimpleImmutableEntry<>(MonthDay.of(12, 25), "1. Weihnachtsfeiertag"), new SimpleImmutableEntry<>(MonthDay.of(12, 26), "2. Weihnachtsfeiertag"));
+	private final Collection<Entry<MonthDay, String>> publicHolidays = Set.of(new SimpleImmutableEntry<>(MonthDay.of(1, 1), "Neujahr"),
+			new SimpleImmutableEntry<>(MonthDay.of(5, 1), "Tag der Arbeit"), new SimpleImmutableEntry<>(MonthDay.of(10, 3), "Tag der Deutschen Einheit"),
+			new SimpleImmutableEntry<>(MonthDay.of(11, 1), "Allerheiligen"), new SimpleImmutableEntry<>(MonthDay.of(12, 25), "1. Weihnachtsfeiertag"),
+			new SimpleImmutableEntry<>(MonthDay.of(12, 26), "2. Weihnachtsfeiertag"));
 
 	@Autowired
-	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository, @Value("${iot2.calendar.latitude}") final double latitude,
-			@Value("${iot2.calendar.longitude}") final double longitude, @Value("${iot2.calendar.dayslimit:30}") final int dayLimit) {
+	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository,
+			@Value("${iot2.calendar.latitude}") final double latitude, @Value("${iot2.calendar.longitude}") final double longitude,
+			@Value("${iot2.calendar.dayslimit:30}") final int dayLimit) {
 		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
@@ -157,7 +159,8 @@ class CalendarServiceImp implements CalendarService {
 	@Override
 	@Transactional
 	public int addLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate) {
-		final Collection<Day<LocalDate>> days = localDateDays(name, fromDate, toDate).stream().filter(day -> dayRepository.findById(IdUtil.getId(day)).isEmpty()).collect(Collectors.toList());
+		final Collection<Day<LocalDate>> days = localDateDays(name, fromDate, toDate).stream().filter(day -> dayRepository.findById(IdUtil.getId(day)).isEmpty())
+				.collect(Collectors.toList());
 		days.forEach(dayRepository::save);
 		return days.size();
 
@@ -189,15 +192,15 @@ class CalendarServiceImp implements CalendarService {
 		final Long numberOfDays = fromDate.until(toDate, ChronoUnit.DAYS);
 		Assert.isTrue(numberOfDays <= dayLimit, String.format(LIMIT_OF_DAYS_MESSAGE, dayLimit));
 
-		final var dayGroup = dayGroupRepository.findByName(name).orElseThrow(() -> new IncorrectResultSizeDataAccessException(String.format(DAY_GROUP_NOT_FOUND_MESSAGE, name), 1, 0));
+		final var dayGroup = dayGroupRepository.findByName(name)
+				.orElseThrow(() -> new IncorrectResultSizeDataAccessException(String.format(DAY_GROUP_NOT_FOUND_MESSAGE, name), 1, 0));
 
 		if (dayGroup.readOnly()) {
 			throw new IllegalStateException(DAY_GROUP_READONLY_MESSAGE);
 		}
 
-		return IntStream.rangeClosed(0, numberOfDays.intValue())
-				.mapToObj(i -> new LocalDateDayImp(dayGroup, fromDate.plusDays(i), fromDate.plusDays(i).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.GERMAN))))
-				.collect(Collectors.toList());
+		return IntStream.rangeClosed(0, numberOfDays.intValue()).mapToObj(i -> new LocalDateDayImp(dayGroup, fromDate.plusDays(i),
+				fromDate.plusDays(i).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.GERMAN)))).collect(Collectors.toList());
 	}
 
 	@Override
@@ -205,7 +208,8 @@ class CalendarServiceImp implements CalendarService {
 	public int deleteLocalDateDays(final int daysBack) {
 		Assert.isTrue(daysBack > 0, DAYS_BACK_INVALID_MESSAGE);
 		final var deleteDate = LocalDate.now().minusDays(daysBack);
-		final Collection<Day<LocalDate>> toBeRemoved = dayRepository.findAllLocalDateDays().stream().filter(day -> beforeEquals(day.value(), deleteDate)).collect(Collectors.toList());
+		final Collection<Day<LocalDate>> toBeRemoved = dayRepository.findAllLocalDateDays().stream().filter(day -> beforeEquals(day.value(), deleteDate))
+				.collect(Collectors.toList());
 		toBeRemoved.forEach(dayRepository::delete);
 		return toBeRemoved.size();
 	}
@@ -218,16 +222,19 @@ class CalendarServiceImp implements CalendarService {
 	@Transactional
 	public Collection<DayGroup> dayGroups() {
 		return dayGroupRepository.findAll();
-		
+
 	}
+
 	@Override
 	@Transactional
 	public Collection<Cycle> cycles() {
 		return cycleRepository.findAll();
 	}
+
 	@Override
 	@Transactional
 	public Collection<Day<?>> days(DayGroup dayGroup) {
+		Assert.notNull(dayGroup, "DayGroup is required.");
 		return dayRepository.findByDayGroup(dayGroup);
 	}
 
@@ -236,25 +243,28 @@ class CalendarServiceImp implements CalendarService {
 	public void deleteDay(final Day<?> day) {
 		Assert.notNull(day, "Day is required.");
 		Assert.notNull(day.dayGroup(), "DayGroup is required.");
-		Assert.isTrue( ! day.dayGroup().readOnly(), DAY_GROUP_READONLY_MESSAGE);
-		
+		Assert.isTrue(!day.dayGroup().readOnly(), DAY_GROUP_READONLY_MESSAGE);
+
 		dayRepository.delete(day);
 	}
-	
+
 	@Override
 	@Transactional
-	public Collection<DayOfWeek> unUsedDaysOfWeek(){
+	public Collection<DayOfWeek> unUsedDaysOfWeek() {
 		final Collection<DayOfWeek> used = dayRepository.findAllDayOfWeekDays().stream().map(day -> day.value()).collect(Collectors.toList());
-		return List.of(DayOfWeek.values()).stream().filter(day ->  ! used.contains(day)).sorted().collect(Collectors.toList());
+		return List.of(DayOfWeek.values()).stream().filter(day -> !used.contains(day)).sorted().collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional
 	public boolean createDayIfNotExists(final Day<?> day) {
+		Assert.notNull(day, "Day is required.");
 		final var id = IdUtil.getId(day);
 		Assert.hasText(id, "Id is required.");
-		
-		if ( dayRepository.findById(id).isPresent() ) {
+		Assert.notNull(day.dayGroup(), "DayGroup is required.");
+		Assert.isTrue(!day.dayGroup().readOnly(), DAY_GROUP_READONLY_MESSAGE);
+
+		if (dayRepository.findById(id).isPresent()) {
 			return false;
 		}
 		dayRepository.save(day);

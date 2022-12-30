@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -101,7 +102,8 @@ class CalendarServiceImpTest {
 		});
 
 		final DayGroup fixedDayGroup = savedDays.get(DayOfMonthImpl.class).stream().map(Day::dayGroup).findAny().get();
-		final Collection<MonthDay> expectedFixedDays = Set.of(MonthDay.of(1, 1), MonthDay.of(5, 1), MonthDay.of(10, 3), MonthDay.of(11, 1), MonthDay.of(12, 25), MonthDay.of(12, 26));
+		final Collection<MonthDay> expectedFixedDays = Set.of(MonthDay.of(1, 1), MonthDay.of(5, 1), MonthDay.of(10, 3), MonthDay.of(11, 1), MonthDay.of(12, 25),
+				MonthDay.of(12, 26));
 		assertEquals(savedDayGroups.get(fixedDayGroup.name()), fixedDayGroup);
 		savedDays.get(DayOfMonthImpl.class).stream().forEach(day -> {
 			assertEquals(fixedDayGroup, day.dayGroup());
@@ -113,12 +115,11 @@ class CalendarServiceImpTest {
 		assertEquals(nonWorkingDayCycle, gaussDayGroup.cycle());
 		assertEquals(nonWorkingDayCycle, fixedDayGroup.cycle());
 		assertFalse(nonWorkingDayCycle.isDeaultCycle());
-	
-		
-		final DayGroup otherTimesDayGroup =  savedDayGroups.get(CalendarServiceImp.OTHER_UP_TIMES_GROUP_NAME);
+
+		final DayGroup otherTimesDayGroup = savedDayGroups.get(CalendarServiceImp.OTHER_UP_TIMES_GROUP_NAME);
 		assertFalse(otherTimesDayGroup.cycle().isDeaultCycle());
 
-		savedCyles.values().stream().filter(c -> !c.equals(nonWorkingDayCycle) &&  !c.equals(otherTimesDayGroup.cycle())).forEach(c -> assertTrue(c.isDeaultCycle()));	
+		savedCyles.values().stream().filter(c -> !c.equals(nonWorkingDayCycle) && !c.equals(otherTimesDayGroup.cycle())).forEach(c -> assertTrue(c.isDeaultCycle()));
 	}
 
 	@Test
@@ -227,7 +228,8 @@ class CalendarServiceImpTest {
 		final var groupName = RandomTestUtil.randomString();
 		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName);
 		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
-		assertEquals(DAY_GROUP_READONLY_MESSAGE, assertThrows(IllegalStateException.class, () -> calendarService.addLocalDateDays(groupName, LocalDate.now(), LocalDate.now())).getMessage());
+		assertEquals(DAY_GROUP_READONLY_MESSAGE,
+				assertThrows(IllegalStateException.class, () -> calendarService.addLocalDateDays(groupName, LocalDate.now(), LocalDate.now())).getMessage());
 
 	}
 
@@ -249,11 +251,10 @@ class CalendarServiceImpTest {
 
 	@Test
 	final void addLocalDateDaysDayLimit() {
-		assertEquals(String.format(LIMIT_OF_DAYS_MESSAGE, DAY_LIMIT),
-				assertThrows(IllegalArgumentException.class, () -> calendarService.addLocalDateDays(RandomTestUtil.randomString(), LocalDate.now(), LocalDate.now().plusDays(DAY_LIMIT + 1)))
-						.getMessage());
+		assertEquals(String.format(LIMIT_OF_DAYS_MESSAGE, DAY_LIMIT), assertThrows(IllegalArgumentException.class,
+				() -> calendarService.addLocalDateDays(RandomTestUtil.randomString(), LocalDate.now(), LocalDate.now().plusDays(DAY_LIMIT + 1))).getMessage());
 	}
-	
+
 	@Test
 	final void deleteLocalDateDays() {
 		final var groupName = RandomTestUtil.randomString();
@@ -263,12 +264,13 @@ class CalendarServiceImpTest {
 		final var day2 = new LocalDateDayImp(dayGroup, LocalDate.now().plusDays(1));
 		Mockito.when(dayRepository.findById(IdUtil.getId(day1))).thenReturn(Optional.of(day1));
 		Mockito.when(dayRepository.findById(IdUtil.getId(day2))).thenReturn(Optional.of(day2));
-		
-		assertEquals(2, calendarService.deleteLocalDateDays(groupName,  LocalDate.now(), LocalDate.now().plusDays(1)));
-		
+
+		assertEquals(2, calendarService.deleteLocalDateDays(groupName, LocalDate.now(), LocalDate.now().plusDays(1)));
+
 		Mockito.verify(dayRepository).delete(day1);
 		Mockito.verify(dayRepository).delete(day2);
 	}
+
 	@Test
 	final void deleteLocalDateDaysNotExists() {
 		final var groupName = RandomTestUtil.randomString();
@@ -276,14 +278,13 @@ class CalendarServiceImpTest {
 		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
 		final var day1 = new LocalDateDayImp(dayGroup, LocalDate.now());
 		final var day2 = new LocalDateDayImp(dayGroup, LocalDate.now().plusDays(1));
-		
-		
-		assertEquals(0, calendarService.deleteLocalDateDays(groupName,  LocalDate.now(), LocalDate.now().plusDays(1)));
-		
+
+		assertEquals(0, calendarService.deleteLocalDateDays(groupName, LocalDate.now(), LocalDate.now().plusDays(1)));
+
 		Mockito.verify(dayRepository, Mockito.never()).delete(day1);
 		Mockito.verify(dayRepository, Mockito.never()).delete(day2);
 	}
-	
+
 	@Test
 	final void deleteLocalDateDaysOtherGroup() {
 		final var groupName = RandomTestUtil.randomString();
@@ -293,14 +294,13 @@ class CalendarServiceImpTest {
 		final var day2 = new LocalDateDayImp(Mockito.mock(DayGroup.class), LocalDate.now().plusDays(1));
 		Mockito.when(dayRepository.findById(IdUtil.getId(day1))).thenReturn(Optional.of(day1));
 		Mockito.when(dayRepository.findById(IdUtil.getId(day2))).thenReturn(Optional.of(day2));
-		
-		assertEquals(0, calendarService.deleteLocalDateDays(groupName,  LocalDate.now(), LocalDate.now().plusDays(1)));
-		
+
+		assertEquals(0, calendarService.deleteLocalDateDays(groupName, LocalDate.now(), LocalDate.now().plusDays(1)));
+
 		Mockito.verify(dayRepository, Mockito.never()).delete(day1);
 		Mockito.verify(dayRepository, Mockito.never()).delete(day2);
 	}
-	
-	
+
 	@Test
 	final void deleteLocalDateDaysDayGroupNotFound() {
 		final var dayGroup = RandomTestUtil.randomString();
@@ -314,7 +314,8 @@ class CalendarServiceImpTest {
 		final var groupName = RandomTestUtil.randomString();
 		final var dayGroup = new DayGroupImpl(Mockito.mock(Cycle.class), groupName);
 		Mockito.when(dayGroupRepository.findByName(groupName)).thenReturn(Optional.of(dayGroup));
-		assertEquals(DAY_GROUP_READONLY_MESSAGE, assertThrows(IllegalStateException.class, () -> calendarService.deleteLocalDateDays(groupName, LocalDate.now(), LocalDate.now())).getMessage());
+		assertEquals(DAY_GROUP_READONLY_MESSAGE,
+				assertThrows(IllegalStateException.class, () -> calendarService.deleteLocalDateDays(groupName, LocalDate.now(), LocalDate.now())).getMessage());
 
 	}
 
@@ -340,11 +341,10 @@ class CalendarServiceImpTest {
 
 	@Test
 	final void deleteLocalDateDaysDayLimit() {
-		assertEquals(String.format(LIMIT_OF_DAYS_MESSAGE, DAY_LIMIT),
-				assertThrows(IllegalArgumentException.class, () -> calendarService.deleteLocalDateDays(RandomTestUtil.randomString(), LocalDate.now(), LocalDate.now().plusDays(DAY_LIMIT + 1)))
-						.getMessage());
+		assertEquals(String.format(LIMIT_OF_DAYS_MESSAGE, DAY_LIMIT), assertThrows(IllegalArgumentException.class,
+				() -> calendarService.deleteLocalDateDays(RandomTestUtil.randomString(), LocalDate.now(), LocalDate.now().plusDays(DAY_LIMIT + 1))).getMessage());
 	}
-	
+
 	@Test
 	final void deleteLocalDateDaysCleanup() {
 		@SuppressWarnings("unchecked")
@@ -354,20 +354,133 @@ class CalendarServiceImpTest {
 		@SuppressWarnings("unchecked")
 		final Day<LocalDate> dayAfterLimit = Mockito.mock(Day.class);
 		Mockito.when(dayEqulasLimit.value()).thenReturn(LocalDate.now().minusDays(DAY_LIMIT));
-		Mockito.when(dayBeforeLimit.value()).thenReturn(LocalDate.now().minusDays(2*DAY_LIMIT));
-		Mockito.when(dayAfterLimit.value()).thenReturn(LocalDate.now().minusDays(DAY_LIMIT-1));
-		Mockito.when(dayRepository.findAllLocalDateDays()).thenReturn(List.of(dayEqulasLimit,dayBeforeLimit, dayAfterLimit));
-		
+		Mockito.when(dayBeforeLimit.value()).thenReturn(LocalDate.now().minusDays(2 * DAY_LIMIT));
+		Mockito.when(dayAfterLimit.value()).thenReturn(LocalDate.now().minusDays(DAY_LIMIT - 1));
+		Mockito.when(dayRepository.findAllLocalDateDays()).thenReturn(List.of(dayEqulasLimit, dayBeforeLimit, dayAfterLimit));
+
 		assertEquals(2, calendarService.deleteLocalDateDays(DAY_LIMIT));
-		
+
 		Mockito.verify(dayRepository).delete(dayEqulasLimit);
 		Mockito.verify(dayRepository).delete(dayBeforeLimit);
 	}
-	
+
 	@ParameterizedTest
-	@ValueSource(ints = {0, -1})
+	@ValueSource(ints = { 0, -1 })
 	final void deleteLocalDateDaysCleanupInvalidDaysBack(final int daysBack) {
-		assertEquals(DAYS_BACK_INVALID_MESSAGE, assertThrows(IllegalArgumentException.class, ()-> calendarService.deleteLocalDateDays(daysBack)).getMessage());
+		assertEquals(DAYS_BACK_INVALID_MESSAGE, assertThrows(IllegalArgumentException.class, () -> calendarService.deleteLocalDateDays(daysBack)).getMessage());
+	}
+
+	@Test
+	void dayGroups() {
+		final Collection<DayGroup> dayGroups = List.of(Mockito.mock(DayGroup.class), Mockito.mock(DayGroup.class));
+
+		Mockito.when(dayGroupRepository.findAll()).thenReturn(dayGroups);
+
+		assertEquals(dayGroups, calendarService.dayGroups());
+	}
+
+	@Test
+	void cycles() {
+		final Collection<Cycle> cycles = List.of(Mockito.mock(Cycle.class), Mockito.mock(Cycle.class));
+
+		Mockito.when(cycleRepository.findAll()).thenReturn(cycles);
+
+		assertEquals(cycles, calendarService.cycles());
+	}
+
+	@Test
+	void days() {
+		final DayGroup dayGroup = Mockito.mock(DayGroup.class);
+		final Collection<Day<?>> days = List.of(Mockito.mock(Day.class), Mockito.mock(Day.class));
+
+		Mockito.when(dayRepository.findByDayGroup(dayGroup)).thenReturn(days);
+
+		assertEquals(days, calendarService.days(dayGroup));
+	}
+
+	@Test
+	void daysNull() {
+		assertThrows(IllegalArgumentException.class, () -> calendarService.days(null));
+	}
+
+	@Test
+	void deleteDay() {
+		final Day<?> day = new LocalDateDayImp(Mockito.mock(DayGroup.class), LocalDate.now());
+
+		calendarService.deleteDay(day);
+
+		Mockito.verify(dayRepository).delete(day);
+	}
+
+	@Test
+	void deleteDayDayGroupReadonly() {
+		final DayGroup dayGroup = Mockito.mock(DayGroup.class);
+		Mockito.when(dayGroup.readOnly()).thenReturn(true);
+		final Day<?> day = new LocalDateDayImp(dayGroup, LocalDate.now());
+
+		assertEquals(CalendarServiceImp.DAY_GROUP_READONLY_MESSAGE, assertThrows(IllegalArgumentException.class, () -> calendarService.deleteDay(day)).getMessage());
+	}
+
+	@Test
+	void deleteDayInvalid() {
+		assertThrows(IllegalArgumentException.class, () -> calendarService.deleteDay(Mockito.mock(Day.class)));
+		assertThrows(IllegalArgumentException.class, () -> calendarService.deleteDay(null));
+	}
+
+	@Test
+	void unUsedDaysOfWeek() {
+		final DayGroup dayGroup = Mockito.mock(DayGroup.class);
+		final Collection<Day<DayOfWeek>> existing = List.of(DayOfWeek.values()).stream().filter(dayOfWeek -> dayOfWeek != DayOfWeek.FRIDAY)
+				.map(dayOfWeek -> new DayOfWeekDayImpl(dayGroup, dayOfWeek)).collect(Collectors.toList());
+		Mockito.when(dayRepository.findAllDayOfWeekDays()).thenReturn(existing);
+
+		final Collection<DayOfWeek> results = calendarService.unUsedDaysOfWeek();
+
+		assertEquals(1, results.size());
+		assertEquals(DayOfWeek.FRIDAY, results.stream().findAny().get());
+	}
+
+	@Test
+	void createDayIfNotExists() {
+		final Day<MonthDay> day = new DayOfMonthImpl(Mockito.mock(DayGroup.class), MonthDay.of(12, 25));
+		Mockito.when(dayRepository.findById(IdUtil.getId(day))).thenReturn(Optional.empty());
+
+		assertTrue(calendarService.createDayIfNotExists(day));
+
+		Mockito.verify(dayRepository).save(day);
+	}
+
+	@Test
+	void createDayIfNotExistsAlreadyExists() {
+		final Day<MonthDay> day = new DayOfMonthImpl(Mockito.mock(DayGroup.class), MonthDay.of(12, 25));
+		Mockito.when(dayRepository.findById(IdUtil.getId(day))).thenReturn(Optional.of(day));
+
+		assertFalse(calendarService.createDayIfNotExists(day));
+
+		Mockito.verify(dayRepository, Mockito.never()).save(day);
+	}
+
+	@Test
+	void createDayIfNotExistsInvalid() {
+		final Day<MonthDay> day = new DayOfMonthImpl(Mockito.mock(DayGroup.class), MonthDay.of(12, 25));
+		ReflectionTestUtils.setField(day, "id", null);
+
+		final var required = "required.";
+		assertTrue(assertThrows(IllegalArgumentException.class, () -> calendarService.createDayIfNotExists(day)).getMessage().contains(required));
+		assertTrue(assertThrows(IllegalArgumentException.class, () -> calendarService.createDayIfNotExists(null)).getMessage().contains(required));
+
+		final Day<?> day2 = new DayOfMonthImpl(Mockito.mock(DayGroup.class), MonthDay.of(12, 25));
+		ReflectionTestUtils.setField(day2, "dayGroup", null);
+		assertTrue(assertThrows(IllegalArgumentException.class, () -> calendarService.createDayIfNotExists(day2)).getMessage().contains(required));
+
+	}
+
+	@Test
+	void createDayIfNotExistsDayGroupReadOnly() {
+		final DayGroup dayGroup = Mockito.mock(DayGroup.class);
+		Mockito.when(dayGroup.readOnly()).thenReturn(true);
+		final Day<MonthDay> day = new DayOfMonthImpl(dayGroup, MonthDay.of(12, 25));
+		assertEquals(CalendarServiceImp.DAY_GROUP_READONLY_MESSAGE, assertThrows(IllegalArgumentException.class, () -> calendarService.createDayIfNotExists(day)).getMessage());
 	}
 
 }

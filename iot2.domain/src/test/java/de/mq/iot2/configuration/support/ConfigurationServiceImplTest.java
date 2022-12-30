@@ -14,9 +14,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
-
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.core.convert.ConversionService;
 
@@ -30,6 +32,7 @@ import de.mq.iot2.configuration.CycleParameter;
 import de.mq.iot2.configuration.Parameter;
 import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.support.IdUtil;
+import de.mq.iot2.support.RandomTestUtil;
 import jakarta.persistence.EntityNotFoundException;
 
 class ConfigurationServiceImplTest {
@@ -71,7 +74,7 @@ class ConfigurationServiceImplTest {
 		assertTrue(savedConfigurations.containsKey(RuleKey.EndOfDay));
 		assertEquals(2, savedConfigurations.size());
 
-		assertEquals(12, savedParameter.size()); 
+		assertEquals(12, savedParameter.size());
 
 		final List<? extends Parameter> cleanUpParameter = savedParameter.stream().filter(parameter -> parameter.configuration() == savedConfigurations.get(RuleKey.CleanUp))
 				.collect(Collectors.toList());
@@ -80,12 +83,15 @@ class ConfigurationServiceImplTest {
 		assertTrue(cleanUpParameter.get(0) instanceof ParameterImpl);
 
 		final Collection<Key> globalEndOfDayParameter = savedParameter.stream()
-				.filter(parameter -> parameter.configuration() == savedConfigurations.get(RuleKey.EndOfDay) && parameter instanceof ParameterImpl).map(Parameter::key).collect(Collectors.toList());
+				.filter(parameter -> parameter.configuration() == savedConfigurations.get(RuleKey.EndOfDay) && parameter instanceof ParameterImpl).map(Parameter::key)
+				.collect(Collectors.toList());
 		assertEquals(8, globalEndOfDayParameter.size());
-		assertTrue(globalEndOfDayParameter.containsAll(Arrays.asList(Key.UpTime, Key.MinSunDownTime,Key.MaxSunDownTime, Key.MinSunUpTime, Key.MaxSunUpTime, Key.SunUpDownType, Key.ShadowTemperature, Key.ShadowTime)));
+		assertTrue(globalEndOfDayParameter.containsAll(
+				Arrays.asList(Key.UpTime, Key.MinSunDownTime, Key.MaxSunDownTime, Key.MinSunUpTime, Key.MaxSunUpTime, Key.SunUpDownType, Key.ShadowTemperature, Key.ShadowTime)));
 
 		final Collection<? extends Parameter> endOfDayCycleParameters = savedParameter.stream()
-				.filter(parameter -> (parameter.configuration() == savedConfigurations.get(RuleKey.EndOfDay)) && (parameter instanceof CycleParameterImpl)).collect(Collectors.toList());
+				.filter(parameter -> (parameter.configuration() == savedConfigurations.get(RuleKey.EndOfDay)) && (parameter instanceof CycleParameterImpl))
+				.collect(Collectors.toList());
 		assertEquals(3, endOfDayCycleParameters.size());
 		endOfDayCycleParameters.forEach(parameter -> {
 			assertEquals(Key.UpTime, parameter.key());
@@ -112,7 +118,7 @@ class ConfigurationServiceImplTest {
 		assertEquals(ConfigurationServiceImpl.NON_WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE,
 				assertThrows(EntityNotFoundException.class, () -> configurationService.createDefaultConfigurationsAndParameters()).getMessage());
 	}
-	
+
 	@Test
 	void createDefaultConfigurationsAndParametersOtherTimesCycleNotFoud() {
 		Mockito.when(cycleRepository.findById(IdUtil.id(ConfigurationServiceImpl.WORKING_DAY_CYCLE_ID))).thenReturn(Optional.of(workingDayCycle));
@@ -133,24 +139,26 @@ class ConfigurationServiceImplTest {
 		final var parameterSunUpDownType = new ParameterImpl(configuration, Key.SunUpDownType, TwilightType.Mathematical.name());
 		final var parameterShadowTemperature = new ParameterImpl(configuration, Key.ShadowTemperature, "25.25");
 		final var parameterShadowTime = new ParameterImpl(configuration, Key.ShadowTime, "09.00");
-		
+
 		final var nonWorkingDayCycleParameterUpTime = new CycleParameterImpl(configuration, Key.UpTime, "07:30", nonWorkingDayCycle);
 
-		Mockito.doAnswer(answer -> convertParameterValue( answer.getArgument(0, String.class))).when(conversionService).convert(Mockito.any(), Mockito.any());
-		Mockito.when(parameterRepository.findByConfiguration(configuration)).thenReturn(List.of(minSunDown, maxSunDown, minSunUp, maxSunUp, parameterUpTime, parameterSunUpDownType, nonWorkingDayCycleParameterUpTime, parameterShadowTemperature, parameterShadowTime));
+		Mockito.doAnswer(answer -> convertParameterValue(answer.getArgument(0, String.class))).when(conversionService).convert(Mockito.any(), Mockito.any());
+		Mockito.when(parameterRepository.findByConfiguration(configuration)).thenReturn(List.of(minSunDown, maxSunDown, minSunUp, maxSunUp, parameterUpTime, parameterSunUpDownType,
+				nonWorkingDayCycleParameterUpTime, parameterShadowTemperature, parameterShadowTime));
 
 		Map<Key, ? extends Object> results = configurationService.parameters(RuleKey.EndOfDay, nonWorkingDayCycle);
 
 		assertEquals(8, results.size());
-		assertTrue(results.keySet().containsAll(List.of(Key.MinSunDownTime, Key.MaxSunDownTime, Key.MaxSunUpTime, Key.UpTime, Key.MinSunDownTime,  Key.MinSunDownTime, Key.ShadowTemperature, Key.ShadowTime)));
+		assertTrue(results.keySet().containsAll(
+				List.of(Key.MinSunDownTime, Key.MaxSunDownTime, Key.MaxSunUpTime, Key.UpTime, Key.MinSunDownTime, Key.MinSunDownTime, Key.ShadowTemperature, Key.ShadowTime)));
 		assertEquals(LocalTime.parse(nonWorkingDayCycleParameterUpTime.value()), results.get(Key.UpTime));
 	}
 
 	private Object convertParameterValue(final String value) {
-		if( value.contains(":")) {
-			return  LocalTime.parse(value);
-		} 
-		if( value.contains(".")) {
+		if (value.contains(":")) {
+			return LocalTime.parse(value);
+		}
+		if (value.contains(".")) {
 			return Double.parseDouble(value);
 		}
 		return TwilightType.valueOf(value);
@@ -167,21 +175,57 @@ class ConfigurationServiceImplTest {
 		assertThrows(IllegalArgumentException.class, () -> configurationService.parameters(null, nonWorkingDayCycle));
 		assertThrows(IllegalArgumentException.class, () -> configurationService.parameters(RuleKey.EndOfDay, null));
 	}
-	
+
 	@Test
 	void parameter() {
-		final var value = 30; 
-		final var parameter = Mockito.mock(Parameter.class );
-		Mockito.when(parameter.value()).thenReturn(""+value);
+		final var value = 30;
+		final var parameter = Mockito.mock(Parameter.class);
+		Mockito.when(parameter.value()).thenReturn("" + value);
 		Mockito.when(conversionService.convert("" + value, Integer.class)).thenReturn(value);
 		Mockito.when(parameterRepository.findByRuleKeyAndKey(RuleKey.CleanUp, Key.DaysBack)).thenReturn(Optional.of(parameter));
 		assertEquals(Optional.of(value), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack));
 	}
-	
+
 	@Test
 	void parameterNotExists() {
 		Mockito.when(conversionService.convert(Mockito.any(), Mockito.any())).thenReturn(30);
 		assertEquals(Optional.empty(), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack));
+	}
+
+	@Test
+	void configurations() {
+		final Collection<Configuration> configurations = List.of(Mockito.mock(Configuration.class), Mockito.mock(Configuration.class));
+		Mockito.when(configurationRepository.findAll()).thenReturn(configurations);
+		assertEquals(configurations, configurationService.configurations());
+	}
+
+	@Test
+	void parametersByConfigurationId() {
+		final var configurationId = RandomTestUtil.randomString();
+		final Collection<Parameter> parameters = List.of(Mockito.mock(Parameter.class), Mockito.mock(Parameter.class));
+		Mockito.when(parameterRepository.findByConfigurationId(configurationId)).thenReturn(parameters);
+		assertEquals(parameters, configurationService.parameters(configurationId));
+	}
+
+	@ParameterizedTest
+	@EmptySource()
+	@NullSource()
+	@ValueSource(strings = " ")
+	void parametersByConfigurationIdWithEmpty(final String id) {
+		assertThrows(IllegalArgumentException.class, () -> configurationService.parameters(id));
+	}
+
+	@Test
+	void save() {
+		final Parameter parameter = new ParameterImpl(Mockito.mock(Configuration.class), Key.MaxSunDownTime, RandomTestUtil.randomString());
+		configurationService.save(parameter);
+		Mockito.verify(parameterRepository).save(parameter);
+	}
+
+	@ParameterizedTest
+	@NullSource
+	void saveNull(final Parameter parameter) {
+		assertThrows(IllegalArgumentException.class, () -> configurationService.save(parameter));
 	}
 
 }
