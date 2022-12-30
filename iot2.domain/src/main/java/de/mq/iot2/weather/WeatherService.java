@@ -1,4 +1,4 @@
-package de.mq.iot2.weather.support;
+package de.mq.iot2.weather;
 
 import java.time.LocalDate;
 import java.util.Optional;

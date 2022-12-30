@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import de.mq.iot2.weather.MeteorologicalData;
+import de.mq.iot2.weather.WeatherService;
 
 class WeatherSerciceImplTest {
 	private final LocalDate localDate = LocalDate.now();

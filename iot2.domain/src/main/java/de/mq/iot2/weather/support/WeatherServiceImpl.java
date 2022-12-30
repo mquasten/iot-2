@@ -6,9 +6,10 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import de.mq.iot2.weather.MeteorologicalData;
+import de.mq.iot2.weather.WeatherService;
 
 @Service
-public class WeatherServiceImpl implements WeatherService {
+class WeatherServiceImpl implements WeatherService {
 
 	private final WeatherRepository weatherRepository;
 
