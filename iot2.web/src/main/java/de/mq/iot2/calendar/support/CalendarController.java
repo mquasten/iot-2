@@ -45,9 +45,7 @@ class CalendarController {
 
 	@GetMapping(value = "/calendar")
 	String configuration(final Model model, @RequestParam(name = "dayGroupId", required = false) final String dayGroupId) {
-
 		model.addAllAttributes(initModel(Optional.ofNullable(dayGroupId)));
-
 		return CALENDAR_VIEW_NAME;
 	}
 
