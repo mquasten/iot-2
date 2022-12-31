@@ -28,7 +28,10 @@ import jakarta.validation.Valid;
 @Controller
 class CalendarController {
 
-	private static final String CALENDAR_VIEW_NAME = "calendar";
+	static final String DAY_GROUP_NAME = "dayGroup";
+	static final String CYCLES_LIST_NAME = "cycles";
+	static final String DAY_GROUPS_LIST_NAME = "dayGroups";
+	static final String CALENDAR_VIEW_NAME = "calendar";
 	static final String REDIRECT_CALENDAR_PATTERN = "redirect:" + CALENDAR_VIEW_NAME + "?dayGroupId=%s";
 	private final CalendarService calendarService;
 	private final ModelMapper<DayGroup, DayGroupModel> dayGroupMapper;
@@ -44,7 +47,7 @@ class CalendarController {
 	}
 
 	@GetMapping(value = "/calendar")
-	String configuration(final Model model, @RequestParam(name = "dayGroupId", required = false) final String dayGroupId) {
+	String calendar(final Model model, @RequestParam(name = "dayGroupId", required = false) final String dayGroupId) {
 		model.addAllAttributes(initModel(Optional.ofNullable(dayGroupId)));
 		return CALENDAR_VIEW_NAME;
 	}
@@ -59,19 +62,17 @@ class CalendarController {
 
 		final Collection<CycleModel> cycles = calendarService.cycles().stream().map(cycle -> cycleMapper.toWeb(cycle)).sorted((c1, c2) -> c1.getName().compareTo(c2.getName()))
 				.collect(Collectors.toList());
-		attributes.put("dayGroups", dayGroups);
-		attributes.put("cycles", cycles);
+		attributes.put(DAY_GROUPS_LIST_NAME, dayGroups);
+		attributes.put(CYCLES_LIST_NAME, cycles);
 
-		dayGroupId.ifPresentOrElse(id -> attributes.put("dayGroup", dayGroupMap.containsKey(id) ? mapDaysInto(dayGroupMap.get(id)) : firstDayGroupIfExistsOrNew(dayGroups)),
-				() -> attributes.put("dayGroup", firstDayGroupIfExistsOrNew(dayGroups)));
+		dayGroupId.ifPresentOrElse(id -> attributes.put(DAY_GROUP_NAME, dayGroupMap.containsKey(id) ? mapDaysInto(dayGroupMap.get(id)) : firstDayGroupIfExistsOrNew(dayGroups)),
+				() -> attributes.put(DAY_GROUP_NAME, firstDayGroupIfExistsOrNew(dayGroups)));
 
 		return Collections.unmodifiableMap(attributes);
 	}
 
 	private DayGroupModel firstDayGroupIfExistsOrNew(final Collection<DayGroupModel> dayGroups) {
-
 		return dayGroups.stream().findFirst().map(x -> mapDaysInto(x)).orElse(new DayGroupModel());
-
 	}
 
 	private DayGroupModel mapDaysInto(final DayGroupModel dayGroup) {
@@ -82,7 +83,7 @@ class CalendarController {
 	}
 
 	@PostMapping(value = "/searchDayGroup")
-	String search(@ModelAttribute("dayGroup") @Valid final DayGroupModel dayGroupModel, final BindingResult bindingResult) {
+	String search(@ModelAttribute(DAY_GROUP_NAME) @Valid final DayGroupModel dayGroupModel, final BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return CALENDAR_VIEW_NAME;
 		}
