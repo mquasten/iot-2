@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 @Component
 class DayGroupMapper implements ModelMapper<DayGroup, DayGroupModel> {
 
+	private static final String ID_REQUIRED_MESSAGE = "Id is required.";
 	private final DayGroupRepository dayGroupRepository;
 
 	DayGroupMapper(final DayGroupRepository dayGroupRepository) {
@@ -20,6 +21,7 @@ class DayGroupMapper implements ModelMapper<DayGroup, DayGroupModel> {
 	@Override
 	public DayGroupModel toWeb(final DayGroup dayGroup) {
 		Assert.notNull(dayGroup, "DayGroup is required.");
+		Assert.hasText(IdUtil.getId(dayGroup), ID_REQUIRED_MESSAGE);
 		final var dayGroupModel = new DayGroupModel();
 		dayGroupModel.setName(dayGroup.name());
 		dayGroupModel.setId(IdUtil.getId(dayGroup));
@@ -30,7 +32,7 @@ class DayGroupMapper implements ModelMapper<DayGroup, DayGroupModel> {
 
 	@Override
 	public DayGroup toDomain(final String id) {
-		Assert.notNull(id, "Id is required.");
+		Assert.hasText(id, ID_REQUIRED_MESSAGE);
 		return dayGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format(CalendarServiceImp.DAY_GROUP_NOT_FOUND_MESSAGE, id)));
 	}
 
