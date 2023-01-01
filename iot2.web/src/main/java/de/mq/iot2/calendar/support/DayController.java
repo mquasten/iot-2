@@ -23,12 +23,10 @@ import jakarta.validation.Valid;
 
 @Controller
 class DayController {
-//	private static final String DAY_MONTH_MODEL_AND_VIEW_NAME = "dayMonth";
-
-	private static final String LOCAL_DATE_MODEL_AND_VIEW_NAME = "localDate";
-
-	private static final String DAY_MODEL_AND_VIEW_NAME = "day";
-
+	static final String MESSAGE_KEY_DAY_EXISTS = "error.day.exists";
+	static final String DAY_OF_WEEK_LIST = "days";
+	static final String LOCAL_DATE_MODEL_AND_VIEW_NAME = "localDate";
+	static final String DAY_MODEL_AND_VIEW_NAME = "day";
 	private final CalendarService calendarService;
 	private final ModelMapper<Day<?>, DayModel> dayMapper;
 
@@ -46,7 +44,7 @@ class DayController {
 	}
 
 	@PostMapping(value = "/editDays", params = LOCAL_DATE_MODEL_AND_VIEW_NAME)
-	String editLocaldates(@ModelAttribute("dayGroup") @Valid final DayGroupModel dayGroupModel, Model model) {
+	String editLocaldates(@ModelAttribute("dayGroup") @Valid final DayGroupModel dayGroupModel, final Model model) {
 		final LocalDateModel localDateModel = new LocalDateModel();
 		localDateModel.setDayGroupId(dayGroupModel.getId());
 		localDateModel.setDayGroupName(dayGroupModel.getName());
@@ -62,7 +60,7 @@ class DayController {
 		dayModel.setType(DayOfWeekDayImpl.class.getName());
 		model.addAttribute(DAY_MODEL_AND_VIEW_NAME, dayModel);
 
-		model.addAttribute("days", daysOfWeek(locale));
+		model.addAttribute(DAY_OF_WEEK_LIST, daysOfWeek(locale));
 		return DAY_MODEL_AND_VIEW_NAME;
 
 	}
@@ -88,15 +86,16 @@ class DayController {
 		if (bindingResult.hasErrors()) {
 			return LOCAL_DATE_MODEL_AND_VIEW_NAME;
 		}
-		final Long expectedNumberOfDays = 1+ localDateModel.getFromDate().until(localDateModel.getToDate(), ChronoUnit.DAYS);
-		
-		final int numberOfDays= calendarService.addLocalDateDays(localDateModel.getDayGroupName(), localDateModel.getFromDate(), localDateModel.getToDate());
-		
-		if( expectedNumberOfDays.intValue() != numberOfDays) {
-			bindingResult.addError(new ObjectError(DAY_MODEL_AND_VIEW_NAME, new String[] {"error.date.exists"}, new Integer[] {numberOfDays, expectedNumberOfDays.intValue()}, "{error.date.exists}"));
+		final Long expectedNumberOfDays = 1 + localDateModel.getFromDate().until(localDateModel.getToDate(), ChronoUnit.DAYS);
+
+		final int numberOfDays = calendarService.addLocalDateDays(localDateModel.getDayGroupName(), localDateModel.getFromDate(), localDateModel.getToDate());
+
+		if (expectedNumberOfDays.intValue() != numberOfDays) {
+			bindingResult.addError(new ObjectError(DAY_MODEL_AND_VIEW_NAME, new String[] { "error.date.exists" }, new Integer[] { numberOfDays, expectedNumberOfDays.intValue() },
+					"{error.date.exists}"));
 			return LOCAL_DATE_MODEL_AND_VIEW_NAME;
 		}
-		
+
 		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, localDateModel.getDayGroupId());
 	}
 
@@ -109,14 +108,14 @@ class DayController {
 		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, localDateModel.getDayGroupId());
 	}
 
-	@PostMapping(value = "/editLocalDate", params = "cancel")
+	@PostMapping(value = "/editLocalDate", params = "" + "")
 	String cancelLocalDate(@ModelAttribute(LOCAL_DATE_MODEL_AND_VIEW_NAME) final LocalDateModel localDateModel) {
 		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, localDateModel.getDayGroupId());
 	}
 
 	@PostMapping(value = "/addDay", params = "cancel")
-	String cancelAdd(@ModelAttribute(DAY_MODEL_AND_VIEW_NAME) final DayModel dayOfWeekModel) {
-		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, dayOfWeekModel.getDayGroupId());
+	String cancelAdd(@ModelAttribute(DAY_MODEL_AND_VIEW_NAME) final DayModel dayModel) {
+		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, dayModel.getDayGroupId());
 	}
 
 	@PostMapping(value = "/addDay", params = "add")
@@ -126,9 +125,9 @@ class DayController {
 			return DAY_MODEL_AND_VIEW_NAME;
 		}
 
-		if(! calendarService.createDayIfNotExists(dayMapper.toDomain(dayModel))) {
+		if (!calendarService.createDayIfNotExists(dayMapper.toDomain(dayModel))) {
 			addDaysIfDayOfWeek(dayModel, model, locale);
-			bindingResult.addError(new ObjectError(DAY_MODEL_AND_VIEW_NAME, new String[] {"error.day.exists"}, null, "{error.day.exists}"));
+			bindingResult.addError(new ObjectError(DAY_MODEL_AND_VIEW_NAME, new String[] { MESSAGE_KEY_DAY_EXISTS }, null, String.format("{%s}", MESSAGE_KEY_DAY_EXISTS)));
 			return DAY_MODEL_AND_VIEW_NAME;
 		}
 		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, dayModel.getDayGroupId());
@@ -139,7 +138,7 @@ class DayController {
 			return;
 		}
 
-		model.addAttribute("days", daysOfWeek(locale));
+		model.addAttribute(DAY_OF_WEEK_LIST, daysOfWeek(locale));
 	}
 
 }
