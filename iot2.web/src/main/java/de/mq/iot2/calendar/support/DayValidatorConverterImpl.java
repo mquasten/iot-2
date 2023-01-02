@@ -15,8 +15,11 @@ import jakarta.validation.ConstraintValidatorContext;
 @Component
 class DayValidatorConverterImpl implements ConstraintValidator<ValidDayModel, DayModel> {
 
+	static final String MESSAGE_KEY_DAYOFMONTH_INVALID = "{error.dayofmonth}";
+	static final String MESSAGE_KEY_DAYOFWEEK_INVALID = "{error.dayofweek}";
+	static final String MESSAGE_KEY_MANDATORY = "{error.mandatory}";
 	private static final String DATE_DELIMITER_ENGLISH = "/";
-	private static final String VALUE_FIELD_NAME = "value";
+	static final String VALUE_FIELD_NAME = "value";
 	final Map<Class<?>, BiFunction<DayModel, ConstraintValidatorContext, Boolean>> converters = Map.of(DayOfWeekDayImpl.class,
 			(dayModel, context) -> dayOfWeekConverter(dayModel, context), DayOfMonthImpl.class, (dayModel, context) -> dayOfMonthConverter(dayModel, context));
 
@@ -32,7 +35,7 @@ class DayValidatorConverterImpl implements ConstraintValidator<ValidDayModel, Da
 
 	private Boolean dayOfWeekConverter(final DayModel dayModel, final ConstraintValidatorContext context) {
 		if (!StringUtils.hasText(dayModel.getValue())) {
-			context.buildConstraintViolationWithTemplate("{error.mandatory}").addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_MANDATORY).addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
 			return false;
 		}
 
@@ -40,15 +43,15 @@ class DayValidatorConverterImpl implements ConstraintValidator<ValidDayModel, Da
 			dayModel.setTargetValue(DayOfWeek.of(Integer.parseInt(dayModel.getValue())));
 			return true;
 		} catch (final Exception ex) {
-			context.buildConstraintViolationWithTemplate("{error.dayofweek}").addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_DAYOFWEEK_INVALID).addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
 			return false;
 		}
-
+ 
 	}
 
 	private Boolean dayOfMonthConverter(final DayModel dayModel, final ConstraintValidatorContext context) {
 		if (!StringUtils.hasText(dayModel.getValue())) {
-			context.buildConstraintViolationWithTemplate("{error.mandatory}").addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_MANDATORY).addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
 			return false;
 		}
 
@@ -63,7 +66,7 @@ class DayValidatorConverterImpl implements ConstraintValidator<ValidDayModel, Da
 	private boolean monthDayEnglish(final DayModel dayModel, final ConstraintValidatorContext context) {
 		final String[] values = dayModel.getValue().split(DATE_DELIMITER_ENGLISH);
 		if (values.length != 2) {
-			context.buildConstraintViolationWithTemplate("{error.dayofmonth}").addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_DAYOFMONTH_INVALID).addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
 			return false;
 		}
 		try {
@@ -71,7 +74,7 @@ class DayValidatorConverterImpl implements ConstraintValidator<ValidDayModel, Da
 			dayModel.setTargetValue(MonthDay.of(Integer.parseInt(values[0]), Integer.parseInt(values[1])));
 			return true;
 		} catch (Exception ex) {
-			context.buildConstraintViolationWithTemplate("{error.dayofmonth}").addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_DAYOFMONTH_INVALID).addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
 			return false;
 		}
 	}
@@ -79,14 +82,14 @@ class DayValidatorConverterImpl implements ConstraintValidator<ValidDayModel, Da
 	private boolean monthDayGerman(final DayModel dayModel, final ConstraintValidatorContext context) {
 		final String[] values = dayModel.getValue().split("[.]");
 		if (values.length != 2) {
-			context.buildConstraintViolationWithTemplate("{error.dayofmonth}").addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_DAYOFMONTH_INVALID).addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
 			return false;
 		}
 		try {
 			dayModel.setTargetValue(MonthDay.of(Integer.parseInt(values[1]), Integer.parseInt(values[0])));
 			return true;
 		} catch (final Exception ex) {
-			context.buildConstraintViolationWithTemplate("{error.dayofmonth}").addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_DAYOFMONTH_INVALID).addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
 			return false;
 		}
 	}

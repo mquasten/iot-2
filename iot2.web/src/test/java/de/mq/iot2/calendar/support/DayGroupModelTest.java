@@ -69,6 +69,9 @@ class DayGroupModelTest {
 		
 		assertEquals(days, dayGroupModel.getDays());
 		
+		dayGroupModel.setDays(null);
+		
+		assertTrue(CollectionUtils.isEmpty(dayGroupModel.getDays()));
 	}
 
 }

@@ -9,12 +9,12 @@ import org.springframework.util.Assert;
 public class DayModel implements Comparable<DayModel> {
 
 	private String id;
-	// @NotBlank
 	private String value;
 	private String valueSorted;
 	private String dayGroupId;
 	private String type;
 	private Object targetValue;
+	private String description;
 
 	Class<?> targetEntity() {
 		Assert.hasText(type, "Type is required.");
@@ -52,8 +52,6 @@ public class DayModel implements Comparable<DayModel> {
 	public void setValueSorted(String valueSorted) {
 		this.valueSorted = valueSorted;
 	}
-
-	private String description;
 
 	public String getId() {
 		return id;

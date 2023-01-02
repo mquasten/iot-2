@@ -1,42 +1,71 @@
 package de.mq.iot2.calendar.support;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+
 import java.time.temporal.ChronoUnit;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import de.mq.iot2.support.LocaleContextRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 @Component
 class LocalDateValidatorConverterImpl implements ConstraintValidator<ValidLocalDateModel, LocalDateModel> {
 
-	private final LocaleContextRepository localeContextRepository;
+	static final String MESSAGE_KEY_DAY_LIMIT = "{error.date.limit}";
+	static final String MESSAGE_KEY_TO_BEFORE_FROM = "{error.date.tobeforefrom}";
+	static final String MESSAGE_KEY_DATE_FUTURE = "{error.date.future}";
+	static final String MESSAGE_KEY_MANDATORY = "{error.mandatory}";
+	static final String TO_PROPERTY = "to";
+	static final String FROM_PROPERY = "from";
+	static final String MESSAGE_KEY_INVALID_DATE = "{error.date}";
 	private final long dayLimit;
+	private static final String DATE_DELIMITER_ENGLISH = "/";
 
-	LocalDateValidatorConverterImpl(final LocaleContextRepository localeContextRepository, @Value("${iot2.calendar.dayslimit:30}") final long dayLimit) {
-		this.localeContextRepository = localeContextRepository;
+	LocalDateValidatorConverterImpl(@Value("${iot2.calendar.dayslimit:30}") final long dayLimit) {
 		this.dayLimit = dayLimit;
 	}
 
-	private boolean isValid(final String value) {
+	private ImmutablePair<Boolean, LocalDate> isValid(final String value) {
 
 		if (!StringUtils.hasText(value)) {
-			return true;
+			return new ImmutablePair<Boolean, LocalDate>(true, null);
 		}
-		final var locale = localeContextRepository.localeContext().getLocale();
-		final var formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale);
+		if (value.contains(DATE_DELIMITER_ENGLISH)) {
+			return dateEnglish(value);
+		}
 
+		return dateGerman(value);
+
+	}
+
+	private ImmutablePair<Boolean, LocalDate> dateEnglish(final String value) {
+		final String[] values = value.split(DATE_DELIMITER_ENGLISH);
+		if (values.length != 3) {
+			return new ImmutablePair<>(false, null);
+		}
 		try {
-			LocalDate.parse(value, formatter);
-			return true;
+
+			return new ImmutablePair<>(true, LocalDate.of(Integer.parseInt(values[2]), Integer.parseInt(values[0]), Integer.parseInt(values[1])));
 		} catch (Exception ex) {
-			return false;
+			return new ImmutablePair<>(false, null);
+		}
+
+	}
+
+	private ImmutablePair<Boolean, LocalDate> dateGerman(final String value) {
+		final String[] values = value.split("[.]");
+		if (values.length != 3) {
+			return new ImmutablePair<>(false, null);
+		}
+		try {
+
+			return new ImmutablePair<>(true, LocalDate.of(Integer.parseInt(values[2]), Integer.parseInt(values[1]), Integer.parseInt(values[0])));
+		} catch (Exception ex) {
+			return new ImmutablePair<>(false, null);
 		}
 
 	}
@@ -46,45 +75,42 @@ class LocalDateValidatorConverterImpl implements ConstraintValidator<ValidLocalD
 		context.disableDefaultConstraintViolation();
 		localDateModel.setFromDate(null);
 		localDateModel.setToDate(null);
-		final boolean fromValid = isValid(localDateModel.getFrom());
-		final boolean toValid = isValid(localDateModel.getTo());
+		final ImmutablePair<Boolean, LocalDate> from = isValid(localDateModel.getFrom());
+		final ImmutablePair<Boolean, LocalDate> to = isValid(localDateModel.getTo());
 
-		if (!fromValid) {
-			context.buildConstraintViolationWithTemplate("{error.date}").addPropertyNode("from").addConstraintViolation();
+		if (!from.left) {
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_INVALID_DATE).addPropertyNode(FROM_PROPERY).addConstraintViolation();
 		}
 
-		if (!toValid) {
-			context.buildConstraintViolationWithTemplate("{error.date}").addPropertyNode("to").addConstraintViolation();
+		if (!to.left) {
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_INVALID_DATE).addPropertyNode(TO_PROPERTY).addConstraintViolation();
 		}
 
 		final boolean fromAware = StringUtils.hasText(localDateModel.getFrom());
 		if (!fromAware) {
-			context.buildConstraintViolationWithTemplate("{error.mandatory}").addPropertyNode("from").addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_MANDATORY).addPropertyNode(FROM_PROPERY).addConstraintViolation();
 		}
 
-		if (!fromValid || !toValid || !fromAware) {
+		if (!from.left || !to.left || !fromAware) {
 			return false;
 		}
 
-		final var locale = localeContextRepository.localeContext().getLocale();
-		final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale);
-		final LocalDate from = LocalDate.parse(localDateModel.getFrom(), formatter);
-		final LocalDate to = LocalDate.parse(StringUtils.hasText(localDateModel.getTo()) ? localDateModel.getTo() : localDateModel.getFrom(), formatter);
+		final LocalDate toDate = to.right != null ? to.right : from.right;
 
-		final boolean fromInFuture = from.isAfter(LocalDate.now());
+		final boolean fromInFuture = from.right.isAfter(LocalDate.now());
 		if (!fromInFuture) {
-			context.buildConstraintViolationWithTemplate("{error.date.future}").addPropertyNode("from").addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_DATE_FUTURE).addPropertyNode(FROM_PROPERY).addConstraintViolation();
 		}
 
-		final boolean toAfterOrEqualsFrom = !to.isBefore(from);
+		final boolean toAfterOrEqualsFrom = !toDate.isBefore(from.right);
 		if (!toAfterOrEqualsFrom) {
-			context.buildConstraintViolationWithTemplate("{error.date.tobeforefrom}").addPropertyNode("to").addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_TO_BEFORE_FROM).addPropertyNode(TO_PROPERTY).addConstraintViolation();
 		}
 
-		final Long numberOfDays = from.until(to, ChronoUnit.DAYS);
+		final Long numberOfDays = from.right.until(toDate, ChronoUnit.DAYS);
 		final boolean numberOfDaysInRange = numberOfDays <= dayLimit;
 		if (!numberOfDaysInRange) {
-			context.buildConstraintViolationWithTemplate("{error.date.limit}").addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_DAY_LIMIT).addConstraintViolation();
 
 		}
 
@@ -92,8 +118,8 @@ class LocalDateValidatorConverterImpl implements ConstraintValidator<ValidLocalD
 			return false;
 		}
 
-		localDateModel.setFromDate(from);
-		localDateModel.setToDate(to);
+		localDateModel.setFromDate(from.right);
+		localDateModel.setToDate(toDate);
 		return true;
 	}
 
