@@ -108,7 +108,7 @@ class DayController {
 		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, localDateModel.getDayGroupId());
 	}
 
-	@PostMapping(value = "/editLocalDate", params = "" + "")
+	@PostMapping(value = "/editLocalDate", params = "cancel")
 	String cancelLocalDate(@ModelAttribute(LOCAL_DATE_MODEL_AND_VIEW_NAME) final LocalDateModel localDateModel) {
 		return String.format(CalendarController.REDIRECT_CALENDAR_PATTERN, localDateModel.getDayGroupId());
 	}

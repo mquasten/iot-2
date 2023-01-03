@@ -1,20 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="UTF-8">
+<head th:replace="~{fragments :: header}" />
 
-<title th:text="#{title}"></title>
-<link th:href="@{/css/min.css}" rel="stylesheet" />
-
-</head>
 <body>
-	<div align="center">
-	<ol>
-	<li><a href="/">Home</a></li>
-	<li th:text="#{configuration.headline}"></li>
-	<li><a href="/calendar"  th:text="#{calendar.headline}" ></a></li>
-	</ol>
-	</div>
+	<div th:replace="~{fragments :: navidation('configuration')}" ></div>
 	<div align="center">
 		<h1 th:text="#{configuration.headline}"></h1>
 		<form action="#" th:action="@{/searchConfiguration}" method="post"

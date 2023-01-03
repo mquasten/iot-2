@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="header" >
+<meta charset="UTF-8">
+
+<title th:text="#{title}"></title>
+<link th:href="@{/css/min.css}" rel="stylesheet" />
+
+</head>
+
+<div th:fragment="navidation(page)" align="center">
+		<ol>
+			<li><a href="/">Home</a></li>
+			
+			<li th:if="${page!='configuration'}"><a  href="/configuration" th:text="#{configuration.headline}"></a></li>
+			<li th:if="${page=='configuration'}" th:text="#{configuration.headline}"></li>
+			<li th:if="${page!='calendar'}"><a href="/calendar"  th:text="#{calendar.headline}" ></a></li>
+			<li th:if="${page=='calendar'}" th:text="#{calendar.headline}"></li>
+		</ol>
+</div>
