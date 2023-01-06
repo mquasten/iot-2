@@ -15,7 +15,7 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 public class SpringConfigurationTest {
 
-	private final SpringConfiguration springConfiguration = new SpringConfiguration();
+	private final SpringConfiguration springConfiguration = new SpringConfiguration(true);
 
 	
 	@Test
