@@ -68,7 +68,7 @@ public class SpringConfiguration implements WebMvcConfigurer {
 	@Bean
 	AuthenticationProvider daoAuthenticationProvider(final UserDetailsService userDetailsService) {
 		final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-		authenticationProvider.setPasswordEncoder(new SimpleMD5MessageDigestPasswordEncoder());
+		authenticationProvider.setPasswordEncoder(new SimpleMessageDigestPasswordEncoderImpl());
 		authenticationProvider.setUserDetailsService(userDetailsService);
 		return authenticationProvider;
 	}

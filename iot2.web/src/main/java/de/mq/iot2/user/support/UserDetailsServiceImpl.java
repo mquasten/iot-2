@@ -11,11 +11,8 @@ class UserDetailsServiceImpl implements UserDetailsService{
 
 	@Override
 	public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-
-		
-		
 		return User.withUsername("mquasten")	
-        .password("0b6bff8b997f50c48bfaea170eab7ce7")
+        .password("6d616e667265643031")
         .roles("USER")
         .build();
 	}

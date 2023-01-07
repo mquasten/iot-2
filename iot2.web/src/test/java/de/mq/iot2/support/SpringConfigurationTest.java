@@ -72,7 +72,7 @@ public class SpringConfigurationTest {
 		final var userDetailsService = mock(UserDetailsService.class);
 		final AuthenticationProvider authenticationProvider = springConfiguration.daoAuthenticationProvider(userDetailsService);
 		assertEquals(userDetailsService, requiredField(authenticationProvider, UserDetailsService.class));
-		assertTrue(requiredField(authenticationProvider, PasswordEncoder.class) instanceof SimpleMD5MessageDigestPasswordEncoder);
+		assertTrue(requiredField(authenticationProvider, PasswordEncoder.class) instanceof SimpleMessageDigestPasswordEncoderImpl);
 	}
 
 	private Object requiredField(final Object authenticationProvider, Class<?> clazz) {
