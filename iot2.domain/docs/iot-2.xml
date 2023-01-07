@@ -532,7 +532,7 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="1274" ColName="PASSWORD_HEX" PrevColName="" Pos="2" idDatatype="20" DatatypeParams="(128)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<COLUMN ID="1274" ColName="PASSWORD_HASH" PrevColName="PASSWORD_HEX" Pos="2" idDatatype="20" DatatypeParams="(128)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
@@ -549,7 +549,7 @@
 <INDEXCOLUMN idColumn="1269" LengthParam="0" />
 </INDEXCOLUMNS>
 </INDEX>
-<INDEX ID="1273" IndexName="USERS_NAME" IndexKind="2" FKRefDef_Obj_id="-1">
+<INDEX ID="1280" IndexName="LOGIN_USER_NAME" IndexKind="2" FKRefDef_Obj_id="-1">
 <INDEXCOLUMNS>
 <INDEXCOLUMN idColumn="1271" LengthParam="0" />
 </INDEXCOLUMNS>
