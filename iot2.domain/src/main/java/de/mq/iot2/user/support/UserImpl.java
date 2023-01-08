@@ -36,15 +36,20 @@ class UserImpl implements User {
 
 	}
 
-	UserImpl(final String name, final String rawPassword) {
-		this(name, rawPassword, Optional.empty());
+	UserImpl(final String name, final String rawPassword,final Optional<String> algorithm) {
+		this( IdUtil.id() ,name, rawPassword, algorithm);
+	}
+	
+	UserImpl(final long id, final String name, final String rawPassword,final Optional<String> algorithm) {
+		this( IdUtil.id(id) ,name, rawPassword, algorithm);
 	}
 
-	UserImpl(final String name, final String rawPassword, final Optional<String> algorithm) {
-		id = IdUtil.id();
+	private UserImpl(final String id, final String name, final String rawPassword, final Optional<String> algorithm) {
+		this.id = id;
 		nameRequiredGuard(name);
 		Assert.notNull(algorithm, "Algorithm should not be null.");
 		this.name = name;
+		
 		algorithm.ifPresentOrElse(value -> assingPassword(rawPassword, value), () -> assingPassword(rawPassword));
 	}
 
@@ -56,6 +61,7 @@ class UserImpl implements User {
 	public void assingPassword(final String rawPassword, final String algorithm) {
 		passwordRequiredGuard(rawPassword);
 		Assert.hasText(algorithm, "Algorithm should not be null.");
+		
 		password = new DigestUtils(algorithm).digestAsHex(rawPassword);
 		this.algorithm = algorithm;
 	}

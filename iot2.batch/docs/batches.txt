@@ -1,0 +1,38 @@
+Batches
+
+SetUpDatabase
+Befüllt die Datenbank mit Werten.
+Aufruf: -c setup
+Keine weiteren Argumente
+
+EndOfDay
+Startet den EndOfDayBatch zum Setzen der Variablen für Homematc CCU2 über xmlApi. 
+Aufruf: -c end-of-day <date>
+<date> ist optional, default: now + 1 Tag , Format: dd.MM.yyyy  
+UpdateVariante:
+Startet den EndOfDayBatch für den aktuellen Tag und setzt Timerevents nur dann, wenn sie >= <time> sind.
+Aufruf: -c end-of-day-update <time>
+<time> ist optional, default: now, Format: HH:mm
+
+CleanUp
+Löscht LocalDateDays, die älter als die konfigurierte Anzahl von Tagen sind (Parameter: DaysBack, Configuration: CleanUp);
+Aufruf: -c cleanup
+Keine weiteren Argumente. 
+
+DayGroupBatch
+Fügt LocalDateDay zu einer DayGroup hinzu oder löscht sie (nur solche, die nicht readonly sind). Die daten werden nur dann hinzugefügt, wenn sie nicht bereits in einer anderen DayGroup verwendet werden.
+Aufruf: -c add-local-date dayGroup fromDate <todate>
+dayGroup: Urlaub oder Sonderzeiten, mandatory
+fromDate: Startdatum, mandatory, Format:dd.MM.yyyy
+toDate: EndeDatum, optional, Format:dd.MM.yyyy, default: fromdate
+Aufruf: -c delete-local-date dayGroup fromDate <todate>
+Argumente wie add-local-date
+
+UserBatch
+Legt user an oder aktualisiert deren Password. Löscht user.
+Aufruf: -c update-user name password <algorithm>
+name: Benutzername/login mandatory
+password: unverschlüsseltes Password mandatory
+<algorithm> Algorithmus für das Messagedigest, Format: Messagedigest(JDK 19): SHA3-512, SHA-1, SHA-384, SHA3-384, SHA-224, SHA-512/256, SHA-256, MD2, SHA-512/224, SHA3-256, SHA-512, SHA3-224, MD5, optional, default Passwort wird unverschlüsselt als HexString gespeichert  
+Aufruf: -c delete-user name 
+name: Benutzername/login mandatory

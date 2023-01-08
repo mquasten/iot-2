@@ -11,5 +11,7 @@ public interface UserRepository {
 
 	User save(final User dayGroup);
 	Optional<User> findByName(final String name);
+	
+	void delete(final User user);
 
 }
