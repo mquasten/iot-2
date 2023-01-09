@@ -36,6 +36,7 @@ class UserServiceImpl implements UserService {
 		
 		userRepository.findByName(name).ifPresentOrElse(user -> { 
 			algorithm.ifPresentOrElse(value -> user.assingPassword(rawPassword, value), () -> user.assingPassword(rawPassword));
+			userRepository.save(user);
 		}, () -> userRepository.save(new UserImpl(name, rawPassword, algorithm)));
 	}
 	@Override

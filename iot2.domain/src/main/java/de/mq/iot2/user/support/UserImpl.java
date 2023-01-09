@@ -17,7 +17,7 @@ import jakarta.persistence.Table;
 @Entity(name = "User")
 @Table(name = "LOGIN_USER")
 class UserImpl implements User {
-	private final static String PASSWORD_DELIMIER = "-";
+	final static String PASSWORD_DELIMIER = "-";
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
