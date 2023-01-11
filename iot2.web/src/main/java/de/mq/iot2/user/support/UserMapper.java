@@ -9,11 +9,13 @@ import de.mq.iot2.user.User;
 @Component
 class UserMapper implements   ModelMapper<User, UserDetails> {
 
+	static final String USER_ROLE = "USER";
+
 	@Override
-	public UserDetails toWeb(User domain) {
+	public final UserDetails toWeb(final User domain) {
 		return org.springframework.security.core.userdetails.User.withUsername(domain.name())	
         .password(domain.encodedPasswordAndAlgorithm())
-        .roles("USER")
+        .roles(USER_ROLE)
         .build();
 	}
 
