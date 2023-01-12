@@ -13,6 +13,8 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.LocaleResolver;
@@ -83,6 +85,11 @@ public class SpringConfiguration implements WebMvcConfigurer {
 			http.authorizeHttpRequests().anyRequest().permitAll();
 		}
 		return http.build();
+	}
+	@Bean()
+	@Scope("request")
+	SecurityContext securityContext() {
+		return SecurityContextHolder.getContext();
 	}
 
 }

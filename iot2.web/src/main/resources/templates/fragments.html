@@ -17,5 +17,7 @@
 			<li th:if="${page=='configuration'}" th:text="#{configuration.headline}"></li>
 			<li th:if="${page!='calendar'}"><a href="/calendar"  th:text="#{calendar.headline}" ></a></li>
 			<li th:if="${page=='calendar'}" th:text="#{calendar.headline}"></li>
+			<li th:if="${page!='user'}"><a href="/user"  th:text="#{user.headline}" ></a></li>
+			<li th:if="${page=='user'}" th:text="#{user.headline}"></li>
 		</ol>
 </div>

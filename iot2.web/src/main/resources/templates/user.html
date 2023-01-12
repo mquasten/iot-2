@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: header}" />
+
+<body>
+	<div th:replace="~{fragments :: navidation('user')}" ></div>
+	<div align="center">
+		<h1 th:text="#{user.headline}"></h1>
+	</div>
+</body>
+</html>	
