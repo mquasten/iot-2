@@ -1,6 +1,8 @@
 package de.mq.iot2.user.support;
 
-import java.util.Locale;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 
 public class UserModel {
 	
@@ -10,8 +12,10 @@ public class UserModel {
 
 	private String algorithm;
 	
-	private Locale locale;
+	@NotNull
+	private String locale;
 	
+	@Size(min = 5, max=15)
 	private String password;
 	
 	public String getName() {
@@ -30,11 +34,11 @@ public class UserModel {
 		this.algorithm = algorithm;
 	}
 
-	public Locale getLocale() {
+	public String getLocale() {
 		return locale;
 	}
 
-	public void setLocale(Locale locale) {
+	public void setLocale(String locale) {
 		this.locale = locale;
 	}
 
