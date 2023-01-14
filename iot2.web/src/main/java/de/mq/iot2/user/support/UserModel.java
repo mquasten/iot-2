@@ -18,6 +18,30 @@ public class UserModel {
 	@Size(min = 5, max=15)
 	private String password;
 	
+	@Size(min = 5, max=15)
+	private String confirmedPassword;
+	
+	private boolean passwordChanged;
+	
+	private boolean loginRequired;
+	
+	
+	public void setLoginRequired(boolean loginRequired) {
+		this.loginRequired = loginRequired;
+	}
+
+	public boolean isLoginRequired() {
+		return loginRequired;
+	}
+
+	public String getConfirmedPassword() {
+		return confirmedPassword;
+	}
+
+	public void setConfirmedPassword(String confirmedPassword) {
+		this.confirmedPassword = confirmedPassword;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -56,6 +80,14 @@ public class UserModel {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public boolean isPasswordChanged() {
+		return passwordChanged;
+	}
+
+	public void setPasswordChanged(boolean passwordChanged) {
+		this.passwordChanged = passwordChanged;
 	}
 
 }

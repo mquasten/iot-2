@@ -3,43 +3,89 @@
 <head th:replace="~{fragments :: header}" />
 
 <body>
-	<div th:replace="~{fragments :: navidation('user')}" ></div>
+	<div th:replace="~{fragments :: navidation('user')}"></div>
 	<div align="center">
 		<h1 th:text="#{user.headline}"></h1>
-		<form th:action="@{/changePassword}" method="post" th:object="${user}" >
-		<input type="hidden" th:field="*{name}" /> 
-		<input type="hidden" name="id" th:field="*{id}" />
-		<input type="hidden" name="locale" th:field="*{locale}" />
-		<table>
-		<tr> <td> <label th:text="#{user.name}"> </label> </td>
-		<td><input type="text" th:field="*{name}"  readonly="readonly"  disabled="disabled"/></td>
-		</tr>
-		<tr> <td> <label th:text="#{user.algorithm}"> </label> </td>
-		
-		<td>
-		<select  th:field="*{algorithm}">
-							<option value="" th:text="#{user.algorithm.choose}"></option>
-							<option th:each="algorithm : ${algorithms}" th:value="${algorithm}"
-								th:utext="${algorithm}" ></option>
-		
-		</select>
-		</td>
-		<td th:if="${#fields.hasErrors('algorithm')}" th:errors="*{algorithm}"
-						th:errorclass="error"></td>
-		</tr>
-		<tr> <td> <label th:text="#{user.password}"> </label> </td>
-		<td><input type="password" th:field="*{password}" /> </td>
-		<td th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
-						th:errorclass="error"></td>
-		</tr>
-		<tr>
-				<th colspan="3">
-						<button type="submit" name="save" th:text="#{user.save}"></button>
-						
-					</th>
-				</tr>
-		</table>
+		<div th:if="${user.loginRequired}">
+		<form th:action="@{/userLogout}" method="post" th:object="${user}"> 
+		<button type="submit" name="save" th:text="#{user.logout}"></button>
 		</form>
+		</div>
+		<h2 th:text="#{user.language.headline}"></h2>
+		<form th:action="@{/changeLanguage}" method="post" th:object="${user}">
+			<table>
+				<tr>
+					<td><select th:field="*{locale}">
+							<option th:each="locale : ${locales}" th:value="${locale.key}"
+								th:utext="${locale.value}"></option>
+					</select></td>
+					<td colspan="2">
+						<button type="submit" name="save" th:text="#{user.save}"></button>
+
+					</td>
+				</tr>
+			</table>
+		</form>
+		<div th:if="${user.loginRequired}">
+			<h2 th:text="#{user.userdata.headline}"></h2>
+			<form th:action="@{/changePassword}" method="post"
+				th:object="${user}">
+				<input type="hidden" th:field="*{name}" /> <input type="hidden"
+					name="id" th:field="*{id}" /> <input type="hidden" name="locale"
+					th:field="*{locale}" /> <input type="hidden" name="loginRequired"
+					th:field="*{loginRequired}" />
+				<table>
+					<tr>
+						<td><label th:text="#{user.name}"> </label></td>
+						<td><input type="text" th:field="*{name}" readonly="readonly"
+							disabled="disabled" /></td>
+					</tr>
+					<tr>
+						<td><label th:text="#{user.algorithm}"> </label></td>
+
+						<td><select th:field="*{algorithm}">
+								<option value="" th:text="#{user.algorithm.choose}"></option>
+								<option th:each="algorithm : ${algorithms}"
+									th:value="${algorithm}" th:utext="${algorithm}"></option>
+
+						</select></td>
+						<td th:if="${#fields.hasErrors('algorithm')}"
+							th:errors="*{algorithm}" th:errorclass="error"></td>
+					</tr>
+					<tr>
+						<td><label th:text="#{user.password}"> </label></td>
+						<td><input type="password" th:field="*{password}" /></td>
+						<td th:if="${#fields.hasErrors('password')}"
+							th:errors="*{password}" th:errorclass="error"></td>
+					</tr>
+					<tr>
+						<td><label th:text="#{user.confirmedpassword}"> </label></td>
+						<td><input type="password" th:field="*{confirmedPassword}" />
+						</td>
+						<td th:if="${#fields.hasErrors('confirmedPassword')}"
+							th:errors="*{confirmedPassword}" th:errorclass="error"></td>
+					</tr>
+					<tr>
+						<th colspan="3">
+							<div th:if="${#fields.hasErrors('global')}">
+								<p th:each="err : ${#fields.errors('global')}" th:text="${err}"
+									class="error" />
+							</div>
+							<div th:if="${user.passwordChanged}">
+								<p th:text="#{user.password.changed}" class="info" />
+							</div>
+
+						</th>
+					</tr>
+					<tr>
+						<th colspan="3">
+							<button type="submit" name="save" th:text="#{user.save}"></button>
+
+						</th>
+					</tr>
+				</table>
+			</form>
+		</div>
 	</div>
 </body>
-</html>	
+</html>

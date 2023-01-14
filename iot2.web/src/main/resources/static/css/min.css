@@ -1,6 +1,9 @@
 .error {
 	color: red;
 }
+.info {
+	color: green;
+}
 li {
     display: inline;
     list-style-type: none;
