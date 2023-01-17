@@ -1,6 +1,9 @@
 package de.mq.iot2.user.support;
 
+import java.security.Security;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +14,7 @@ import de.mq.iot2.user.UserService;
 
 @Service
 class UserServiceImpl implements UserService {
+	private static final String MESSAGE_DIGEST = "MessageDigest";
 	private final UserRepository userRepository;
 	
 	UserServiceImpl(final UserRepository userRepository){
@@ -50,6 +54,11 @@ class UserServiceImpl implements UserService {
 		
 		userRepository.delete(user.get());
 		return true;
+	}
+	
+	@Override
+	public Collection<String> algorithms() {
+		return Security.getAlgorithms(MESSAGE_DIGEST).stream().sorted().collect(Collectors.toList());
 	}
 
 }

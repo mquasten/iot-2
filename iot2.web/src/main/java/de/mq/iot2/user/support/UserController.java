@@ -2,12 +2,10 @@ package de.mq.iot2.user.support;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
-import java.security.Security;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Controller;
@@ -30,8 +28,11 @@ import jakarta.validation.Valid;
 
 @Controller
 class UserController{
+	static final String USER_NOT_FOUND_MESSAGE = "User %s not found.";
+	static final String ALGORITHMS_MODEL = "algorithms";
+	static final String LOCALES_MODEL = "locales";
 	private static final String REDIRECT_ROOT = "redirect:/";
-	private static final String  USER_MODEL_AND_VIEW_NAME ="user";
+	static final String  USER_MODEL_AND_VIEW_NAME ="user";
 	private static final String  USER_MODEL_AND_VIEW_NAME_REDIRECT_CHANGE ="redirect:"+USER_MODEL_AND_VIEW_NAME+"?changed=true";
 	private static final String  USER_MODEL_AND_VIEW_NAME_REDIRECT_LOCALE_PATTERN ="redirect:"+USER_MODEL_AND_VIEW_NAME+"?locale=%s";
 	private final SecurityContectRepository securityContectRepository;
@@ -48,17 +49,17 @@ class UserController{
 	String login(final Model model , final Locale locale, @RequestParam(name = "changed", required = false ) final boolean changed){
 		final String name = securityContectRepository.securityContext().getAuthentication().getName();
 		Assert.hasText(name, "Name is required.");
-		final UserModel userModel= userMapper.toWeb(userService.user(name).orElseThrow(() -> new EntityNotFoundException(String.format("User %s not found.", name))));
+		final UserModel userModel= userMapper.toWeb(userService.user(name).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, name))));
 		userModel.setLocale(locale.getLanguage());
 		userModel.setPasswordChanged(changed);
 		model.addAttribute(USER_MODEL_AND_VIEW_NAME, userModel);
 		
-		model.addAttribute("locales", List.of(new SimpleImmutableEntry<>(Locale.GERMAN.getLanguage(), Locale.GERMAN.getDisplayLanguage(locale)), new SimpleImmutableEntry<>(Locale.ENGLISH.getLanguage(), Locale.ENGLISH.getDisplayLanguage(locale))));
+		model.addAttribute(LOCALES_MODEL, List.of(new SimpleImmutableEntry<>(Locale.GERMAN.getLanguage(), Locale.GERMAN.getDisplayLanguage(locale)), new SimpleImmutableEntry<>(Locale.ENGLISH.getLanguage(), Locale.ENGLISH.getDisplayLanguage(locale))));
 		addMessageDigests(model);
 		return USER_MODEL_AND_VIEW_NAME;
 	}
 	private void addMessageDigests(final Model model) {
-		model.addAttribute("algorithms", Security.getAlgorithms("MessageDigest").stream().sorted().collect(Collectors.toList()));
+		model.addAttribute(ALGORITHMS_MODEL, userService.algorithms());
 	}
 	
 	@PostMapping(value = "/changePassword")

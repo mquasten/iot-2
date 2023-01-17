@@ -11,6 +11,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
 import java.util.Optional;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -102,5 +103,13 @@ class UserServiceImplTest {
 		assertFalse(userService.delete(NAME));
 		
 		verify(userRepository, never()).delete(user);
+	}
+	
+	@Test
+	void algorithms() {
+		final Collection<String> results = userService.algorithms();
+		
+		assertEquals(13, results.size());
+		assertTrue(results.contains("MD5"));
 	}
 }
