@@ -31,14 +31,14 @@ class UserController{
 	static final String USER_NOT_FOUND_MESSAGE = "User %s not found.";
 	static final String ALGORITHMS_MODEL = "algorithms";
 	static final String LOCALES_MODEL = "locales";
-	private static final String REDIRECT_ROOT = "redirect:/";
+	static final String REDIRECT_ROOT = "redirect:/";
 	static final String  USER_MODEL_AND_VIEW_NAME ="user";
-	private static final String  USER_MODEL_AND_VIEW_NAME_REDIRECT_CHANGE ="redirect:"+USER_MODEL_AND_VIEW_NAME+"?changed=true";
-	private static final String  USER_MODEL_AND_VIEW_NAME_REDIRECT_LOCALE_PATTERN ="redirect:"+USER_MODEL_AND_VIEW_NAME+"?locale=%s";
+	static final String  USER_MODEL_AND_VIEW_NAME_REDIRECT_CHANGE ="redirect:"+USER_MODEL_AND_VIEW_NAME+"?changed=true";
+	static final String  USER_MODEL_AND_VIEW_NAME_REDIRECT_LOCALE_PATTERN ="redirect:"+USER_MODEL_AND_VIEW_NAME+"?locale=%s";
 	private final SecurityContectRepository securityContectRepository;
 	private final UserService userService;
 	private final  ModelMapper<User, UserModel> userMapper;
-	private final static String MESSAGE_KEY_PASSWORDS_DIFFERENT="error.passwords.different";
+	final static String MESSAGE_KEY_PASSWORDS_DIFFERENT="error.passwords.different";
 	
 	UserController(final UserService userService, final SecurityContectRepository securityContectRepository, final  ModelMapper<User, UserModel> userMapper) {
 		this.userService=userService;
