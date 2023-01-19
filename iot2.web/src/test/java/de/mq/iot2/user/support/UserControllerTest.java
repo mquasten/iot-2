@@ -54,7 +54,7 @@ class UserControllerTest {
 	private final Authentication authentication = mock(Authentication.class);
 	private final Model model = new ExtendedModelMap();
 	private final Collection<String> algorithms = List.of(ALGORITHM);
-	private final UserController userController = new UserController(userService, securityContectRepository, userMapper);
+	private final UserController userController = new UserController(userService, securityContectRepository, userMapper, true);
 	private final UserModel userModel = new UserModel();
 	private final BindingResult bindingResult = mock(BindingResult.class);
 

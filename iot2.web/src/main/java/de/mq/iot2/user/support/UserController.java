@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
@@ -39,17 +40,16 @@ class UserController{
 	private final UserService userService;
 	private final  ModelMapper<User, UserModel> userMapper;
 	final static String MESSAGE_KEY_PASSWORDS_DIFFERENT="error.passwords.different";
-	
-	UserController(final UserService userService, final SecurityContectRepository securityContectRepository, final  ModelMapper<User, UserModel> userMapper) {
+	private final boolean loginRequired;
+	UserController(final UserService userService, final SecurityContectRepository securityContectRepository, final  ModelMapper<User, UserModel> userMapper, @Value("${iot2.login.required:true}") final boolean loginRequired) {
 		this.userService=userService;
 		this.securityContectRepository=securityContectRepository;
 		this.userMapper=userMapper;
+		this.loginRequired=loginRequired;
 	}
 	@GetMapping(value = "/user")
 	String login(final Model model , final Locale locale, @RequestParam(name = "changed", required = false ) final boolean changed){
-		final String name = securityContectRepository.securityContext().getAuthentication().getName();
-		Assert.hasText(name, "Name is required.");
-		final UserModel userModel= userMapper.toWeb(userService.user(name).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, name))));
+		final UserModel userModel=  loginRequired?userMapper.toWeb(userService.user(userName()).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, userName())))): new UserModel();
 		userModel.setLocale(locale.getLanguage());
 		userModel.setPasswordChanged(changed);
 		model.addAttribute(USER_MODEL_AND_VIEW_NAME, userModel);
@@ -58,6 +58,12 @@ class UserController{
 		addMessageDigests(model);
 		return USER_MODEL_AND_VIEW_NAME;
 	}
+	private String userName() {
+		final String name = securityContectRepository.securityContext().getAuthentication().getName();
+		Assert.hasText(name, "Name is required.");
+		return name;
+	}
+	
 	private void addMessageDigests(final Model model) {
 		model.addAttribute(ALGORITHMS_MODEL, userService.algorithms());
 	}
