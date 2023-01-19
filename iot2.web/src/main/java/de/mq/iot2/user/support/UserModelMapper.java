@@ -13,6 +13,7 @@ class UserModelMapper implements   ModelMapper<User, UserModel> {
 
 	private final boolean loginRequired;
 	
+	
 	UserModelMapper(@Value("${iot2.login.required:true}") final boolean loginRequired){
 		 this.loginRequired=loginRequired;
 	 }
