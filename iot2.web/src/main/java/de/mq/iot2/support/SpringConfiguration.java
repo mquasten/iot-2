@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -32,8 +33,10 @@ public class SpringConfiguration implements WebMvcConfigurer {
 	static final String I18N_MESSAGE_PATH = "i18n/messages";
 
 	private final boolean loginRequired;
+	private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
-	SpringConfiguration(@Value("${iot2.login.required:true}") final boolean loginRequired) {
+	SpringConfiguration(final AuthenticationSuccessHandler authenticationSuccessHandler, @Value("${iot2.login.required:true}") final boolean loginRequired) {
+		this.authenticationSuccessHandler = authenticationSuccessHandler;
 		this.loginRequired = loginRequired;
 	}
 
@@ -57,6 +60,7 @@ public class SpringConfiguration implements WebMvcConfigurer {
 	@Bean
 	LocaleResolver localeResolver() {
 		final var localeResolver = new SessionLocaleResolver();
+
 		localeResolver.setDefaultLocale(Locale.GERMAN);
 		return localeResolver;
 	}
@@ -77,15 +81,15 @@ public class SpringConfiguration implements WebMvcConfigurer {
 
 	@Bean
 	SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
-
 		if (loginRequired) {
 			http.authorizeHttpRequests().requestMatchers("/css/**", "/error", "/", "/index.html").permitAll().anyRequest().authenticated().and().formLogin().loginPage(LOGIN_PAGE)
-					.permitAll().and().logout().permitAll();
+					.successHandler(authenticationSuccessHandler).permitAll().and().logout().permitAll();
 		} else {
 			http.authorizeHttpRequests().anyRequest().permitAll();
 		}
 		return http.build();
 	}
+
 	@Bean()
 	@Scope("request")
 	SecurityContext securityContext() {
