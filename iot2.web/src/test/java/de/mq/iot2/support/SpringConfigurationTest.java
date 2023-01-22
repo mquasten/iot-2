@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -24,6 +25,8 @@ import org.springframework.security.config.annotation.web.configurers.AuthorizeH
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer.AuthorizationManagerRequestMatcherRegistry;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -33,6 +36,12 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 public class SpringConfigurationTest {
 
 	private final SpringConfiguration springConfiguration = new SpringConfiguration(true);
+	private final static SecurityContext SECURITY_CONTEXT = mock(SecurityContext.class);
+
+	@BeforeAll
+	static void setup() {
+		SecurityContextHolder.setContext(SECURITY_CONTEXT);
+	}
 
 	@Test
 	void messageSource() {
@@ -120,6 +129,11 @@ public class SpringConfigurationTest {
 
 		verify(authorizationManagerRequestMatcherRegistry).anyRequest();
 		verify(authorizedUrl).permitAll();
+	}
+
+	@Test
+	void securityContext() {
+		assertEquals(SECURITY_CONTEXT, springConfiguration.securityContext());
 	}
 
 }

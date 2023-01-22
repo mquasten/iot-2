@@ -6,10 +6,14 @@ import static de.mq.iot2.user.support.UserController.USER_MODEL_AND_VIEW_NAME;
 import static de.mq.iot2.user.support.UserController.USER_MODEL_AND_VIEW_NAME_REDIRECT_CHANGE;
 import static de.mq.iot2.user.support.UserController.USER_NOT_FOUND_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -74,6 +78,36 @@ class UserControllerTest {
 		assertEquals(userModel, model.getAttribute(USER_MODEL_AND_VIEW_NAME));
 		assertEquals(locale.getLanguage(), userModel.getLocale());
 		assertTrue(userModel.isPasswordChanged());
+		assertTrue(userModel.isLoginRequired());
+
+		@SuppressWarnings("unchecked")
+		final Map<?, ?> locales = ((Collection<Entry<?, ?>>) model.getAttribute(LOCALES_MODEL)).stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+		assertEquals(2, locales.size());
+		assertTrue(locales.containsKey(Locale.GERMAN.getLanguage()));
+		assertTrue(locales.containsKey(Locale.ENGLISH.getLanguage()));
+		assertEquals(Locale.GERMAN.getDisplayLanguage(locale), locales.get(Locale.GERMAN.getLanguage()));
+		assertEquals(Locale.ENGLISH.getDisplayLanguage(locale), locales.get(Locale.ENGLISH.getLanguage()));
+		assertEquals(algorithms, model.getAttribute(UserController.ALGORITHMS_MODEL));
+		
+	}
+	
+	
+	@ParameterizedTest
+	@MethodSource("locales")
+	void loginLoginNotRequired(final Locale locale) {
+		UserController userController = new UserController(userService, securityContectRepository, userMapper, false);
+		when(authentication.getName()).thenReturn(NAME);
+		when(securityContectRepository.securityContext()).thenReturn(securityContext);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		when(userService.algorithms()).thenReturn(algorithms);	
+
+		assertEquals(USER_MODEL_AND_VIEW_NAME, userController.login(model, locale, true));
+
+		final UserModel userModel = (UserModel) model.getAttribute(USER_MODEL_AND_VIEW_NAME);
+		assertEquals(locale.getLanguage(), userModel.getLocale());
+		assertFalse(userModel.isLoginRequired());
+		assertTrue(userModel.isPasswordChanged());
+		assertFalse(userModel.isLoginRequired());
 
 		@SuppressWarnings("unchecked")
 		final Map<?, ?> locales = ((Collection<Entry<?, ?>>) model.getAttribute(LOCALES_MODEL)).stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
@@ -83,7 +117,10 @@ class UserControllerTest {
 		assertEquals(Locale.GERMAN.getDisplayLanguage(locale), locales.get(Locale.GERMAN.getLanguage()));
 		assertEquals(Locale.ENGLISH.getDisplayLanguage(locale), locales.get(Locale.ENGLISH.getLanguage()));
 
-		assertEquals(algorithms, model.getAttribute(UserController.ALGORITHMS_MODEL));
+		assertNull(model.getAttribute(UserController.ALGORITHMS_MODEL));
+		
+		verify(userService, never()).user(any());
+		verify(userMapper, never()).toWeb(Mockito.any(User.class));
 	}
 
 	private static Collection<Locale> locales() {

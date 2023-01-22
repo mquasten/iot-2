@@ -52,6 +52,7 @@ class UserController{
 		final UserModel userModel=  loginRequired?userMapper.toWeb(userService.user(userName()).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, userName())))): new UserModel();
 		userModel.setLocale(locale.getLanguage());
 		userModel.setPasswordChanged(changed);
+		userModel.setLoginRequired(loginRequired);
 		model.addAttribute(USER_MODEL_AND_VIEW_NAME, userModel);
 		
 		model.addAttribute(LOCALES_MODEL, List.of(new SimpleImmutableEntry<>(Locale.GERMAN.getLanguage(), Locale.GERMAN.getDisplayLanguage(locale)), new SimpleImmutableEntry<>(Locale.ENGLISH.getLanguage(), Locale.ENGLISH.getDisplayLanguage(locale))));
@@ -65,6 +66,9 @@ class UserController{
 	}
 	
 	private void addMessageDigests(final Model model) {
+		if(!loginRequired) {
+			return;
+		}
 		model.addAttribute(ALGORITHMS_MODEL, userService.algorithms());
 	}
 	
