@@ -1,6 +1,8 @@
 package de.mq.iot2.user.support;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.commons.codec.binary.Hex;
@@ -17,6 +19,8 @@ import jakarta.persistence.Table;
 @Entity(name = "User")
 @Table(name = "LOGIN_USER")
 class UserImpl implements User {
+	static final String LANGUAGE_INVALID_MESSAGE = "Language %s is invalid.";
+
 	final static String PASSWORD_DELIMIER = "-";
 
 	@Id
@@ -30,6 +34,9 @@ class UserImpl implements User {
 
 	@Column(name = "ALGORITHM", length = 15)
 	private String algorithm;
+	
+	@Column(name = "LANGUAGE", length = 2)
+	private String language;
 
 	@SuppressWarnings("unused")
 	private UserImpl() {
@@ -98,6 +105,26 @@ class UserImpl implements User {
 	@Override
 	public final Optional<String> algorithm() {
 		return StringUtils.hasText(algorithm) ? Optional.of(algorithm) : Optional.empty();
+	}
+	
+	@Override
+	public final Optional<Locale> language() {
+		if( !StringUtils.hasText(language)) {
+			return Optional.empty();
+		}
+		validLanguageGuard(language);
+		return  Optional.of(Locale.of(language));
+	}
+
+	private void validLanguageGuard(final String language) {
+		Assert.isTrue(Arrays.asList(Locale.getISOLanguages()).contains(language), String.format(LANGUAGE_INVALID_MESSAGE, language));
+	}
+	
+	@Override
+	public final void assignLanguage(final Locale locale) {
+		Assert.notNull(locale, "Locale is required");
+		validLanguageGuard(locale.getLanguage());
+		language=locale.getLanguage();
 	}
 	
 	@Override

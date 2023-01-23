@@ -1,16 +1,19 @@
 package de.mq.iot2.user;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 
 public interface UserService {
 
-	Optional<User> user(String name);
+	Optional<User> user(final String name);
 
-	void update(String name, String rawPassword, Optional<String> algorithm);
+	void update(final String name, final String rawPassword, final Optional<String> algorithm);
 
-	boolean delete(String name);
+	boolean delete(final String name);
 
 	Collection<String> algorithms();
+
+	void update(final String name, final Locale language);
 
 }

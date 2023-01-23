@@ -92,6 +92,7 @@ class UserController{
 	
 	@PostMapping(value = "/changeLanguage")
 	String changeLanguage(@ModelAttribute(USER_MODEL_AND_VIEW_NAME) final UserModel user) {
+		userService.update(user.getName(), Locale.of(user.getLocale()));
 		return String.format(USER_MODEL_AND_VIEW_NAME_REDIRECT_LOCALE_PATTERN, user.getLocale());
 	}
 	

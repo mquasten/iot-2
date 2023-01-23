@@ -11,6 +11,7 @@
 		</form>
 		<h2 th:text="#{user.language.headline}"></h2>
 		<form th:action="@{/changeLanguage}" method="post" th:object="${user}">
+		<input type="hidden" th:field="*{name}" /> 
 			<table>
 				<tr>
 					<td><select th:field="*{locale}">
@@ -28,10 +29,9 @@
 			<h2 th:text="#{user.userdata.headline}"></h2>
 			<form th:action="@{/changePassword}" method="post"
 				th:object="${user}">
-				<input type="hidden" th:field="*{name}" /> <input type="hidden"
-					name="id" th:field="*{id}" /> <input type="hidden" name="locale"
-					th:field="*{locale}" /> <input type="hidden" name="loginRequired"
-					th:field="*{loginRequired}" />
+				<input type="hidden" th:field="*{name}" /> 
+				<input type="hidden" name="id" th:field="*{id}" /> 
+				<input type="hidden" name="locale" th:field="*{locale}" /> <input type="hidden" name="loginRequired" th:field="*{loginRequired}" />
 				<table>
 					<tr>
 						<td><label th:text="#{user.name}"> </label></td>

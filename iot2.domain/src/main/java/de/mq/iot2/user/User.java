@@ -1,5 +1,6 @@
 package de.mq.iot2.user;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public interface User {
@@ -15,5 +16,9 @@ public interface User {
 	String encodedPassword();
 
 	Optional<String> algorithm();
+
+	Optional<Locale> language();
+
+	void assignLanguage(final Locale language);
 
 }
