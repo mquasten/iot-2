@@ -14,15 +14,6 @@ class UserModelTest {
 	private final UserModel userModel = new UserModel();
 
 	@Test
-	void id() {
-		assertNull(userModel.getId());
-		final var id = random();
-		userModel.setId(id);
-
-		assertEquals(id, userModel.getId());
-	}
-
-	@Test
 	void name() {
 		assertNull(userModel.getName());
 		final var name = random();

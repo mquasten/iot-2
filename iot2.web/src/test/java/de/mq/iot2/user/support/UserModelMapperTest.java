@@ -9,8 +9,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.util.DigestUtils;
-
-import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.ModelMapper;
 import de.mq.iot2.user.User;
 
@@ -24,7 +22,6 @@ class UserModelMapperTest {
 
 		final UserModel userModel = mapper.toWeb(user);
 
-		assertEquals(IdUtil.getId(user), userModel.getId());
 		assertEquals(user.name(), userModel.getName());
 		assertFalse(userModel.isLoginRequired());
 		assertEquals(DigestUtils.md5DigestAsHex(password.getBytes()), userModel.getPassword());

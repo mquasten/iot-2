@@ -30,7 +30,6 @@
 			<form th:action="@{/changePassword}" method="post"
 				th:object="${user}">
 				<input type="hidden" th:field="*{name}" /> 
-				<input type="hidden" name="id" th:field="*{id}" /> 
 				<input type="hidden" name="locale" th:field="*{locale}" /> <input type="hidden" name="loginRequired" th:field="*{loginRequired}" />
 				<table>
 					<tr>

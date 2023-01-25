@@ -11,7 +11,7 @@
 
 <div th:fragment="navidation(page)" align="center">
 		<ol>
-			<li><a href="/">Home</a></li>
+			<!-- >li><a href="/">Home</a></li-->
 			
 			<li th:if="${page!='configuration'}"><a  href="/configuration" th:text="#{configuration.headline}"></a></li>
 			<li th:if="${page=='configuration'}" th:text="#{configuration.headline}"></li>

@@ -195,9 +195,11 @@ class UserControllerTest {
 	@ParameterizedTest
 	@MethodSource("locales")
 	void changeLanguage(Locale locale) {
+		userModel.setName(NAME);
 		userModel.setLocale(locale.getLanguage());
 		
 		assertEquals(String.format(UserController.USER_MODEL_AND_VIEW_NAME_REDIRECT_LOCALE_PATTERN,  locale.getLanguage()), userController.changeLanguage(userModel));
+	    verify(userService).update(NAME, locale);
 	}
 	
 	@Test

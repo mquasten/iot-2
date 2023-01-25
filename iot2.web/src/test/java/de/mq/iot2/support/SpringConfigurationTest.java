@@ -2,6 +2,7 @@ package de.mq.iot2.support;
 
 import static de.mq.iot2.support.SpringConfiguration.LOGIN_PAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -68,8 +69,8 @@ public class SpringConfigurationTest {
 
 	@Test
 	void localeResolver() {
-		final var localeResolver = (springConfiguration.localeResolver());
-		assertEquals(Locale.GERMAN, ReflectionTestUtils.getField(localeResolver, "defaultLocale"));
+		final var localeResolver = springConfiguration.localeResolver();
+		assertNull(ReflectionTestUtils.getField(localeResolver, "defaultLocale"));
 	}
 
 	@Test
