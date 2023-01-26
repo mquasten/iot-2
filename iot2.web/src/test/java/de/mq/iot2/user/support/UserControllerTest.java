@@ -80,6 +80,12 @@ class UserControllerTest {
 		assertTrue(userModel.isPasswordChanged());
 		assertTrue(userModel.isLoginRequired());
 
+		assertLocales(locale);
+		assertEquals(algorithms, model.getAttribute(UserController.ALGORITHMS_MODEL));
+
+	}
+
+	private void assertLocales(final Locale locale) {
 		@SuppressWarnings("unchecked")
 		final Map<?, ?> locales = ((Collection<Entry<?, ?>>) model.getAttribute(LOCALES_MODEL)).stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 		assertEquals(2, locales.size());
@@ -87,11 +93,8 @@ class UserControllerTest {
 		assertTrue(locales.containsKey(Locale.ENGLISH.getLanguage()));
 		assertEquals(Locale.GERMAN.getDisplayLanguage(locale), locales.get(Locale.GERMAN.getLanguage()));
 		assertEquals(Locale.ENGLISH.getDisplayLanguage(locale), locales.get(Locale.ENGLISH.getLanguage()));
-		assertEquals(algorithms, model.getAttribute(UserController.ALGORITHMS_MODEL));
-		
 	}
-	
-	
+
 	@ParameterizedTest
 	@MethodSource("locales")
 	void loginLoginNotRequired(final Locale locale) {
@@ -99,7 +102,7 @@ class UserControllerTest {
 		when(authentication.getName()).thenReturn(NAME);
 		when(securityContectRepository.securityContext()).thenReturn(securityContext);
 		when(securityContext.getAuthentication()).thenReturn(authentication);
-		when(userService.algorithms()).thenReturn(algorithms);	
+		when(userService.algorithms()).thenReturn(algorithms);
 
 		assertEquals(USER_MODEL_AND_VIEW_NAME, userController.login(model, locale, true));
 
@@ -109,16 +112,10 @@ class UserControllerTest {
 		assertTrue(userModel.isPasswordChanged());
 		assertFalse(userModel.isLoginRequired());
 
-		@SuppressWarnings("unchecked")
-		final Map<?, ?> locales = ((Collection<Entry<?, ?>>) model.getAttribute(LOCALES_MODEL)).stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-		assertEquals(2, locales.size());
-		assertTrue(locales.containsKey(Locale.GERMAN.getLanguage()));
-		assertTrue(locales.containsKey(Locale.ENGLISH.getLanguage()));
-		assertEquals(Locale.GERMAN.getDisplayLanguage(locale), locales.get(Locale.GERMAN.getLanguage()));
-		assertEquals(Locale.ENGLISH.getDisplayLanguage(locale), locales.get(Locale.ENGLISH.getLanguage()));
+		assertLocales(locale);
 
 		assertNull(model.getAttribute(UserController.ALGORITHMS_MODEL));
-		
+
 		verify(userService, never()).user(any());
 		verify(userMapper, never()).toWeb(Mockito.any(User.class));
 	}
@@ -139,7 +136,8 @@ class UserControllerTest {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		when(userService.user(name)).thenReturn(Optional.empty());
 
-		assertEquals(String.format(USER_NOT_FOUND_MESSAGE, name),assertThrows(EntityNotFoundException.class, () -> userController.login(model, Locale.ENGLISH, true)).getMessage());
+		assertEquals(String.format(USER_NOT_FOUND_MESSAGE, name),
+				assertThrows(EntityNotFoundException.class, () -> userController.login(model, Locale.ENGLISH, true)).getMessage());
 	}
 
 	@Test
@@ -149,7 +147,7 @@ class UserControllerTest {
 		userModel.setAlgorithm(ALGORITHM);
 		userModel.setName(NAME);
 
-		assertEquals(USER_MODEL_AND_VIEW_NAME_REDIRECT_CHANGE, userController.changePassword(userModel, bindingResult, model));
+		assertEquals(USER_MODEL_AND_VIEW_NAME_REDIRECT_CHANGE, userController.changePassword(userModel, bindingResult, model, null));
 
 		Mockito.verify(userService).update(NAME, PASSWORD, Optional.of(ALGORITHM));
 	}
@@ -163,45 +161,55 @@ class UserControllerTest {
 		userModel.setAlgorithm(algorithm);
 		userModel.setName(NAME);
 
-		assertEquals(USER_MODEL_AND_VIEW_NAME_REDIRECT_CHANGE, userController.changePassword(userModel, bindingResult, model));
+		assertEquals(USER_MODEL_AND_VIEW_NAME_REDIRECT_CHANGE, userController.changePassword(userModel, bindingResult, model, null));
 
 		Mockito.verify(userService).update(NAME, PASSWORD, Optional.empty());
 	}
 
-	@Test
-	void changePasswordValidationError() {
+	@ParameterizedTest
+	@MethodSource("locales")
+	void changePasswordValidationError(final Locale locale) {
 		
 		when(bindingResult.hasErrors()).thenReturn(true);
+		when(userService.algorithms()).thenReturn(algorithms);
 		
-		assertEquals(USER_MODEL_AND_VIEW_NAME, userController.changePassword(userModel, bindingResult, model));
+		assertEquals(USER_MODEL_AND_VIEW_NAME, userController.changePassword(userModel, bindingResult, model, locale));
 		
-		verify(userService, Mockito.never()).update(NAME,PASSWORD, Optional.of(ALGORITHM) );
+		assertLocales(locale);
+		assertEquals(algorithms, model.getAttribute(UserController.ALGORITHMS_MODEL)); 
+		
+		verify(userService, Mockito.never()).update(NAME,PASSWORD, Optional.of(ALGORITHM) ); 
 	}
 
-	@Test
-	void changePasswordPasswordsDifferent() {
+	@ParameterizedTest
+	@MethodSource("locales")
+	void changePasswordPasswordsDifferent(final Locale locale) {
 		userModel.setPassword(PASSWORD);
 		userModel.setConfirmedPassword(random());
 		userModel.setAlgorithm(ALGORITHM);
 		userModel.setName(NAME);
+		when(userService.algorithms()).thenReturn(algorithms);
 
-		assertEquals(USER_MODEL_AND_VIEW_NAME, userController.changePassword(userModel, bindingResult, model));
+		assertEquals(USER_MODEL_AND_VIEW_NAME, userController.changePassword(userModel, bindingResult, model, locale));
+
+		assertLocales(locale);
+		assertEquals(algorithms, model.getAttribute(UserController.ALGORITHMS_MODEL));
 
 		verify(userService, Mockito.never()).update(NAME, PASSWORD, Optional.of(ALGORITHM));
 		verify(bindingResult).addError(argThat(objectError -> objectError.getObjectName().equals(USER_MODEL_AND_VIEW_NAME) && objectError.getCodes().length == 1
 				&& objectError.getCodes()[0].equals(MESSAGE_KEY_PASSWORDS_DIFFERENT) && objectError.getDefaultMessage().equals(MESSAGE_KEY_PASSWORDS_DIFFERENT)));
 	}
-	
+
 	@ParameterizedTest
 	@MethodSource("locales")
-	void changeLanguage(Locale locale) {
+	void changeLanguage(final Locale locale) {
 		userModel.setName(NAME);
 		userModel.setLocale(locale.getLanguage());
-		
-		assertEquals(String.format(UserController.USER_MODEL_AND_VIEW_NAME_REDIRECT_LOCALE_PATTERN,  locale.getLanguage()), userController.changeLanguage(userModel));
-	    verify(userService).update(NAME, locale);
+
+		assertEquals(String.format(UserController.USER_MODEL_AND_VIEW_NAME_REDIRECT_LOCALE_PATTERN, locale.getLanguage()), userController.changeLanguage(userModel));
+		verify(userService).update(NAME, locale);
 	}
-	
+
 	@Test
 	void logout() {
 		when(securityContectRepository.securityContext()).thenReturn(securityContext);

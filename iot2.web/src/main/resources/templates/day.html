@@ -34,6 +34,8 @@
 				<tr>
 					<td><label th:text="#{day.description}"></label></td>
 					<td><input type="text" th:field="*{description}" size="30" maxlength="25"/>
+					<td th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
+						th:errorclass="error"></td>
 				</tr>
 				<tr>
 					<th  th:switch="${#strings.contains(day.type, 'DayOfWeekDay')}" colspan="3">

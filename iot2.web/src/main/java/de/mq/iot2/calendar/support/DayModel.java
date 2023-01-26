@@ -5,6 +5,8 @@ import java.util.Objects;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.Assert;
 
+import jakarta.validation.constraints.Size;
+
 @ValidDayModel
 public class DayModel implements Comparable<DayModel> {
 
@@ -14,6 +16,7 @@ public class DayModel implements Comparable<DayModel> {
 	private String dayGroupId;
 	private String type;
 	private Object targetValue;
+	@Size(max = 25)
 	private String description;
 
 	Class<?> targetEntity() {
