@@ -15,6 +15,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity(name = "User")
 @Table(name = "LOGIN_USER")
@@ -25,17 +27,25 @@ class UserImpl implements User {
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
+	@Size(max=36)
+	@NotBlank
 	private String id;
 
 	@Column(name = "NAME", length = 25, nullable = false)
+	@Size(max=25)
+	@NotBlank
 	private String name;
 	@Column(name = "PASSWORD_HASH", length = 128, nullable = false)
+	@Size(max=128)
+	@NotBlank
 	private String password;
 
 	@Column(name = "ALGORITHM", length = 15)
+	@Size(max=15)
 	private String algorithm;
 	
 	@Column(name = "LANGUAGE", length = 2)
+	@Size(max=2)
 	private String language;
 
 	@SuppressWarnings("unused")

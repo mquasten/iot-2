@@ -11,6 +11,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.SerializationUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.util.Base64Utils;
@@ -23,6 +25,8 @@ import de.mq.iot2.main.support.ScanUtil;
 import de.mq.iot2.main.support.SimpleReflectionCommandLineRunner;
 
 public abstract class Main {
+	
+	private static Logger LOG = LoggerFactory.getLogger(Main.class);
 
 	public static final void main(final String[] args) throws Exception {
 		process(args, SimpleReflectionCommandLineRunner.class);
@@ -45,6 +49,7 @@ public abstract class Main {
 			final HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("java -jar <file> [OPTION]... [ARGUMENT]...", options);
 			System.err.println("\n" + exception.getMessage());
+			LOG.error("Error executing batch:" , exception);
 		}
 	}
 
