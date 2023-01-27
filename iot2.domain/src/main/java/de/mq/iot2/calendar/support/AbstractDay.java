@@ -19,6 +19,9 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity(name = AbstractDay.ENTITY_NAME)
 @Table(name = "SPECIAL_DAY")
@@ -35,16 +38,21 @@ abstract class AbstractDay<T> implements Day<T> {
 	static final int SIGNUM_POSITIV_INT = 1;
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
+	@Size(min=36, max=36)
 	private String id;
 
 	@Column(name = "DAY_VALUE", nullable = false)
+	@NotNull
 	private Integer value;
 
 	@Column(name = "DESCRIPTION", length = 25)
+	@Size(max=25)
 	private String description;
 
 	@ManyToOne(targetEntity = DayGroupImpl.class)
 	@JoinColumn(name = "DAY_GROUP_ID", nullable = false)
+	@NotNull
+	@Valid
 	private DayGroup dayGroup;
 
 	AbstractDay() {

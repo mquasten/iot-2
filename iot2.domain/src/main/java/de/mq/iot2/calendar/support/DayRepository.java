@@ -10,6 +10,7 @@ import org.springframework.data.repository.RepositoryDefinition;
 
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
+import jakarta.validation.Valid;
 
 @RepositoryDefinition(domainClass = AbstractDay.class, idClass = String.class)
 public interface DayRepository {
@@ -25,7 +26,7 @@ public interface DayRepository {
 
 	Collection<Day<?>> findByDayGroup(final DayGroup dayGroup);
 
-	Day<?> save(final Day<?> day);
+	Day<?> save(@Valid final Day<?> day);
 
 	void delete(final Day<?> entity);
 

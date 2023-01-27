@@ -12,6 +12,8 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @Entity(name = "CycleParameter")
 @DiscriminatorValue("CycleParameter")
@@ -19,6 +21,8 @@ class CycleParameterImpl extends AbstractParameter implements CycleParameter {
 
 	@ManyToOne(targetEntity = CycleImpl.class)
 	@JoinColumn(name = "CYCLE_ID", nullable = false)
+	@NotNull
+	@Valid
 	private Cycle cycle;
 
 	@SuppressWarnings("unused")

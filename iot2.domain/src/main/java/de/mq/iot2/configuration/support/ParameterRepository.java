@@ -11,6 +11,7 @@ import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.Parameter;
 import de.mq.iot2.configuration.Parameter.Key;
+import jakarta.validation.Valid;
 
 @RepositoryDefinition(domainClass = AbstractParameter.class, idClass = String.class)
 public interface ParameterRepository {
@@ -25,7 +26,7 @@ public interface ParameterRepository {
 	Collection<Parameter> findByConfigurationId(final String configurationId );
 	
 	
-	Parameter save(final Parameter parameter);
+	Parameter save(@Valid Parameter parameter);
 
 	@Modifying
 	@Query("delete from Parameter p where configuration= ?1")

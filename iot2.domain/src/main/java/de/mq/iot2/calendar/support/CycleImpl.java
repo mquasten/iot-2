@@ -8,6 +8,9 @@ import de.mq.iot2.support.IdUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity(name = "Cycle")
 public class CycleImpl implements Cycle {
@@ -16,10 +19,14 @@ public class CycleImpl implements Cycle {
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
+	@Size(min=36, max=36)
 	private String id;
 	@Column(name = "NAME", length = 25, nullable = false)
+	@Size(max=25)
+	@NotBlank
 	private String name;
 	@Column(name = "PRIORITY", nullable = false)
+	@NotNull
 	private Integer priority;
 
 	@Column(name = "DEFAULT_CYCLE", nullable = false)

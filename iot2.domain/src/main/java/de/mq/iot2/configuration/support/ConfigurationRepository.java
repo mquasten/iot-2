@@ -7,6 +7,7 @@ import org.springframework.data.repository.RepositoryDefinition;
 
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Configuration.RuleKey;
+import jakarta.validation.Valid;
 
 @RepositoryDefinition(domainClass = ConfigurationImpl.class, idClass = String.class)
 public interface ConfigurationRepository {
@@ -14,5 +15,5 @@ public interface ConfigurationRepository {
 	
 	Optional<Configuration> findByKey(final RuleKey key);
 	
-	Configuration save(final Configuration cycle);
+	Configuration save(@Valid final Configuration cycle);
 }

@@ -27,8 +27,7 @@ class UserImpl implements User {
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
-	@Size(max=36)
-	@NotBlank
+	@Size(min=36, max=36)
 	private String id;
 
 	@Column(name = "NAME", length = 25, nullable = false)

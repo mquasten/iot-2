@@ -14,6 +14,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity(name = "DayGroup")
 @Table(name = "DAY_GROUP")
@@ -21,9 +25,12 @@ class DayGroupImpl implements DayGroup {
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
+	@Size(min=36, max=36)
 	private String id;
 
 	@Column(name = "NAME", length = 25, nullable = false)
+	@NotBlank
+	@Size(max=25)
 	private String name;
 
 	@Column(name = "READ_ONLY", nullable = false)
@@ -31,6 +38,8 @@ class DayGroupImpl implements DayGroup {
 	
 	@ManyToOne(targetEntity = CycleImpl.class)
 	@JoinColumn(name = "CYCLE_ID", nullable = false)
+	@NotNull
+	@Valid
 	private Cycle cycle;
 
 	@SuppressWarnings("unused")

@@ -16,6 +16,10 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity(name = "Parameter")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -24,16 +28,22 @@ abstract class AbstractParameter implements Parameter {
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
+	@Size(min=36, max=36)
 	private String id;
 
 	@Column(name = "PARAMETER_KEY", nullable = false)
 	@Enumerated(EnumType.STRING)
+	@NotNull
 	private Key key;
-	@Column(name = "PARAMETER_VALUE", nullable = false)
+	@Column(name = "PARAMETER_VALUE", nullable = false , length = 50)
+	@Size(max=50)
+	@NotBlank
 	private String value;
 
 	@ManyToOne(targetEntity = ConfigurationImpl.class)
 	@JoinColumn(name = "CONFIGURATION_ID", nullable = false)
+	@NotNull
+	@Valid
 	private Configuration configuration;
 
 	AbstractParameter() {

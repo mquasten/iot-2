@@ -12,19 +12,26 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity(name = "Configuration")
 @Table(name = "CONFIGURATION")
 class ConfigurationImpl implements Configuration {
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
+	@Size(min=36, max=36)
 	private String id;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "RULE_KEY", length = 15, nullable = false)
+	@NotNull
 	private RuleKey key;
 
 	@Column(name = "NAME", length = 25, nullable = false)
+	@NotBlank
+	@Size( max=25)
 	private String name;
 
 	@SuppressWarnings("unused")
