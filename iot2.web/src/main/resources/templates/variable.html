@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: header}" />
+
+<body>
+	<div th:replace="~{fragments :: navidation('variable')}" ></div>
+	<div align="center">
+		<h1 th:text="#{variable.headline}"></h1>
+		
+		<table>
+		<tr><th colspan="3" th:text="#{variable.sunupdown.headline} +' ('+ ${variable.twilightType}+')'"> </th></tr>
+		<tr>
+		<td th:text="${variable.today}"> </td>
+		<td th:text="${variable.sunUpDownToday.first}"> </td>
+		<td th:text="${variable.sunUpDownToday.second}"> </td>
+		</tr>
+		<tr>
+		<td th:text="${variable.tomorrow}"> </td>
+		<td th:text="${variable.sunUpDownTomorrow.first}"> </td>
+		<td th:text="${variable.sunUpDownTomorrow.second}"> </td>
+		</tr>
+		</table>
+	</div>	
+</body>
+</html>
