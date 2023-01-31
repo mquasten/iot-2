@@ -20,6 +20,9 @@ public interface CalendarService {
 			return name().toUpperCase();
 		}
 
+		// can be replaced with:
+		//ZonedDateTime t = ZonedDateTime.of(LocalDate.of(2023, Month.MARCH,25), LocalTime.NOON ,ZoneId.of("Europe/Berlin")); 
+		//System.out.println(t.getOffset().getTotalSeconds()/3600);
 		public int offset() {
 			return offset;
 		}
