@@ -2,8 +2,12 @@ package de.mq.iot2.sysvars.support;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 import org.springframework.data.util.Pair;
+import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 
@@ -16,9 +20,10 @@ public class VariableModel {
 	private final Pair<LocalTime, LocalTime> sunUpDownToday;
 
 	private final Pair<LocalTime, LocalTime> sunUpDownTomorrow;
+	
+	private  Locale locale = Locale.getDefault();
 
-	public VariableModel(final LocalDate today, final TwilightType twilightType, final Pair<LocalTime, LocalTime> sunUpDownToday,
-			final Pair<LocalTime, LocalTime> sunUpDownTomorrow) {
+	public VariableModel(final LocalDate today, final TwilightType twilightType, final Pair<LocalTime, LocalTime> sunUpDownToday, final Pair<LocalTime, LocalTime> sunUpDownTomorrow) {
 		this.today = today;
 		this.twilightType = twilightType;
 		this.sunUpDownToday = sunUpDownToday;
@@ -32,17 +37,26 @@ public class VariableModel {
 	public Pair<LocalTime, LocalTime> getSunUpDownToday() {
 		return sunUpDownToday;
 	}
-
-	public LocalDate getToday() {
-		return today;
+	
+	public String getToday() {
+		return dateToString(today);
 	}
 
-	public LocalDate getTomorrow() {
-		return today.plusDays(1);
+	private String dateToString(final LocalDate date) {
+		return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale));
+	}
+
+	public String getTomorrow() {
+		return dateToString(today.plusDays(1));
 	}
 	
-	public TwilightType getTwilightType() {
-		return twilightType;
+	public String getTwilightType() {
+		return twilightType.name().toLowerCase();
+	}
+	
+	void setLocale(final Locale locale) {
+		Assert.notNull(locale, "Locale is required.");
+		this.locale = locale;
 	}
 
 }

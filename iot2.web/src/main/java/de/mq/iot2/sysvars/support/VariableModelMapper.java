@@ -28,7 +28,7 @@ class VariableModelMapper implements ModelMapper<SystemVariables, VariableModel>
 	@Override
 	public VariableModel toWeb(final  SystemVariables domain) {
 		
-		final TwilightType twilightType = (TwilightType) configurationService.parameter(RuleKey.EndOfDay, Key.SunUpDownType).orElseThrow();
+		final TwilightType twilightType = (TwilightType) configurationService.parameter(RuleKey.EndOfDay, Key.SunUpDownType).orElse(TwilightType.Mathematical);
 		final var date = LocalDate.now();
 		final var defaultTime= LocalTime.of(0, 0);
 		final Pair<LocalTime, LocalTime> sunUpDownToday =  Pair.of(calendarService.sunUpTime(date, twilightType).orElse(defaultTime) ,calendarService.sunDownTime(date, twilightType).orElse(defaultTime)) ;
