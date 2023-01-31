@@ -108,11 +108,10 @@ class ConfigurationServiceImpl implements ConfigurationService {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Transactional
 	@Override
-	public <T> Optional<T> parameter(final RuleKey ruleKey, final Key key) {
-		 return   (Optional<T>) parameterRepository.findByRuleKeyAndKey(ruleKey, key).map(parameter -> conversionService.convert(parameter.value(), key.type()));
+	public <T> Optional<T> parameter(final RuleKey ruleKey, final Key key, final Class<T> clazz) {
+		 return   parameterRepository.findByRuleKeyAndKey(ruleKey, key).map(parameter -> conversionService.convert(parameter.value(), clazz));
 	}
 	
 	@Transactional

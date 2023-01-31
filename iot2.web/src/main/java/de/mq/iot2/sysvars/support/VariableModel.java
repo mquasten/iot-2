@@ -21,13 +21,21 @@ public class VariableModel {
 
 	private final Pair<LocalTime, LocalTime> sunUpDownTomorrow;
 	
+	
+
+	private final Double maxTemperatureToday;
+
+	private final Double maxTemperatureTomorrow;
+	
 	private  Locale locale = Locale.getDefault();
 
-	public VariableModel(final LocalDate today, final TwilightType twilightType, final Pair<LocalTime, LocalTime> sunUpDownToday, final Pair<LocalTime, LocalTime> sunUpDownTomorrow) {
+	public VariableModel(final LocalDate today, final TwilightType twilightType, final Pair<LocalTime, LocalTime> sunUpDownToday, final Pair<LocalTime, LocalTime> sunUpDownTomorrow, final Double maxTemperatureToday, final Double maxTemperatureTomorrow ) {
 		this.today = today;
 		this.twilightType = twilightType;
 		this.sunUpDownToday = sunUpDownToday;
 		this.sunUpDownTomorrow = sunUpDownTomorrow;
+		this.maxTemperatureToday=maxTemperatureToday;
+		this.maxTemperatureTomorrow=maxTemperatureTomorrow;
 	}
 
 	public Pair<LocalTime, LocalTime> getSunUpDownTomorrow() {
@@ -58,5 +66,15 @@ public class VariableModel {
 		Assert.notNull(locale, "Locale is required.");
 		this.locale = locale;
 	}
+	
+	public Double getMaxTemperatureToday() {
+		return maxTemperatureToday;
+	}
+
+	public Double getMaxTemperatureTomorrow() {
+		return maxTemperatureTomorrow;
+	}
+	
+	
 
 }

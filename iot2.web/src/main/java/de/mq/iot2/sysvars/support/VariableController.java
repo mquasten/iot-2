@@ -5,11 +5,15 @@ import java.util.Locale;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import de.mq.iot2.support.ModelMapper;
 import de.mq.iot2.sysvars.SystemVariables;
+import jakarta.validation.Valid;
 
 
 
@@ -30,6 +34,20 @@ class VariableController {
 		variableModel.setLocale(locale);
 		model.addAttribute(VARIABLE_MODEL_AND_VIEW_NAME, variableModel);
 		return VARIABLE_MODEL_AND_VIEW_NAME;
+	}
+	
+	@PostMapping(value = "/updateTimer", params="today" )
+	String updateTimerToday(@ModelAttribute(VARIABLE_MODEL_AND_VIEW_NAME) @Valid final VariableModel variableModel, final BindingResult bindingResult) {
+		System.out.println("today");
+
+		return "redirect:" +  VARIABLE_MODEL_AND_VIEW_NAME;
+	}
+	
+	@PostMapping(value = "/updateTimer", params="tomorrow" )
+	String updateTimerTomorrow(@ModelAttribute(VARIABLE_MODEL_AND_VIEW_NAME) @Valid final VariableModel variableModel, final BindingResult bindingResult) {
+		System.out.println("tomorrow");
+
+		return "redirect:" +  VARIABLE_MODEL_AND_VIEW_NAME;
 	}
 
 }

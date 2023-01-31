@@ -25,7 +25,7 @@ class CleanUpBatchImpl {
 
 	@BatchMethod(value = "cleanup", converterClass = NoArgumentConverterImpl.class)
 	final void cleanUpLocalDateDays() {
-		final Optional<Integer> daysBack = configurationService.parameter(RuleKey.CleanUp, Key.DaysBack);
+		final Optional<Integer> daysBack = configurationService.parameter(RuleKey.CleanUp, Key.DaysBack, Integer.class);
 		if(daysBack.isEmpty()) {
 			LOGGER.warn("Configuration for cleanup is missing. Nothing will be deleted.");
 			return;

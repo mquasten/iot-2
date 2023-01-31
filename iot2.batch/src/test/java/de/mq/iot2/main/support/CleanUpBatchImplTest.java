@@ -18,7 +18,7 @@ class CleanUpBatchImplTest {
 	@Test
 	void cleanUpLocalDateDays() {
 		int daysBack = 30;
-		Mockito.when(configurationService.parameter(RuleKey.CleanUp, Key.DaysBack)).thenReturn(Optional.of(daysBack));
+		Mockito.when(configurationService.parameter(RuleKey.CleanUp, Key.DaysBack, Integer.class)).thenReturn(Optional.of(daysBack));
 		
 		cleanUpBatch.cleanUpLocalDateDays();
 		
@@ -27,7 +27,7 @@ class CleanUpBatchImplTest {
 	
 	@Test
 	void cleanUpLocalDateDaysDaysBackEmpty() {
-		Mockito.when(configurationService.parameter(RuleKey.CleanUp, Key.DaysBack)).thenReturn(Optional.empty());
+		Mockito.when(configurationService.parameter(RuleKey.CleanUp, Key.DaysBack, Integer.class)).thenReturn(Optional.empty());
 		
 		cleanUpBatch.cleanUpLocalDateDays();
 		

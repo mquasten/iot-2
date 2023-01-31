@@ -20,6 +20,40 @@
 		<td th:text="${variable.sunUpDownTomorrow.second}"> </td>
 		</tr>
 		</table>
+		
+		
+		<table>
+		<tr><th colspan="2" th:text="#{variable.forecast.headline}"> </th></tr>
+		<tr>
+		<td th:text="${variable.today}"> </td>
+		<td th:text="${variable.maxTemperatureToday} +' °C'"> </td>
+		</tr>
+		<tr>
+		<td th:text="${variable.tomorrow}"> </td>
+		
+		<td th:text="${variable.maxTemperatureTomorrow}+' °C'"> </td>
+		</tr>
+		</table>
+		<h2 th:text="#{variable.timer.headline}"></h2>
+		
+		<form action="#" th:action="@{/updateTimer}" method="post"
+				th:object="${variable}">
+		<table>
+		<tr>
+		<td th:text="#{variable.timer.today}"> </td>
+		<td> <button type="submit" name="today" th:text="#{variable.timer.update}"></button></td>
+		</tr>
+		<tr>
+		
+		<tr>
+		<td th:text="#{variable.timer.tomorrow}"> </td>
+		<td> <button type="submit" name="tomorrow" th:text="#{variable.timer.update}"></button></td>
+		</tr>
+		<tr>
+		
+		</tr>
+		</table>
+		</form>
 	</div>	
 </body>
 </html>

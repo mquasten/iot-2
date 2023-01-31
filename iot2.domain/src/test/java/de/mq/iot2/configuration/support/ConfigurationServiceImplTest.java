@@ -183,13 +183,13 @@ class ConfigurationServiceImplTest {
 		Mockito.when(parameter.value()).thenReturn("" + value);
 		Mockito.when(conversionService.convert("" + value, Integer.class)).thenReturn(value);
 		Mockito.when(parameterRepository.findByRuleKeyAndKey(RuleKey.CleanUp, Key.DaysBack)).thenReturn(Optional.of(parameter));
-		assertEquals(Optional.of(value), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack));
+		assertEquals(Optional.of(value), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack, Integer.class));
 	}
 
 	@Test
 	void parameterNotExists() {
 		Mockito.when(conversionService.convert(Mockito.any(), Mockito.any())).thenReturn(30);
-		assertEquals(Optional.empty(), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack));
+		assertEquals(Optional.empty(), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack, Integer.class));
 	}
 
 	@Test

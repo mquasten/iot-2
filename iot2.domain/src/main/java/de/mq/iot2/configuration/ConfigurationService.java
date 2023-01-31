@@ -14,7 +14,7 @@ public interface ConfigurationService {
 
 	Map<Key,Object> parameters(final RuleKey key, final Cycle cycle);
 
-	<T> Optional<T> parameter(final RuleKey ruleKey, final Key key);
+	<T> Optional<T> parameter(final RuleKey ruleKey, final Key key, final Class<T> clazz);
 
 	Collection<Configuration> configurations();
 
