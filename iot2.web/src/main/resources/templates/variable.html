@@ -3,57 +3,72 @@
 <head th:replace="~{fragments :: header}" />
 
 <body>
-	<div th:replace="~{fragments :: navidation('variable')}" ></div>
+	<div th:replace="~{fragments :: navidation('variable')}"></div>
 	<div align="center">
 		<h1 th:text="#{variable.headline}"></h1>
-		
+
 		<table>
-		<tr><th colspan="3" th:text="#{variable.sunupdown.headline} +' ('+ ${variable.twilightType}+')'"> </th></tr>
-		<tr>
-		<td th:text="${variable.today}"> </td>
-		<td th:text="${variable.sunUpDownToday.first}"> </td>
-		<td th:text="${variable.sunUpDownToday.second}"> </td>
-		</tr>
-		<tr>
-		<td th:text="${variable.tomorrow}"> </td>
-		<td th:text="${variable.sunUpDownTomorrow.first}"> </td>
-		<td th:text="${variable.sunUpDownTomorrow.second}"> </td>
-		</tr>
+			<tr>
+				<th colspan="3"
+					th:text="#{variable.sunupdown.headline} +' ('+ ${variable.twilightType}+')'">
+				</th>
+			</tr>
+			<tr>
+				<td th:text="${variable.today}"></td>
+				<td th:text="${variable.sunUpToday}"></td>
+				<td th:text="${variable.sunDownToday}"></td>
+			</tr>
+			<tr>
+				<td th:text="${variable.tomorrow}"></td>
+				<td th:text="${variable.sunUpTomorrow}"></td>
+				<td th:text="${variable.sunDownTomorrow}"></td>
+			</tr>
 		</table>
-		
-		
+
+
 		<table>
-		<tr><th colspan="2" th:text="#{variable.forecast.headline}"> </th></tr>
-		<tr>
-		<td th:text="${variable.today}"> </td>
-		<td th:text="${variable.maxTemperatureToday} +' °C'"> </td>
-		</tr>
-		<tr>
-		<td th:text="${variable.tomorrow}"> </td>
-		
-		<td th:text="${variable.maxTemperatureTomorrow}+' °C'"> </td>
-		</tr>
+			<tr>
+				<th colspan="2" th:text="#{variable.forecast.headline}"></th>
+			</tr>
+			<tr>
+				<td th:text="${variable.today}"></td>
+				<td th:text="${variable.maxTemperatureToday} +' °C'"></td>
+			</tr>
+			<tr>
+				<td th:text="${variable.tomorrow}"></td>
+
+				<td th:text="${variable.maxTemperatureTomorrow}+' °C'"></td>
+			</tr>
 		</table>
 		<h2 th:text="#{variable.timer.headline}"></h2>
-		
+
 		<form action="#" th:action="@{/updateTimer}" method="post"
-				th:object="${variable}">
-		<table>
-		<tr>
-		<td th:text="#{variable.timer.today}"> </td>
-		<td> <button type="submit" name="today" th:text="#{variable.timer.update}"></button></td>
-		</tr>
-		<tr>
-		
-		<tr>
-		<td th:text="#{variable.timer.tomorrow}"> </td>
-		<td> <button type="submit" name="tomorrow" th:text="#{variable.timer.update}"></button></td>
-		</tr>
-		<tr>
-		
-		</tr>
-		</table>
+			th:object="${variable}">
+			<input type="hidden" th:field="*{sunUpToday}" /> <input
+				type="hidden" name="type" th:field="*{sunDownToday}" /> 
+				<input type="hidden" th:field="*{sunUpTomorrow}" /> 
+				<input type="hidden" name="type" th:field="*{sunDownTomorrow}" /> 
+				<input type="hidden" th:field="*{maxTemperatureToday}" /> 
+				<input type="hidden" name="type" th:field="*{maxTemperatureTomorrow}" />
+			<table>
+				<tr>
+					<td th:text="#{variable.timer.today}"></td>
+					<td>
+						<button type="submit" name="today" th:text="#{variable.timer.update}"></button>
+					</td>
+				</tr>
+				<tr>
+				<tr>
+					<td th:text="#{variable.timer.tomorrow}"></td>
+					<td>
+						<button type="submit" name="tomorrow" th:text="#{variable.timer.update}"></button>
+					</td>
+				</tr>
+				<tr>
+
+				</tr>
+			</table>
 		</form>
-	</div>	
+	</div>
 </body>
 </html>

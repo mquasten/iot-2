@@ -1,53 +1,42 @@
 package de.mq.iot2.sysvars.support;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
-import org.springframework.data.util.Pair;
 import org.springframework.util.Assert;
-
-import de.mq.iot2.calendar.CalendarService.TwilightType;
 
 public class VariableModel {
 
-	private final LocalDate today;
-	private final TwilightType twilightType;
-	
+	private final LocalDate today = LocalDate.now();
+	private String  twilightType;
+	private  String  sunUpToday;
+	private  String  sunDownToday;
+	private  String  sunUpTomorrow;
+	private  String  sunDownTomorrow;
 
-	private final Pair<LocalTime, LocalTime> sunUpDownToday;
+	private  String maxTemperatureToday;
 
-	private final Pair<LocalTime, LocalTime> sunUpDownTomorrow;
-	
-	
-
-	private final Double maxTemperatureToday;
-
-	private final Double maxTemperatureTomorrow;
+	private  String maxTemperatureTomorrow;
 	
 	private  Locale locale = Locale.getDefault();
 
-	public VariableModel(final LocalDate today, final TwilightType twilightType, final Pair<LocalTime, LocalTime> sunUpDownToday, final Pair<LocalTime, LocalTime> sunUpDownTomorrow, final Double maxTemperatureToday, final Double maxTemperatureTomorrow ) {
-		this.today = today;
-		this.twilightType = twilightType;
-		this.sunUpDownToday = sunUpDownToday;
-		this.sunUpDownTomorrow = sunUpDownTomorrow;
-		this.maxTemperatureToday=maxTemperatureToday;
-		this.maxTemperatureTomorrow=maxTemperatureTomorrow;
+	public VariableModel() {
+	
 	}
-
-	public Pair<LocalTime, LocalTime> getSunUpDownTomorrow() {
-		return sunUpDownTomorrow;
-	}
-
-	public Pair<LocalTime, LocalTime> getSunUpDownToday() {
-		return sunUpDownToday;
-	}
+	 public final LocalDate getDate() {
+		 dateExistsGuard();
+		 return today;
+	 }
 	
 	public String getToday() {
+		dateExistsGuard();
 		return dateToString(today);
+	}
+
+	private void dateExistsGuard() {
+		Assert.notNull(today, "Date required.");
 	}
 
 	private String dateToString(final LocalDate date) {
@@ -55,11 +44,8 @@ public class VariableModel {
 	}
 
 	public String getTomorrow() {
+		dateExistsGuard();
 		return dateToString(today.plusDays(1));
-	}
-	
-	public String getTwilightType() {
-		return twilightType.name().toLowerCase();
 	}
 	
 	void setLocale(final Locale locale) {
@@ -67,14 +53,60 @@ public class VariableModel {
 		this.locale = locale;
 	}
 	
-	public Double getMaxTemperatureToday() {
+	public String getTwilightType() {
+		return twilightType;
+	}
+
+	public void setTwilightType(final String twilightType) {
+		this.twilightType = twilightType;
+	}
+
+	public String getSunUpToday() {
+		return sunUpToday;
+	}
+
+	public void setSunUpToday(final String sunUpToday) {
+		this.sunUpToday = sunUpToday;
+	}
+
+	public String getSunDownToday() {
+		return sunDownToday;
+	}
+
+	public void setSunDownToday(final String sunDownToday) {
+		this.sunDownToday = sunDownToday;
+	}
+
+	public String getSunUpTomorrow() {
+		return sunUpTomorrow;
+	}
+
+	public void setSunUpTomorrow(final String sunUpTomorrow) {
+		this.sunUpTomorrow = sunUpTomorrow;
+	}
+
+	public String getSunDownTomorrow() {
+		return sunDownTomorrow;
+	}
+
+	public void setSunDownTomorrow(final String sunDownTomorrow) {
+		this.sunDownTomorrow = sunDownTomorrow;
+	}
+
+	public String getMaxTemperatureToday() {
 		return maxTemperatureToday;
 	}
 
-	public Double getMaxTemperatureTomorrow() {
+	public void setMaxTemperatureToday(String maxTemperatureToday) {
+		this.maxTemperatureToday = maxTemperatureToday;
+	}
+
+	public String getMaxTemperatureTomorrow() {
 		return maxTemperatureTomorrow;
 	}
-	
-	
+
+	public void setMaxTemperatureTomorrow(String maxTemperatureTomorrow) {
+		this.maxTemperatureTomorrow = maxTemperatureTomorrow;
+	}
 
 }

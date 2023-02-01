@@ -1,16 +1,16 @@
 package de.mq.iot2.sysvars.support;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
-import org.springframework.data.util.Pair;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.CalendarService.TwilightType;
+import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
-import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.support.ModelMapper;
 import de.mq.iot2.sysvars.SystemVariables;
 import de.mq.iot2.weather.WeatherService;
@@ -22,29 +22,35 @@ class VariableModelMapper implements ModelMapper<SystemVariables, VariableModel>
 	private final ConfigurationService configurationService;
 	
 	private final WeatherService weatherService;
+	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+	private final ConversionService conversionService;
 	
-	VariableModelMapper(final CalendarService calendarService, final ConfigurationService configurationService, final WeatherService weatherService) {
+	VariableModelMapper(final CalendarService calendarService, final ConfigurationService configurationService, final WeatherService weatherService, ConversionService conversionService) {
 		this.calendarService = calendarService;
 		this.configurationService=configurationService;
 		this.weatherService=weatherService;
+		this.conversionService=conversionService;
 	}
 
 	@Override
 	public VariableModel toWeb(final  SystemVariables domain) {
 		
 		final var twilightType = configurationService.parameter(RuleKey.EndOfDay, Key.SunUpDownType, TwilightType.class).orElse(TwilightType.Mathematical);
-		final var date = LocalDate.now();
-		final var defaultUpTime= LocalTime.of(0, 0);
-		final var defaultDownTime= LocalTime.of(23, 59);
-		final Pair<LocalTime, LocalTime> sunUpDownToday =  Pair.of(calendarService.sunUpTime(date, twilightType).orElse(defaultUpTime) ,calendarService.sunDownTime(date, twilightType).orElse(defaultDownTime)) ;
-		final Pair<LocalTime, LocalTime> sunUpDownTomorrow =  Pair.of(calendarService.sunUpTime(date.plusDays(1), twilightType).orElse(defaultUpTime) ,calendarService.sunDownTime(date.plusDays(1), twilightType).orElse(defaultDownTime)) ;
-	
-		final var maxTemperatureToday= weatherService.maxForecastTemperature(date).orElse(Double.NaN);
-		final var maxTemperatureTomorrow= weatherService.maxForecastTemperature(date.plusDays(1)).orElse(Double.NaN);
-		final VariableModel variableModel = new VariableModel(date, twilightType, sunUpDownToday, sunUpDownTomorrow, maxTemperatureToday, maxTemperatureTomorrow);
-	
+		final VariableModel variableModel = new VariableModel();
+		variableModel.setTwilightType(twilightType.name().toLowerCase());
 		
+		
+		calendarService.sunUpTime(variableModel.getDate(), twilightType).ifPresent(time -> variableModel.setSunUpToday(format(time)));
+		calendarService.sunDownTime(variableModel.getDate(), twilightType).ifPresent(time -> variableModel.setSunDownToday(format(time)));
+		calendarService.sunUpTime(variableModel.getDate().plusDays(1), twilightType).ifPresent(time -> variableModel.setSunUpTomorrow(format(time)));
+		calendarService.sunDownTime(variableModel.getDate().plusDays(1), twilightType).ifPresent(time -> variableModel.setSunDownTomorrow(format(time)));
+		weatherService.maxForecastTemperature(variableModel.getDate()).ifPresent(temperature -> variableModel.setMaxTemperatureToday(conversionService.convert(temperature, String.class)));
+		weatherService.maxForecastTemperature(variableModel.getDate().plusDays(1)).ifPresent(temperature -> variableModel.setMaxTemperatureTomorrow(conversionService.convert(temperature, String.class)));
 		return variableModel;
+	}
+
+	private String format(final LocalTime time) {
+		return time.format(dateTimeFormatter);
 	}
 
 	

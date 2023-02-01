@@ -3,8 +3,10 @@ package de.mq.iot2.sysvars.support;
 
 import java.util.Locale;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.Base64Utils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -39,13 +41,26 @@ class VariableController {
 	@PostMapping(value = "/updateTimer", params="today" )
 	String updateTimerToday(@ModelAttribute(VARIABLE_MODEL_AND_VIEW_NAME) @Valid final VariableModel variableModel, final BindingResult bindingResult) {
 		System.out.println("today");
-
+		System.out.println(variableModel.getMaxTemperatureToday());
+		System.out.println(variableModel.getSunUpToday());
+		System.out.println(variableModel.getSunDownToday());
+		
+		final TimerModel timerModel = new TimerModel();
+		
+		timerModel.setSecondUp(variableModel.getSunUpToday());
+		timerModel.setDown(variableModel.getSunDownToday());
+		
+	System.out.println(Base64Utils.encodeToString(SerializationUtils.serialize(new String[] {"xxx" , null , "a" , "b"})));
 		return "redirect:" +  VARIABLE_MODEL_AND_VIEW_NAME;
 	}
 	
 	@PostMapping(value = "/updateTimer", params="tomorrow" )
 	String updateTimerTomorrow(@ModelAttribute(VARIABLE_MODEL_AND_VIEW_NAME) @Valid final VariableModel variableModel, final BindingResult bindingResult) {
 		System.out.println("tomorrow");
+		System.out.println(variableModel.getMaxTemperatureTomorrow());
+		System.out.println(variableModel.getSunUpTomorrow());
+		System.out.println(variableModel.getSunDownTomorrow());
+
 
 		return "redirect:" +  VARIABLE_MODEL_AND_VIEW_NAME;
 	}
