@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: header}" />
+
+<body>
+	<div align="center">
+		<h1 th:text="#{timer.headline}"></h1>
+		
+		<form action="#" th:action="@{/timer}" method="post" th:object="${timer}">
+			<input type="hidden" th:field="*{update}" /> 
+			<div th:if="${timer.update}">
+				<p th:text="#{timer.update.hint}" class="info" />
+			</div>
+			<table>
+					
+				<tr>
+					<td><label th:text="#{timer.first}"></label></td>
+					<td><input type="text" th:field="*{upTime}"  /></td>
+					<td th:if="${#fields.hasErrors('upTime')}" th:errors="*{upTime}" th:errorclass="error"></td>
+				</tr>
+				<tr>
+					<td><label th:text="#{timer.second}"></label></td>
+					<td><input type="text" th:field="*{sunUpTime}"  /></td>
+					<td th:if="${#fields.hasErrors('sunUpTime')}" th:errors="*{sunUpTime}" th:errorclass="error"></td>
+				</tr>
+				
+				<tr>
+					<td><label th:text="#{timer.third}"></label></td>
+					<td><input type="text" th:field="*{shadowTime}"  /></td>
+					<td th:if="${#fields.hasErrors('shadowTime')}" th:errors="*{shadowTime}" th:errorclass="error"></td>
+				</tr>
+				
+				<tr>
+					<td><label th:text="#{timer.fourth}"></label></td>
+					<td><input type="text" th:field="*{sunDownTime}"  /></td>
+					<td th:if="${#fields.hasErrors('sunDownTime')}" th:errors="*{sunDownTime}" th:errorclass="error"></td>
+				</tr>
+
+				<tr>
+					<th colspan="3">
+						<div th:if="${#fields.hasErrors('global')}">
+							<p th:each="err : ${#fields.errors('global')}" th:text="${err}"
+								class="error" />
+						</div>
+
+
+					</th>
+				</tr>
+
+				<tr>
+					<th colspan="3">
+						<button type="submit" name="cancel" th:text="#{timer.cancel}"></button>
+						<button type="submit" name="save" th:text="#{timer.update}"></button>
+					</th>
+				</tr>
+			</table>
+		</form>
+	</div>
+</body>
+</html>

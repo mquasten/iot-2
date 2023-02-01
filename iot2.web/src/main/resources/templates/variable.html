@@ -42,7 +42,7 @@
 		</table>
 		<h2 th:text="#{variable.timer.headline}"></h2>
 
-		<form action="#" th:action="@{/updateTimer}" method="post"
+		<form action="#" th:action="@{/variable}" method="post"
 			th:object="${variable}">
 			<input type="hidden" th:field="*{sunUpToday}" /> <input
 				type="hidden" name="type" th:field="*{sunDownToday}" /> 

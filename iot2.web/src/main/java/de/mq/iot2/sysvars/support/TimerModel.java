@@ -1,61 +1,54 @@
 package de.mq.iot2.sysvars.support;
 
-import java.io.Serializable;
+public class TimerModel {
 
-public class TimerModel implements Serializable {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private String upTime;
+	private String sunUpTime;
 
-	private  String firstUp;
+	private String shadowTime;
+
+	private String sunDownTime;
 	
-	private String secondUp;
-	
-	private String shadow;
-	
-	private String down;
-	
-	
-	public String getFirstUp() {
-		return firstUp;
+	private boolean update;
+
+	public boolean isUpdate() {
+		return update;
 	}
 
-	public void setFirstUp(String firstUp) {
-		this.firstUp = firstUp;
+	public void setUpdate(boolean update) {
+		this.update = update;
 	}
 
-	public String getSecondUp() {
-		return secondUp;
+	public String getUpTime() {
+		return upTime;
 	}
 
-	public void setSecondUp(String secondUp) {
-		this.secondUp = secondUp;
+	public void setUpTime(final String upTime) {
+		this.upTime = upTime;
 	}
 
-	public String getShadow() {
-		return shadow;
+	public String getSunUpTime() {
+		return sunUpTime;
 	}
 
-	public void setShadow(String shadow) {
-		this.shadow = shadow;
+	public void setSunUpTime(final String sunUpTime) {
+		this.sunUpTime = sunUpTime;
 	}
 
-	public String getDown() {
-		return down;
+	public String getShadowTime() {
+		return shadowTime;
 	}
 
-	public void setDown(String down) {
-		this.down = down;
+	public void setShadowTime(final String shadowTime) {
+		this.shadowTime = shadowTime;
 	}
 
-	
-	
-	
-	
-	
-	
-	
+	public String getSunDownTime() {
+		return sunDownTime;
+	}
+
+	public void setSunDownTime(final String sunDownTime) {
+		this.sunDownTime = sunDownTime;
+	}
 
 }
