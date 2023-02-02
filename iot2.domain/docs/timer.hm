@@ -1,0 +1,103 @@
+if (! dom.GetObject("TimerEvents"))  {   
+object timerEvents = dom.CreateObject(OT_VARDP);
+dom.GetObject(ID_SYSTEM_VARIABLES).Add(timerEvents.ID());
+timerEvents.Name("TimerEvents");   
+timerEvents.ValueType(ivtInteger);
+timerEvents.ValueSubType(istEnum);
+timerEvents.DPInfo("TimerEvents Werteliste");
+timerEvents.ValueList("NIL;T0;T1;T2;T3;T4;T5;T6;T7;T8;T9");
+timerEvents.DPArchive(true);
+timerEvents.State(0);
+timerEvents.Internal(false);
+timerEvents.Visible(true);
+dom.RTUpdate(0);
+
+!WriteLine("TimerEvents  created.");
+
+}
+
+
+ if (!dom.GetObject("EventExecutions")){   
+   
+ 
+    object eventExecutions = dom.CreateObject(OT_VARDP);
+ 
+    dom.GetObject(ID_SYSTEM_VARIABLES).Add(eventExecutions.ID());
+ 
+    eventExecutions.Name("EventExecutions");   
+    eventExecutions.ValueType(ivtString);
+    eventExecutions.ValueSubType(istChar8859);
+	
+     
+    eventExecutions.DPInfo("Events, die ausgefuehrt werden sollen.");
+    eventExecutions.ValueUnit("");
+    eventExecutions.State("");
+    eventExecutions.Internal(false);
+    eventExecutions.Visible(true);
+ 
+    dom.RTUpdate(0);
+	
+	!WriteLine("EventExecutions  created.");
+}
+
+
+real c_zeit = (1.0*system.Date("%H").ToInteger()) +(0.01*system.Date("%M").ToInteger());
+
+if( c_zeit <= 23.45 ) {
+object liste = dom.GetObject("EventExecutions");
+string index;
+string todo="";
+foreach (index, liste.State().Split(";")){
+  string key= index.StrValueByIndex(":", 0);
+  string time= index.StrValueByIndex(":",1);
+
+ if( key && time) {
+
+    real timeAsReal = time.ToFloat();
+   if( timeAsReal  <= c_zeit ) {
+      !WriteLine("ausfuehren:" # key #"="# timeAsReal );
+      object timerEvents = dom.GetObject("TimerEvents");
+      string eventAsString;
+      integer event=-1;
+      integer i=0;
+      foreach (eventAsString, timerEvents.ValueList().Split(";")){
+          if( eventAsString == key) {
+               event=i; 
+          }
+           i=i+1;
+      }
+      if( event >=0) {
+            !WriteLine("event setzen" #event);
+            timerEvents.State(event); 
+      } 
+   } else {
+         !WriteLine("nicht ausfuehren:" # key #"="# timeAsReal );
+        if(todo.Length() ==0 ) {
+            todo=key#":"#time;
+         } else {
+              todo=todo#";"#key#":"#time;
+         }
+
+   }
+
+
+
+
+}
+
+
+}
+
+liste.State(todo);
+!WriteLine("neue Liste setzen:" #todo);
+!WriteLine("neue Liste setzen:" #todo);
+} else {
+
+string dailyEventList = dom.GetObject("DailyEvents").State();
+string eventExecutions = dom.GetObject("EventExecutions");
+eventExecutions.State(dailyEventList);
+object timerEvents = dom.GetObject("TimerEvents");
+timerEvents.State(0);
+}
+
+dom.GetObject("SystemTime").State(c_zeit);
