@@ -77,8 +77,13 @@ class TimerController {
 	@PostMapping(value = "/timer", params="save" )
 	String timer(@ModelAttribute(TIMER_MODEL_AND_VIEW_NAME) @Valid final TimerModel timerModel, final BindingResult bindingResult) {
 		
-		System.out.println(timerModel.isUpdate());
-		return TIMER_MODEL_AND_VIEW_NAME;
+		
+	
+		if(bindingResult.hasErrors()) {
+			return TIMER_MODEL_AND_VIEW_NAME;
+		}
+		
+		return VariableController.REDIRECT_VARIABLE_VIEW_NAME;
 	}
 
 }

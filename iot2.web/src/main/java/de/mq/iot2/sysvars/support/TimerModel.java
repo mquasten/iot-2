@@ -2,11 +2,13 @@ package de.mq.iot2.sysvars.support;
 
 public class TimerModel {
 
+	@ValidTime
 	private String upTime;
+	@ValidTime
 	private String sunUpTime;
-
+	@ValidTime
 	private String shadowTime;
-
+	@ValidTime
 	private String sunDownTime;
 	
 	private boolean update;
