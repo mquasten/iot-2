@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +21,7 @@ import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.Parameter.Key;
+import de.mq.iot2.weather.WeatherService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -31,38 +33,36 @@ class TimerController {
 	
 	private final ConfigurationService configurationService;
 	private final CalendarService calendarService;
+	private final WeatherService weatherService;
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 	
-	TimerController(final ConfigurationService configurationService, final CalendarService calendarService) {
+	TimerController(final ConfigurationService configurationService, final CalendarService calendarService, final WeatherService weatherService) {
 		this.configurationService=configurationService;
 		this.calendarService=calendarService;
+		this.weatherService=weatherService;
 	}
 	
 	@GetMapping(value = "/timer")
 	String variable(final Model model, @RequestParam(name = "update", required = false, defaultValue = "false") final boolean update, final Locale locale) {
-	
-		final LocalDate date = update? LocalDate.now() : LocalDate.now().plusDays(1);
-		
-		final var twilightType = configurationService.parameter(RuleKey.EndOfDay, Key.SunUpDownType, TwilightType.class).orElse(TwilightType.Mathematical);
-		
+		final var date = update? LocalDate.now() : LocalDate.now().plusDays(1);
 		final Cycle cycle =calendarService.cycle(date);
-		
 		final Map<Key,Object> parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);
-		
-		final TimerModel timerModel = new TimerModel();
+		final var twilightType = value(parameters, Key.SunUpDownType, TwilightType.class).orElse(TwilightType.Mathematical);
+		final var timerModel = new TimerModel();
 		timerModel.setUpdate(update);	
-		if( parameters.containsKey(Key.UpTime)) {
-			timerModel.setUpTime(format((LocalTime) parameters.get(Key.UpTime)));
-		}
-		
+		final var temperatureLimit = value(parameters, Key.ShadowTemperature, Double.class).orElse(Double.MAX_VALUE);
+		value(parameters, Key.UpTime,LocalTime.class).ifPresent(time -> timerModel.setUpTime( format(time)));
+		value(parameters, Key.ShadowTime, LocalTime.class).ifPresent(time ->  weatherService.maxForecastTemperature(date).filter( temperatur -> temperatur >= temperatureLimit ).ifPresent(temperature -> timerModel.setShadowTime(format(time))) );
 		calendarService.sunUpTime(date, twilightType).ifPresent(time -> timerModel.setSunUpTime(format(time)));
-		
 		calendarService.sunDownTime(date, twilightType).ifPresent(time -> timerModel.setSunDownTime(format(time)));
-		System.out.println(parameters);
-		
-	
 		model.addAttribute(TIMER_MODEL_AND_VIEW_NAME, timerModel);
 		return TIMER_MODEL_AND_VIEW_NAME;
+	}
+	
+
+	@SuppressWarnings("unchecked")
+	private <T> Optional<T>value(final Map<Key,Object> parameters, final Key key, final Class<T> clazz) {
+		 return (Optional<T>) Optional.ofNullable( parameters.get(key));
 	}
 	
 	private String format(final LocalTime time) {
