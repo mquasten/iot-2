@@ -52,5 +52,6 @@ public class TimerModel {
 	public void setSunDownTime(final String sunDownTime) {
 		this.sunDownTime = sunDownTime;
 	}
+	
 
 }
