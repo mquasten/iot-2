@@ -31,6 +31,7 @@ import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.sysvars.SystemVariable;
+import de.mq.iot2.sysvars.SystemVariableService;
 import de.mq.iot2.weather.WeatherService;
 import jakarta.validation.Valid;
 
@@ -47,9 +48,11 @@ class TimerController {
 	private final CalendarService calendarService;
 	private final WeatherService weatherService;
 	private final ConversionService conversionService ;
+	private final SystemVariableService systemVariableService;
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 	
-	TimerController(final ConfigurationService configurationService, final CalendarService calendarService, final WeatherService weatherService, final ConversionService conversionService) {
+	TimerController(final SystemVariableService systemVariableService, final ConfigurationService configurationService, final CalendarService calendarService, final WeatherService weatherService, final ConversionService conversionService) {
+		this.systemVariableService=systemVariableService;
 		this.configurationService=configurationService;
 		this.calendarService=calendarService;
 		this.weatherService=weatherService;
@@ -94,25 +97,29 @@ class TimerController {
 			return TIMER_MODEL_AND_VIEW_NAME;
 		}
 		
-		System.out.println(timerModel.isUpdate());
-		
 		final List<Entry<String, Double>> timers = timers(timerModel);
 		
 		final double  limit = timerModel.isUpdate()?  timeAsDouble(LocalTime.now().plusMinutes(MINUTES_IN_FUTURE)): 0;
 		
-		if(timers.get(0).getValue() < limit) {
+		
+		if(minTimer(timers) < limit) {
 			
 			bindingResult.addError(new ObjectError(TIMER_MODEL_AND_VIEW_NAME, new String[] { "error.time.future" }, new Integer[] { MINUTES_IN_FUTURE},
 					"{error.time.future}"));
 			return TIMER_MODEL_AND_VIEW_NAME;
 		}
 		
+		systemVariableService.update(List.of(systemVariable(timers, timerModel.isUpdate()), new SystemVariable("TimerEvents", "0")));
 		
-		SystemVariable systemVariable = systemVariable(timers, timerModel.isUpdate() );
-		System.out.println(systemVariable.getName());
-		System.out.println(systemVariable.getValue());
 		
 		return VariableController.REDIRECT_VARIABLE_VIEW_NAME;
+	}
+
+	private Double minTimer(final List<Entry<String, Double>> timers) {
+		if(timers.size()==0) {
+			return Double.MAX_VALUE;
+		}
+		return timers.get(0).getValue();
 	}
 
 	private SystemVariable  systemVariable(final List<Entry<String, Double>> timers, final boolean update) {

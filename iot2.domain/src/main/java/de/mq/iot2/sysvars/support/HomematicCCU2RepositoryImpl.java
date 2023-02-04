@@ -56,7 +56,7 @@ class HomematicCCU2RepositoryImpl implements SystemVariableRepository {
 	public void updateSystemVariable(final SystemVariable systemVariable) {
 		Assert.notNull(systemVariable, SYSTEM_VARIABLE_REQUIRED_MESSAGE);
 		Assert.hasText(systemVariable.getId(), ID_REQUIRED_MESSAGE);
-		Assert.hasText(systemVariable.getValue(), VALUE_REQUIRED_MESSAGE);
+		Assert.notNull(systemVariable.getValue(), VALUE_REQUIRED_MESSAGE);
 		restOperations.put(STATE_CHANGE_URL, null, Map.of(RARAMETER_HOST, host, PARAMETER_PORT, port, PARAMETER_ID, systemVariable.getId(), PARAMETER_VALUE, systemVariable.getValue()));
 		LOGGER.debug("Systemvariable {} value='{}' updated.", systemVariable.getName(), systemVariable.getValue());
 	}
