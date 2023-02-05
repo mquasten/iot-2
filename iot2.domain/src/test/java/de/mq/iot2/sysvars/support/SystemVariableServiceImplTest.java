@@ -1,6 +1,8 @@
 package de.mq.iot2.sysvars.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -63,6 +65,13 @@ class SystemVariableServiceImplTest {
 		systemVariableService.update(List.of(newSystemVariable( RandomTestUtil.randomString(), RandomTestUtil.randomString())));
 		
 		Mockito.verify(systemVariableRepository, Mockito.never()).updateSystemVariable(Mockito.any());
+	}
+	@Test
+	void read() {
+		final var  systemVariables = List.of(mock(SystemVariable.class));
+		when(systemVariableRepository.readSystemVariables()).thenReturn(systemVariables);
+		
+		assertEquals(systemVariables, systemVariableService.read());
 	}
 
 }

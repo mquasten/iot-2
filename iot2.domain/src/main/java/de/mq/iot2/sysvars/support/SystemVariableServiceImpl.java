@@ -65,4 +65,9 @@ class SystemVariableServiceImpl implements SystemVariableService {
 		return systemVariable.getValue().equals(existingSystemVariable.getValue());
 	}
 
+	@Override
+	public Collection<SystemVariable> read() {
+		return systemVariableRepository.readSystemVariables();
+	}
+
 }

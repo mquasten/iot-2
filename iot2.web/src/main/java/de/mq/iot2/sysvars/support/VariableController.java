@@ -17,6 +17,7 @@ import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.Parameter.Key;
+import de.mq.iot2.sysvars.SystemVariableService;
 import de.mq.iot2.weather.WeatherService;
 
 
@@ -30,23 +31,28 @@ class VariableController {
 	private final WeatherService weatherService;
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 	private final ConversionService conversionService;
+	private final SystemVariableService systemVariableService;
 	
 	static final String VARIABLE_MODEL_AND_VIEW_NAME = "variable";
 	
 	static final String REDIRECT_VARIABLE_VIEW_NAME = "redirect:" +VARIABLE_MODEL_AND_VIEW_NAME;
 	
+	static final String REDIRECT_VARIABLE_VIEW_NAME_READ_SYSTEM_VARIABLES = "redirect:" +VARIABLE_MODEL_AND_VIEW_NAME +"?showVariables=true";
 	
 	
-	VariableController(final CalendarService calendarService, final ConfigurationService configurationService, final WeatherService weatherService, ConversionService conversionService) {
+	
+	VariableController(final CalendarService calendarService, final ConfigurationService configurationService, final WeatherService weatherService, ConversionService conversionService, final SystemVariableService systemVariableService) {
 		this.calendarService = calendarService;
 		this.configurationService=configurationService;
 		this.weatherService=weatherService;
 		this.conversionService=conversionService;
+		this.systemVariableService=systemVariableService;
 	}
 
 	@GetMapping(value = "/variable")
-	String variable(final Model model, @RequestParam(name = "readSystemVariables", required = false) final boolean readSystemVariables, final Locale locale) {
+	String variable(final Model model, @RequestParam(name = "showVariables", required = false) final boolean showVariables, final Locale locale) {
 		final VariableModel variableModel = new VariableModel();
+		variableModel.setShowVariables(showVariables);
 		variableModel.setLocale(locale);
 		final var twilightType = configurationService.parameter(RuleKey.EndOfDay, Key.SunUpDownType, TwilightType.class).orElse(TwilightType.Mathematical);
 		variableModel.setTwilightType(twilightType.name().toLowerCase());
@@ -56,6 +62,10 @@ class VariableController {
 		calendarService.sunDownTime(variableModel.getDate().plusDays(1), twilightType).ifPresent(time -> variableModel.setSunDownTomorrow(format(time)));
 		weatherService.maxForecastTemperature(variableModel.getDate()).ifPresent(temperature -> variableModel.setMaxTemperatureToday(conversionService.convert(temperature, String.class)));
 		weatherService.maxForecastTemperature(variableModel.getDate().plusDays(1)).ifPresent(temperature -> variableModel.setMaxTemperatureTomorrow(conversionService.convert(temperature, String.class)));
+		
+		if( showVariables) {
+			variableModel.setVariables(systemVariableService.read());
+		}
 		model.addAttribute(VARIABLE_MODEL_AND_VIEW_NAME, variableModel);
 		return VARIABLE_MODEL_AND_VIEW_NAME;
 	}
@@ -72,6 +82,11 @@ class VariableController {
 	@PostMapping(value = "/variable", params="tomorrow" )
 	String updateTimerTomorrow() {
 		return String.format(TimerController.REDIRECT_TIMER_VIEW_NAME, false);
+	}
+	
+	@PostMapping(value = "/variables")
+	String variables() {
+		return REDIRECT_VARIABLE_VIEW_NAME_READ_SYSTEM_VARIABLES;
 	}
 
 }

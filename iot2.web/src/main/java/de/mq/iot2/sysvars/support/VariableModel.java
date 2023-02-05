@@ -3,9 +3,13 @@ package de.mq.iot2.sysvars.support;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Locale;
 
 import org.springframework.util.Assert;
+
+import de.mq.iot2.sysvars.SystemVariable;
 
 public class VariableModel {
 
@@ -22,6 +26,23 @@ public class VariableModel {
 	
 	private  Locale locale = Locale.getDefault();
 
+	private  boolean showVariables;
+	
+	private  final Collection<SystemVariable> variables = new ArrayList<>();
+	
+	public Collection<SystemVariable> getVariables() {
+		return variables;
+	}
+	public void setVariables(final Collection<SystemVariable> variables) {
+		this.variables.clear();
+		this.variables.addAll(variables);
+	}
+	public boolean isShowVariables() {
+		return showVariables;
+	}
+	public void setShowVariables(boolean showVariables) {
+		this.showVariables = showVariables;
+	}
 	public VariableModel() {
 	
 	}

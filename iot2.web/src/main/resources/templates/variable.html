@@ -69,6 +69,30 @@
 				</tr>
 			</table>
 		</form>
+		
+		<h2 th:text="#{variable.systemvariables.headline}"></h2>
+		<div th:if="${!variable.showVariables}">
+		<form action="#" th:action="@{/variables}" method="post"
+			th:object="${variable}">
+			
+			<button type="submit" name="today" th:text="#{variable.variables.show}"></button>
+		</form>	
+		</div>
+		<table th:if="${variable.showVariables}" class="result-table">
+			<thead>
+				<tr>
+					<th th:text="#{variable.sysvar.name}"></th>
+					<th th:text="#{variable.sysvar.value}"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="sysvar: ${variable.variables}">
+					<td th:text="${sysvar.name}"></td>
+					<td th:text="${sysvar.value}"></td>
+				</tr>
+			</tbody>
+
+		</table>
 	</div>
 </body>
 </html>

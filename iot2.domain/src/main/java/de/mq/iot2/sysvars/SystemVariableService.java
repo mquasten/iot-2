@@ -6,4 +6,6 @@ public interface SystemVariableService {
 
 	void update(final Collection<SystemVariable> systemVariables);
 
+	Collection<SystemVariable> read();
+
 }
