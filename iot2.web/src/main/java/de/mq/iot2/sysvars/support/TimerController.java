@@ -7,7 +7,6 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -38,6 +37,14 @@ import jakarta.validation.Valid;
 @Controller
 class TimerController {
 	
+	static final String SYSTEM_VARIABLE_NAME_TIMER_EVENTS = "TimerEvents";
+
+	static final String SYSTEM_VARIABLE_NAME_DAILY_EVENTS = "DailyEvents";
+
+	static final String SYSTEM_VARIABLE_NAME_EVENT_EXECUTIONS = "EventExecutions";
+
+	static final String TIME_PATTERN = "HH:mm";
+
 	private static final int MINUTES_IN_FUTURE = 5;
 
 	static final String TIMER_MODEL_AND_VIEW_NAME= "timer";
@@ -49,7 +56,7 @@ class TimerController {
 	private final WeatherService weatherService;
 	private final ConversionService conversionService ;
 	private final SystemVariableService systemVariableService;
-	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
 	
 	TimerController(final SystemVariableService systemVariableService, final ConfigurationService configurationService, final CalendarService calendarService, final WeatherService weatherService, final ConversionService conversionService) {
 		this.systemVariableService=systemVariableService;
@@ -60,7 +67,7 @@ class TimerController {
 	}
 	
 	@GetMapping(value = "/timer")
-	String variable(final Model model, @RequestParam(name = "update", required = false, defaultValue = "false") final boolean update, final Locale locale) {
+	String variable(final Model model, @RequestParam(name = "update", required = false, defaultValue = "false") final boolean update) {
 		final var date = update? LocalDate.now() : LocalDate.now().plusDays(1);
 		final Cycle cycle =calendarService.cycle(date);
 		final Map<Key,Object> parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);
@@ -109,7 +116,7 @@ class TimerController {
 			return TIMER_MODEL_AND_VIEW_NAME;
 		}
 		
-		systemVariableService.update(List.of(systemVariable(timers, timerModel.isUpdate()), new SystemVariable("TimerEvents", "0")));
+		systemVariableService.update(List.of(systemVariable(timers, timerModel.isUpdate()), new SystemVariable(SYSTEM_VARIABLE_NAME_TIMER_EVENTS, "0")));
 		
 		
 		return VariableController.REDIRECT_VARIABLE_VIEW_NAME;
@@ -123,12 +130,15 @@ class TimerController {
 	}
 
 	private SystemVariable  systemVariable(final List<Entry<String, Double>> timers, final boolean update) {
-		return new SystemVariable(update?"EventExecutions":"DailyEvents", StringUtils.collectionToDelimitedString(timers.stream().map(entry -> String.format("%s:%s", entry.getKey(), conversionService.convert(entry.getValue(), String.class))).collect(Collectors.toList()), ";" ))	; 
+		return new SystemVariable(update?SYSTEM_VARIABLE_NAME_EVENT_EXECUTIONS:SYSTEM_VARIABLE_NAME_DAILY_EVENTS, StringUtils.collectionToDelimitedString(timers.stream().map(entry -> String.format("%s:%s", entry.getKey(), conversionService.convert(entry.getValue(), String.class))).collect(Collectors.toList()), ";" ))	; 
 	
 	}
 
 	private List<Entry<String, Double>> timers(final TimerModel timerModel) {
 		final List<Entry<String, Double>> timers = new ArrayList<>();
+		
+	
+		
 		timer("T0", timerModel.getUpTime()).ifPresent(timers::add);
 		timer("T1" , timerModel.getSunUpTime()).ifPresent(timers::add);
 		timer("T2", timerModel.getShadowTime()).ifPresent(timers::add);
