@@ -1,31 +1,45 @@
 package de.mq.iot2.sysvars.support;
 
+import static de.mq.iot2.sysvars.support.TimerController.I18N_TIME_INFUTURE;
+import static de.mq.iot2.sysvars.support.TimerController.MINUTES_IN_FUTURE;
+import static de.mq.iot2.sysvars.support.TimerController.SYSTEM_VARIABLE_NAME_DAILY_EVENTS;
+import static de.mq.iot2.sysvars.support.TimerController.SYSTEM_VARIABLE_NAME_TIMER_EVENTS;
 import static de.mq.iot2.sysvars.support.TimerController.TIMER_MODEL_AND_VIEW_NAME;
+import static de.mq.iot2.sysvars.support.VariableController.REDIRECT_VARIABLE_VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.CalendarService.TwilightType;
@@ -113,23 +127,17 @@ class TimerControllerTest {
 	@Test
 	void timer() {
 		final var timerModel = timerModel();
-
 		perpareConversionService();
 
-		timerController.timer(timerModel, bindingResults);
+		assertEquals(REDIRECT_VARIABLE_VIEW_NAME, timerController.timer(timerModel, bindingResults));
 
 		@SuppressWarnings("unchecked")
 		final ArgumentCaptor<List<SystemVariable>> systemVariablesListCapture = ArgumentCaptor.forClass(List.class);
-
-		Mockito.verify(systemVariableService).update(systemVariablesListCapture.capture());
-
+		verify(systemVariableService).update(systemVariablesListCapture.capture());
 		final List<SystemVariable> results = systemVariablesListCapture.getValue();
 		assertEquals(2, results.size());
-
 		assertEquals(TimerController.SYSTEM_VARIABLE_NAME_DAILY_EVENTS, results.get(0).getName());
-
 		assertEquals(String.format("T0:%s;T1:%s;T2:%s;T6:%s", time(UPTIME), time(SUN_UPTIME), time(SHADOW_TIME), time(SUN_DOWNTIME)), results.get(0).getValue());
-
 		assertEquals(TimerController.SYSTEM_VARIABLE_NAME_TIMER_EVENTS, results.get(1).getName());
 		assertEquals("0", results.get(1).getValue());
 
@@ -156,30 +164,72 @@ class TimerControllerTest {
 	@Test
 	void timerEmpty() {
 		final var timerModel = new TimerModel();
-
 		perpareConversionService();
 
-		timerController.timer(timerModel, bindingResults);
+		assertEquals(REDIRECT_VARIABLE_VIEW_NAME,timerController.timer(timerModel, bindingResults));
 
 		@SuppressWarnings("unchecked")
 		final ArgumentCaptor<List<SystemVariable>> systemVariablesListCapture = ArgumentCaptor.forClass(List.class);
-
-		Mockito.verify(systemVariableService).update(systemVariablesListCapture.capture());
-
+		verify(systemVariableService).update(systemVariablesListCapture.capture());
 		final List<SystemVariable> results = systemVariablesListCapture.getValue();
 		assertEquals(2, results.size());
-
-		assertEquals(TimerController.SYSTEM_VARIABLE_NAME_DAILY_EVENTS, results.get(0).getName());
-
+		assertEquals(SYSTEM_VARIABLE_NAME_DAILY_EVENTS, results.get(0).getName());
 		assertEquals(StringUtils.EMPTY, results.get(0).getValue());
-
-		assertEquals(TimerController.SYSTEM_VARIABLE_NAME_TIMER_EVENTS, results.get(1).getName());
+		assertEquals(SYSTEM_VARIABLE_NAME_TIMER_EVENTS, results.get(1).getName());
 		assertEquals("0", results.get(1).getValue());
 
 	}
 
 	private void perpareConversionService() {
-		Mockito.doAnswer(a -> time(a)).when(conversionService).convert(Mockito.anyString(), Mockito.any());
-		Mockito.doAnswer(a -> "" + a.getArgument(0, Double.class)).when(conversionService).convert(Mockito.anyDouble(), Mockito.any());
+		doAnswer(a -> time(a)).when(conversionService).convert(anyString(),any());
+		doAnswer(a -> "" + a.getArgument(0, Double.class)).when(conversionService).convert(anyDouble(), any());
 	}
+	
+	@Test
+	void timerUpdate() {
+		final TimerModel timerModel = timerModel();
+		timerModel.setUpdate(true);
+		ReflectionTestUtils.setField(timerController, "now", (Supplier<?>) () -> LocalDateTime.of(LocalDate.now(), UPTIME.minusMinutes(MINUTES_IN_FUTURE)));
+		perpareConversionService();
+
+		assertEquals(REDIRECT_VARIABLE_VIEW_NAME,timerController.timer(timerModel, bindingResults));
+
+		@SuppressWarnings("unchecked")
+		final ArgumentCaptor<List<SystemVariable>> systemVariablesListCapture = ArgumentCaptor.forClass(List.class);
+		verify(systemVariableService).update(systemVariablesListCapture.capture());
+		final List<SystemVariable> results = systemVariablesListCapture.getValue();
+		assertEquals(2, results.size());
+		assertEquals(TimerController.SYSTEM_VARIABLE_NAME_EVENT_EXECUTIONS, results.get(0).getName());
+		assertEquals(String.format("T0:%s;T1:%s;T2:%s;T6:%s", time(UPTIME), time(SUN_UPTIME), time(SHADOW_TIME), time(SUN_DOWNTIME)), results.get(0).getValue());
+		assertEquals(TimerController.SYSTEM_VARIABLE_NAME_TIMER_EVENTS, results.get(1).getName());
+		assertEquals("0", results.get(1).getValue());
+
+	}
+	
+	
+	@Test
+	void timerUpdateEventsBeforeNowExists() {
+		final TimerModel timerModel = timerModel();
+		timerModel.setUpdate(true);
+		ReflectionTestUtils.setField(timerController, "now", (Supplier<?>) () -> LocalDateTime.of(LocalDate.now(), UPTIME));
+		perpareConversionService();
+
+		assertEquals(TIMER_MODEL_AND_VIEW_NAME,timerController.timer(timerModel, bindingResults));
+		
+		final ArgumentCaptor<ObjectError> errorCaptor = ArgumentCaptor.forClass(ObjectError.class);
+		verify(systemVariableService, never()).update(any());
+		verify(bindingResults).addError(errorCaptor.capture());
+		assertEquals(errorCaptor.getValue().getObjectName(), TIMER_MODEL_AND_VIEW_NAME);
+		assertEquals("{" +I18N_TIME_INFUTURE+"}" , errorCaptor.getValue().getDefaultMessage());
+		assertEquals(1, errorCaptor.getValue().getArguments().length);
+		assertEquals(MINUTES_IN_FUTURE, errorCaptor.getValue().getArguments()[0]);
+		assertEquals(I18N_TIME_INFUTURE,  errorCaptor.getValue().getCode());
+	}
+	
+	@Test
+	void timerBindingErrors() {
+		when(bindingResults.hasErrors()).thenReturn(true);
+		assertEquals(TIMER_MODEL_AND_VIEW_NAME,timerController.timer(new TimerModel(), bindingResults));
+	}
+
 }
