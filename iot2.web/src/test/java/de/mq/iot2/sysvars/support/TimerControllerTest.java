@@ -5,6 +5,7 @@ import static de.mq.iot2.sysvars.support.TimerController.MINUTES_IN_FUTURE;
 import static de.mq.iot2.sysvars.support.TimerController.SYSTEM_VARIABLE_NAME_DAILY_EVENTS;
 import static de.mq.iot2.sysvars.support.TimerController.SYSTEM_VARIABLE_NAME_TIMER_EVENTS;
 import static de.mq.iot2.sysvars.support.TimerController.TIMER_MODEL_AND_VIEW_NAME;
+import static de.mq.iot2.sysvars.support.TimerController.TIME_PATTERN;
 import static de.mq.iot2.sysvars.support.VariableController.REDIRECT_VARIABLE_VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -115,7 +116,7 @@ class TimerControllerTest {
 	}
 
 	private String format(final LocalTime time) {
-		return DateTimeFormatter.ofPattern(TimerController.TIME_PATTERN).format(time);
+		return DateTimeFormatter.ofPattern(TIME_PATTERN).format(time);
 
 	}
 
