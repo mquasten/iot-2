@@ -1,9 +1,12 @@
 package de.mq.iot2.sysvars.support;
 
+import static de.mq.iot2.sysvars.support.TimerController.REDIRECT_TIMER_VIEW_NAME;
 import static de.mq.iot2.sysvars.support.TimerController.TIME_PATTERN;
+import static de.mq.iot2.sysvars.support.VariableController.REDIRECT_VARIABLE_VIEW_NAME_READ_SYSTEM_VARIABLES;
 import static de.mq.iot2.sysvars.support.VariableController.VARIABLE_MODEL_AND_VIEW_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.doAnswer;
@@ -15,6 +18,8 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -29,6 +34,7 @@ import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
+import de.mq.iot2.sysvars.SystemVariable;
 import de.mq.iot2.sysvars.SystemVariableService;
 import de.mq.iot2.weather.WeatherService;
 
@@ -83,5 +89,54 @@ class VariableControllerTest {
 	private String format(final LocalTime time) {
 		return DateTimeFormatter.ofPattern(TIME_PATTERN).format(time);
 
+	}
+	
+	
+	@Test
+	void variableWithSystemVariables() {
+		final var date = LocalDate.now();
+		when(configurationService.parameter(RuleKey.EndOfDay, Key.SunUpDownType, TwilightType.class)).thenReturn(Optional.of(TwilightType.Civil));
+		when(calendarService.sunUpTime(date, TwilightType.Civil)).thenReturn(Optional.of(SUN_UPTIME));
+		when(calendarService.sunDownTime(date, TwilightType.Civil)).thenReturn(Optional.of(SUN_DOWNTIME));
+		when(calendarService.sunUpTime(date.plusDays(1), TwilightType.Civil)).thenReturn(Optional.of(SUN_UPTIME_NEXT));
+		when(calendarService.sunDownTime(date.plusDays(1), TwilightType.Civil)).thenReturn(Optional.of(SUN_DOWNTIME_NEXT));
+		when(weatherService.maxForecastTemperature(date)).thenReturn(Optional.of(TEMPERATURE));
+		when(weatherService.maxForecastTemperature(date.plusDays(1))).thenReturn(Optional.of(TEMPERATURE_NEXT));
+		final Collection<SystemVariable> systemVariables = List.of(mock(SystemVariable.class));
+		when(systemVariableService.read()).thenReturn(systemVariables);
+		doAnswer(a -> "" + a.getArgument(0)).when(conversionService).convert(anyDouble(), any());
+
+		assertEquals(VARIABLE_MODEL_AND_VIEW_NAME, variableController.variable(model, true, Locale.ENGLISH));
+
+		final VariableModel variableModel = (VariableModel) model.getAttribute(VARIABLE_MODEL_AND_VIEW_NAME);
+		assertEquals(date, variableModel.getDate());
+		assertTrue(variableModel.isShowVariables());
+		assertEquals(Locale.ENGLISH, ReflectionTestUtils.getField(variableModel, "locale"));
+		assertEquals(TwilightType.Civil.name().toLowerCase(), variableModel.getTwilightType());
+		assertEquals(format(SUN_UPTIME), variableModel.getSunUpToday());
+		assertEquals(format(SUN_UPTIME_NEXT), variableModel.getSunUpTomorrow());
+		assertEquals(format(SUN_DOWNTIME), variableModel.getSunDownToday());
+		assertEquals(format(SUN_DOWNTIME_NEXT), variableModel.getSunDownTomorrow());
+		assertEquals("" + TEMPERATURE, variableModel.getMaxTemperatureToday());
+		assertEquals("" + TEMPERATURE_NEXT, variableModel.getMaxTemperatureTomorrow());
+		assertEquals(1, variableModel.getVariables().size());
+		assertEquals(systemVariables, variableModel.getVariables());
+
+		verify(systemVariableService).read();
+	}
+	
+	@Test
+	void updateTimerToday() {
+		assertEquals(String.format(REDIRECT_TIMER_VIEW_NAME, true), variableController.updateTimerToday()) ; 
+	}
+	
+	@Test
+	void updateTimerTomorrow() {
+		assertEquals(String.format(REDIRECT_TIMER_VIEW_NAME, false), variableController.updateTimerTomorrow()) ; 
+	}
+	
+	@Test
+	void variables() {
+		assertEquals( REDIRECT_VARIABLE_VIEW_NAME_READ_SYSTEM_VARIABLES, variableController.variables());
 	}
 }
