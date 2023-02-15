@@ -19,13 +19,9 @@ public class VariableModel {
 	private  String  sunDownToday;
 	private  String  sunUpTomorrow;
 	private  String  sunDownTomorrow;
-
 	private  String maxTemperatureToday;
-
 	private  String maxTemperatureTomorrow;
-	
 	private  Locale locale = Locale.getDefault();
-
 	private  boolean showVariables;
 	
 	private  final Collection<SystemVariable> variables = new ArrayList<>();
@@ -47,17 +43,11 @@ public class VariableModel {
 	
 	}
 	 public final LocalDate getDate() {
-		 dateExistsGuard();
 		 return today;
 	 }
 	
 	public String getToday() {
-		dateExistsGuard();
 		return dateToString(today);
-	}
-
-	private void dateExistsGuard() {
-		Assert.notNull(today, "Date required.");
 	}
 
 	private String dateToString(final LocalDate date) {
@@ -65,7 +55,6 @@ public class VariableModel {
 	}
 
 	public String getTomorrow() {
-		dateExistsGuard();
 		return dateToString(today.plusDays(1));
 	}
 	
