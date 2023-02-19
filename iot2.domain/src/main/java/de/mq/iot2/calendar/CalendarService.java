@@ -8,24 +8,7 @@ import java.util.Optional;
 
 public interface CalendarService {
 	public enum TimeType {
-		Winter(1), Summer(2);
-
-		private final int offset;
-
-		TimeType(final int offset) {
-			this.offset = offset;
-		}
-
-		public String key() {
-			return name().toUpperCase();
-		}
-
-		// can be replaced with:
-		//ZonedDateTime t = ZonedDateTime.of(LocalDate.of(2023, Month.MARCH,25), LocalTime.NOON ,ZoneId.of("Europe/Berlin")); 
-		//System.out.println(t.getOffset().getTotalSeconds()/3600);
-		public int offset() {
-			return offset;
-		}
+		Winter, Summer;
 	}
 
 	public enum TwilightType {
@@ -63,8 +46,6 @@ public interface CalendarService {
 
 	int deleteLocalDateDays(final int daysBack);
 	
-	
-	/* ab  hier ungetestet */
 	Collection<DayGroup> dayGroups();
 
 	Collection<Cycle> cycles();

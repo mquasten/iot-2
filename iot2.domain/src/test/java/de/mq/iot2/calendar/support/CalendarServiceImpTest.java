@@ -13,6 +13,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.MonthDay;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -166,6 +167,12 @@ class CalendarServiceImpTest {
 	@MethodSource("timeTypeWinter")
 	void timeWinter(final LocalDate date) {
 		assertEquals(TimeType.Winter, calendarService.timeType(date));
+	}
+	
+	@Test
+	void timeTypeInvalid() {
+		ReflectionTestUtils.setField(calendarService, "zoneId", ZoneId.of("Asia/Magadan"));
+		assertEquals(String.format(CalendarServiceImp.WRONG_ZONE_OFFSET_MESSAHE, 11*3600), assertThrows(IllegalArgumentException.class, () -> calendarService.timeType(LocalDate.now())).getMessage());
 	}
 
 	private static Collection<LocalDate> timeTypeSummer() {

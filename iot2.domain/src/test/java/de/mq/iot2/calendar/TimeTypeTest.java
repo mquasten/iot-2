@@ -11,14 +11,8 @@ import de.mq.iot2.calendar.CalendarService.TimeType;
 class TimeTypeTest {
 	
 	@Test
-	void key() {
-		Arrays.asList(TimeType.values()).forEach(timeType -> assertEquals(timeType.name().toUpperCase(),timeType.key()));
-	}
-	
-	@Test
-	void offset() {
-		assertEquals(1, TimeType.Winter.offset());
-		assertEquals(2, TimeType.Summer.offset());
+	void values() {
+		Arrays.asList(TimeType.values()).forEach(timeType -> assertEquals(timeType,TimeType.valueOf(timeType.name())));
 	}
 
 }
