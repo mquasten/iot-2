@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.MonthDay;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,6 +42,7 @@ import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.RandomTestUtil;
 
 class CalendarServiceImpTest {
+	private static final String ZONE = "Europe/Berlin";
 	private static final double LONGITUDE = 6.2815922;
 	private static final double LATITUDE = 51.1423399;
 	private static final String VALUE_FIELD_NAME = "value";
@@ -50,7 +51,7 @@ class CalendarServiceImpTest {
 	private final DayRepository dayRepository = Mockito.mock(DayRepository.class);
 	private final static int DAY_LIMIT = 30;
 
-	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, LATITUDE, LONGITUDE, DAY_LIMIT);
+	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, LATITUDE, LONGITUDE, DAY_LIMIT, ZONE);
 
 	@Test
 	void createDefaultCyclesGroupsAndDays() {
@@ -168,12 +169,6 @@ class CalendarServiceImpTest {
 	void timeWinter(final LocalDate date) {
 		assertEquals(TimeType.Winter, calendarService.timeType(date));
 	}
-	
-	@Test
-	void timeTypeInvalid() {
-		ReflectionTestUtils.setField(calendarService, "zoneId", ZoneId.of("Asia/Magadan"));
-		assertEquals(String.format(CalendarServiceImp.WRONG_ZONE_OFFSET_MESSAHE, 11*3600), assertThrows(IllegalArgumentException.class, () -> calendarService.timeType(LocalDate.now())).getMessage());
-	}
 
 	private static Collection<LocalDate> timeTypeSummer() {
 		return List.of(LocalDate.of(2022, 3, 27), LocalDate.of(2022, 10, 29), LocalDate.of(2022, 6, 30));
@@ -188,6 +183,19 @@ class CalendarServiceImpTest {
 	@Test
 	final void sunDownTime() {
 		assertEquals(Optional.of(LocalTime.of(19, 57)), calendarService.sunDownTime(LocalDate.of(2022, 3, 27), TwilightType.Mathematical));
+
+	}
+
+	@Test
+	void sunUpDownTimeNotContinuousSummerWinterTimeChange() {
+		assertEquals(61L, Duration.between(calendarService.sunDownTime(LocalDate.of(2022, 3, 26), TwilightType.Mathematical).get(),
+				calendarService.sunDownTime(LocalDate.of(2022, 3, 27), TwilightType.Mathematical).get()).toMinutes());
+		assertEquals(57L, Duration.between(calendarService.sunUpTime(LocalDate.of(2022, 3, 26), TwilightType.Mathematical).get(),
+				calendarService.sunUpTime(LocalDate.of(2022, 3, 27), TwilightType.Mathematical).get()).toMinutes());
+		assertEquals(62L, Duration.between(calendarService.sunDownTime(LocalDate.of(2022, 10, 30), TwilightType.Mathematical).get(),
+				calendarService.sunDownTime(LocalDate.of(2022, 10, 29), TwilightType.Mathematical).get()).toMinutes());
+		assertEquals(58L, Duration.between(calendarService.sunUpTime(LocalDate.of(2022, 10, 30), TwilightType.Mathematical).get(),
+				calendarService.sunUpTime(LocalDate.of(2022, 10, 29), TwilightType.Mathematical).get()).toMinutes());
 	}
 
 	@Test

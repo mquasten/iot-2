@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
@@ -38,8 +37,6 @@ import de.mq.iot2.support.IdUtil;
 
 @Service
 class CalendarServiceImp implements CalendarService {
-
-	static final String WRONG_ZONE_OFFSET_MESSAHE = "Wrong zoneOffset: %s s.";
 	static final String DAYS_BACK_INVALID_MESSAGE = "DaysBack should be > 0.";
 	static final String OTHER_UP_TIMES_GROUP_NAME = "Sonderzeiten";
 	static final String LIMIT_OF_DAYS_MESSAGE = "Limit of days is %s.";
@@ -60,19 +57,19 @@ class CalendarServiceImp implements CalendarService {
 			new SimpleImmutableEntry<>(MonthDay.of(11, 1), "Allerheiligen"), new SimpleImmutableEntry<>(MonthDay.of(12, 25), "1. Weihnachtsfeiertag"),
 			new SimpleImmutableEntry<>(MonthDay.of(12, 26), "2. Weihnachtsfeiertag"));
 
-	
-	private final ZoneId zoneId = ZoneId.of("Europe/Berlin");
-	
+	private final ZoneId zoneId;
+
 	@Autowired
 	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository,
 			@Value("${iot2.calendar.latitude}") final double latitude, @Value("${iot2.calendar.longitude}") final double longitude,
-			@Value("${iot2.calendar.dayslimit:30}") final int dayLimit) {
+			@Value("${iot2.calendar.dayslimit:30}") final int dayLimit, @Value("${iot2.calendar.zone:Europe/Berlin}") final String zone) {
 		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.dayLimit = dayLimit;
+		this.zoneId = ZoneId.of(zone);
 	}
 
 	@Override
@@ -125,30 +122,23 @@ class CalendarServiceImp implements CalendarService {
 		return dayRepository.findAll().stream().filter(day -> day.matches(date)).map(day -> day.dayGroup().cycle())
 				.sorted((Comparator<Cycle>) (c1, c2) -> Integer.signum(c1.priority() - c2.priority())).findFirst().orElse(defaultCycle);
 	}
-	
-	private int  zoneOffsetHours(final LocalDate date) {
-		final var zoneOffsetSeconds   = ZonedDateTime.of(date, LocalTime.NOON ,zoneId).getOffset().getTotalSeconds();
-		Assert.isTrue(zoneOffsetSeconds==3600||zoneOffsetSeconds==7200, String.format(WRONG_ZONE_OFFSET_MESSAHE,zoneOffsetSeconds));
-		return zoneOffsetSeconds/3600;
-	}
 
 	@Override
 	public TimeType timeType(final LocalDate date) {
-		
-		if( zoneOffsetHours(date)==2) {
+		if (ZoneUtil.zoneOffsetHours(date, zoneId) == 2) {
 			return TimeType.Summer;
 		}
 		return TimeType.Winter;
-	} 
+	}
 
 	@Override
 	public Optional<LocalTime> sunDownTime(final LocalDate date, final TwilightType twilightType) {
-		return new SunUpDownCalculatorImpl(latitude, longitude, twilightType).sunDownTime(date.getDayOfYear(), zoneOffsetHours(date));
+		return new SunUpDownCalculatorImpl(latitude, longitude, twilightType).sunDownTime(date.getDayOfYear(), ZoneUtil.zoneOffsetHours(date, zoneId));
 	}
 
 	@Override
 	public Optional<LocalTime> sunUpTime(final LocalDate date, final TwilightType twilightType) {
-		return new SunUpDownCalculatorImpl(latitude, longitude, twilightType).sunUpTime(date.getDayOfYear(), zoneOffsetHours(date));
+		return new SunUpDownCalculatorImpl(latitude, longitude, twilightType).sunUpTime(date.getDayOfYear(), ZoneUtil.zoneOffsetHours(date, zoneId));
 	}
 
 	@Override
