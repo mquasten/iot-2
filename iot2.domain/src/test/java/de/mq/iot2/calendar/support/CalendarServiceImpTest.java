@@ -42,7 +42,6 @@ import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.RandomTestUtil;
 
 class CalendarServiceImpTest {
-	private static final String ZONE = "Europe/Berlin";
 	private static final double LONGITUDE = 6.2815922;
 	private static final double LATITUDE = 51.1423399;
 	private static final String VALUE_FIELD_NAME = "value";
@@ -51,7 +50,7 @@ class CalendarServiceImpTest {
 	private final DayRepository dayRepository = Mockito.mock(DayRepository.class);
 	private final static int DAY_LIMIT = 30;
 
-	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, LATITUDE, LONGITUDE, DAY_LIMIT, ZONE);
+	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, LATITUDE, LONGITUDE, DAY_LIMIT,  ZoneUtil.ZONE_ID_EUROPEAN_SUMMERTIME.getId());
 
 	@Test
 	void createDefaultCyclesGroupsAndDays() {
