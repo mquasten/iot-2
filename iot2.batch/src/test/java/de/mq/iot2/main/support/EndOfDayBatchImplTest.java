@@ -13,12 +13,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import de.mq.iot2.calendar.CalendarService;
-import de.mq.iot2.calendar.CalendarService.TimeType;
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
+import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
-import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.rules.RuleService;
 import de.mq.iot2.sysvars.SystemVariable;
@@ -45,7 +44,7 @@ class EndOfDayBatchImplTest {
 		final var maxForecastTemperature = Optional.of( 11.11d);;
 		Mockito.when(calendarService.cycle(date)).thenReturn(cycle);
 		final Map<Key, Object> parameters = Map.of(Key.SunUpDownType, TwilightType.Civil);
-		Mockito.when(calendarService.timeType(date)).thenReturn(TimeType.Winter);
+		
 		Mockito.when(configurationService.parameters(RuleKey.EndOfDay, cycle)).thenReturn(parameters);
 		Mockito.when(calendarService.sunUpTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunUpTime));
 		Mockito.when(calendarService.sunDownTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunDownTime));
@@ -60,7 +59,6 @@ class EndOfDayBatchImplTest {
 		endOfDayBatch.execute(date);
 
 		assertEquals(parameters, parameterCapture.getValue());
-		assertEquals(TimeType.Winter, argumentCaptor.getValue().get(EndOfDayArguments.TimeType));
 		assertEquals(date, argumentCaptor.getValue().get(EndOfDayArguments.Date));
 		assertEquals(Optional.of(sunUpTime), argumentCaptor.getValue().get(EndOfDayArguments.SunUpTime));
 		assertEquals(Optional.of(sunDownTime), argumentCaptor.getValue().get(EndOfDayArguments.SunDownTime));
@@ -77,7 +75,6 @@ class EndOfDayBatchImplTest {
 		final var sunDownTime = LocalTime.of(17, 0);
 		Mockito.when(calendarService.cycle(date)).thenReturn(cycle);
 		final Map<Key, Object> parameters = Map.of(Key.MaxSunDownTime, LocalTime.of(23, 30));
-		Mockito.when(calendarService.timeType(date)).thenReturn(TimeType.Winter);
 		Mockito.when(configurationService.parameters(RuleKey.EndOfDay, cycle)).thenReturn(parameters);
 		Mockito.when(calendarService.sunUpTime(date, TwilightType.Mathematical)).thenReturn(Optional.of(sunUpTime));
 		Mockito.when(calendarService.sunDownTime(date, TwilightType.Mathematical)).thenReturn(Optional.of(sunDownTime));
@@ -98,7 +95,7 @@ class EndOfDayBatchImplTest {
 		final var maxForecastTemperature = Optional.of( 11.11d);;
 		Mockito.when(calendarService.cycle(date)).thenReturn(cycle);
 		final Map<Key, Object> parameters = Map.of(Key.SunUpDownType, TwilightType.Civil);
-		Mockito.when(calendarService.timeType(date)).thenReturn(TimeType.Winter);
+	
 		Mockito.when(configurationService.parameters(RuleKey.EndOfDay, cycle)).thenReturn(parameters);
 		Mockito.when(calendarService.sunUpTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunUpTime));
 		Mockito.when(calendarService.sunDownTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunDownTime));
@@ -113,7 +110,6 @@ class EndOfDayBatchImplTest {
 		endOfDayBatch.executeUpdate(time);
 
 		assertEquals(parameters, parameterCapture.getValue());
-		assertEquals(TimeType.Winter, argumentCaptor.getValue().get(EndOfDayArguments.TimeType));
 		assertEquals(date, argumentCaptor.getValue().get(EndOfDayArguments.Date));
 		assertEquals(Optional.of(sunUpTime), argumentCaptor.getValue().get(EndOfDayArguments.SunUpTime));
 		assertEquals(Optional.of(sunDownTime), argumentCaptor.getValue().get(EndOfDayArguments.SunDownTime));

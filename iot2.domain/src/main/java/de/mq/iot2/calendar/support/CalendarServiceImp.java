@@ -124,14 +124,6 @@ class CalendarServiceImp implements CalendarService {
 	}
 
 	@Override
-	public TimeType timeType(final LocalDate date) {
-		if (ZoneUtil.zoneOffsetHours(date, zoneId) == 2) {
-			return TimeType.Summer;
-		}
-		return TimeType.Winter;
-	}
-
-	@Override
 	public Optional<LocalTime> sunDownTime(final LocalDate date, final TwilightType twilightType) {
 		return new SunUpDownCalculatorImpl(latitude, longitude, twilightType).sunDownTime(date.getDayOfYear(), ZoneUtil.zoneOffsetHours(date, zoneId));
 	}

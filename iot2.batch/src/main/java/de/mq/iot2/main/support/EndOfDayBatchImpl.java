@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.CalendarService;
-import de.mq.iot2.calendar.CalendarService.TimeType;
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.configuration.Configuration.RuleKey;
@@ -58,7 +57,7 @@ public class EndOfDayBatchImpl {
 
 		final var parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);
 		
-		final TimeType timeType = calendarService.timeType(date);
+		//final TimeType timeType = calendarService.timeType(date);
 
 		final var twilightType = parameters.containsKey(Key.SunUpDownType) ? (TwilightType) parameters.get(Key.SunUpDownType) : TwilightType.Mathematical;
 
@@ -68,7 +67,7 @@ public class EndOfDayBatchImpl {
 		
 		final var maxForecastTemperature = weatherService.maxForecastTemperature(date);
 		
-		final var arguments = Map.of(EndOfDayArguments.Date, date,EndOfDayArguments.TimeType, timeType, EndOfDayArguments.SunUpTime, sunUpTime, EndOfDayArguments.SunDownTime, sunDownTime, EndOfDayArguments.Cycle, cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature, EndOfDayArguments.UpdateTime, uptateTime);
+		final var arguments = Map.of(EndOfDayArguments.Date, date, EndOfDayArguments.SunUpTime, sunUpTime, EndOfDayArguments.SunDownTime, sunDownTime, EndOfDayArguments.Cycle, cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature, EndOfDayArguments.UpdateTime, uptateTime);
 
 		LOGGER.debug("Start RulesEngine parameters {} arguments {}.", parameters, arguments );
 		final var results =  ruleService.process(parameters, arguments);

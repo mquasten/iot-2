@@ -7,9 +7,6 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface CalendarService {
-	public enum TimeType {
-		Winter, Summer;
-	}
 
 	public enum TwilightType {
 		Mathematical(-50d / 60d), Civil(-6d), Nautical(-12d), Astronomical(-18d);
@@ -33,8 +30,6 @@ public interface CalendarService {
 	void createDefaultCyclesGroupsAndDays();
 
 	Cycle cycle(final LocalDate date);
-
-	TimeType timeType(final LocalDate date);
 
 	Optional<LocalTime> sunDownTime(final LocalDate date, final TwilightType twilightType);
 

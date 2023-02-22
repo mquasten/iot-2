@@ -26,14 +26,12 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import de.mq.iot2.calendar.CalendarService;
-import de.mq.iot2.calendar.CalendarService.TimeType;
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.Day;
@@ -155,28 +153,6 @@ class CalendarServiceImpTest {
 		Mockito.when(dayRepository.findAll()).thenReturn(days);
 
 		assertEquals(defaultCycle, calendarService.cycle(LocalDate.now().plusDays(1)));
-	}
-
-	@ParameterizedTest
-	@MethodSource("timeTypeSummer")
-	void timeTypeSummer(final LocalDate date) {
-		assertEquals(TimeType.Summer, calendarService.timeType(date));
-	}
-
-	@ParameterizedTest
-	@MethodSource("timeTypeWinter")
-	void timeWinter(final LocalDate date) {
-		assertEquals(TimeType.Winter, calendarService.timeType(date));
-	}
-
-	private static Collection<LocalDate> timeTypeSummer() {
-		return List.of(LocalDate.of(2022, 3, 27), LocalDate.of(2022, 10, 29), LocalDate.of(2022, 6, 30));
-
-	}
-
-	private static Collection<LocalDate> timeTypeWinter() {
-		return List.of(LocalDate.of(2022, 3, 26), LocalDate.of(2022, 10, 30), LocalDate.of(2022, 2, 1));
-
 	}
 
 	@Test

@@ -17,8 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
-
-import de.mq.iot2.calendar.CalendarService.TimeType;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.sysvars.SystemVariable;
 
@@ -57,20 +55,28 @@ class OtherVariablesRulesImplTest {
 		assertThrows(IllegalArgumentException.class, () -> otherVariablesRules.workingday(Mockito.mock(Cycle.class), null));
 	}
 
-	@ParameterizedTest
-	@EnumSource(TimeType.class)
-	void timerType(final TimeType timeType) {
-		otherVariablesRules.timeType(timeType, systemVariables);
+	@Test
+	void timerTypeWinter() {
+		otherVariablesRules.timeType(LocalDate.of(2023, 3, 2), systemVariables);
 
 		assertEquals(1, systemVariables.size());
 		assertEquals(OtherVariablesRulesImpl.TIME_TYP_SYSTEM_VARIABLE_NAME, systemVariables.stream().findAny().get().getName());
-		assertEquals(String.valueOf(timeType.ordinal()), systemVariables.stream().findAny().get().getValue());
+		assertEquals(String.valueOf(0), systemVariables.stream().findAny().get().getValue());
+	}
+	
+	@Test
+	void timerTypeSummer() {
+		otherVariablesRules.timeType(LocalDate.of(2023, 3, 31), systemVariables);
+
+		assertEquals(1, systemVariables.size());
+		assertEquals(OtherVariablesRulesImpl.TIME_TYP_SYSTEM_VARIABLE_NAME, systemVariables.stream().findAny().get().getName());
+		assertEquals(String.valueOf(1), systemVariables.stream().findAny().get().getValue());
 	}
 
 	@Test
 	void timeTypeNullValues() {
 		assertThrows(IllegalArgumentException.class, () -> otherVariablesRules.timeType(null, new ArrayList<>()));
-		assertThrows(IllegalArgumentException.class, () -> otherVariablesRules.timeType(TimeType.Winter, null));
+		assertThrows(IllegalArgumentException.class, () -> otherVariablesRules.timeType(LocalDate.now(), null));
 	}
 
 	@ParameterizedTest

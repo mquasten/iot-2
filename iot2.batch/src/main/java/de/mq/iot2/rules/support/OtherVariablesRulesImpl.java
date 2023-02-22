@@ -16,9 +16,8 @@ import org.jeasy.rules.annotation.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-
-import de.mq.iot2.calendar.CalendarService.TimeType;
 import de.mq.iot2.calendar.Cycle;
+import de.mq.iot2.calendar.support.ZoneUtil;
 import de.mq.iot2.sysvars.SystemVariable;
 @Rule(name = "Other-Variables-Rule", description = "\"Other-Variables-Rule", priority = 1)
 public class OtherVariablesRulesImpl {
@@ -59,23 +58,28 @@ public class OtherVariablesRulesImpl {
 	
 	
 	@Action(order = DEFAULT_PRIORITY)
-	public final void timeType(@Fact("TimeType") final TimeType timeType,  @Fact("SystemVariables") final Collection<SystemVariable> systemVariables ) {
-		Assert.notNull(timeType, "TimeType is required.");
+	public final void timeType(@Fact("Date") final LocalDate date,  @Fact("SystemVariables") final Collection<SystemVariable> systemVariables ) {
+		dateExistsGuard(date);
 		systemVariablesNotNullGuard(systemVariables);
-		final var  systemVariable = new SystemVariable(TIME_TYP_SYSTEM_VARIABLE_NAME, ""+ timeType.ordinal());
+		final var offsetInHours = ZoneUtil.zoneOffsetEuropeanSummertimeHours(date);
+		final var  systemVariable = new SystemVariable(TIME_TYP_SYSTEM_VARIABLE_NAME, ""+ (offsetInHours-1));
 		systemVariables.add(systemVariable);
 		writeSystemVariable2Logger(systemVariable);
 	}
 	
 	@Action(order = DEFAULT_PRIORITY)
 	public final void month(@Fact("Date") final LocalDate date,  @Fact("SystemVariables") final Collection<SystemVariable> systemVariables ) {
-		Assert.notNull(date, "Date is required.");
+		dateExistsGuard(date);
 		systemVariablesNotNullGuard(systemVariables);
 	
 		final var  systemVariable = new SystemVariable(MONTH_SYSTEM_VARIABLE_NAME, ""+ date.getMonth().ordinal());
 		
 		systemVariables.add(systemVariable);
 		writeSystemVariable2Logger(systemVariable);
+	}
+
+	private void dateExistsGuard(final LocalDate date) {
+		Assert.notNull(date, "Date is required.");
 	}
 	
 	@Action(order = DEFAULT_PRIORITY)
