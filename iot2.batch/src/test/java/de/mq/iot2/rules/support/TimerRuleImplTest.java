@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
@@ -243,6 +244,16 @@ class TimerRuleImplTest {
 		assertEquals(1, systemVariables.size());
 		assertEquals(TimerRuleImpl.EVENT_EXECUTION, systemVariables.iterator().next().getName());
 		assertEquals("T6:17.15", systemVariables.iterator().next().getValue());
+	}
+	
+	@Test
+	void reset() {
+		final List<SystemVariable> systemVariables = new ArrayList<>();
+		timerRules.resetTimerEvents(systemVariables);
+		
+		assertEquals(1, systemVariables.size());
+		assertEquals(TimerRuleImpl.TIMER_EVENTS_SYSTEM_VARIABLE_NAME, systemVariables.get(0).getName());
+		assertEquals(""+ BigInteger.ZERO, systemVariables.get(0).getValue());
 	}
 
 

@@ -1,5 +1,6 @@
 package de.mq.iot2.rules.support;
 
+import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -28,6 +29,9 @@ public class TimerRuleImpl {
 	static final String DAILY_EVENTS_SYSTEM_VARIABLE_NAME = "DailyEvents";
 	
 	static final String EVENT_EXECUTION = "EventExecutions";
+	static final String TIMER_EVENTS_SYSTEM_VARIABLE_NAME = "TimerEvents";
+	
+	
 	private static final int DEFAULT_PRIORITY = 2;
 	
 	@ParameterValue(Key.MaxSunUpTime)
@@ -125,6 +129,11 @@ public class TimerRuleImpl {
 			return maxSunDownTime;
 		}
 		return time;
+	}
+	
+	@Action(order = DEFAULT_PRIORITY)
+	public final void resetTimerEvents(@Fact("SystemVariables") final Collection<SystemVariable> systemVariables) {
+		systemVariables.add(new SystemVariable(TIMER_EVENTS_SYSTEM_VARIABLE_NAME, String.valueOf(BigInteger.ZERO.intValue())));
 	}
 	
 	@Action(order = Integer.MAX_VALUE)

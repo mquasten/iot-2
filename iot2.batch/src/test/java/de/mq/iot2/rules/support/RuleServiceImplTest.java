@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -67,15 +68,16 @@ class RuleServiceImplTest {
 		@SuppressWarnings("unchecked")
 		final var systemVariableMap = ((Collection<SystemVariable>) results.get(EndOfDayArguments.SystemVariables.name())).stream()
 				.collect(Collectors.toMap(SystemVariable::getName, SystemVariable::getValue));
-		assertEquals(6, systemVariableMap.size());
+		assertEquals(7, systemVariableMap.size());
 		assertEquals("T0:7.15;T1:8.2;T2:9.0;T6:17.15", systemVariableMap.get(TimerRuleImpl.DAILY_EVENTS_SYSTEM_VARIABLE_NAME));
 		assertEquals("" + Month.DECEMBER.ordinal(), systemVariableMap.get(OtherVariablesRulesImpl.MONTH_SYSTEM_VARIABLE_NAME));
 		assertEquals(String.valueOf(false), systemVariableMap.get(OtherVariablesRulesImpl.WORKING_DAY_SYSTEM_VARIABLE_NAME));
-		assertEquals("0" , systemVariableMap.get(OtherVariablesRulesImpl.TIME_TYP_SYSTEM_VARIABLE_NAME));
+		assertEquals(""+BigInteger.ZERO , systemVariableMap.get(OtherVariablesRulesImpl.TIME_TYP_SYSTEM_VARIABLE_NAME));
 		assertEquals(DECIMAL_FORMAT_CCU2.format(maxForecastTemperature.get()), systemVariableMap.get(OtherVariablesRulesImpl.TEMPERATURE_SYSTEM_VARIABLE_NAME));
 		assertTrue(1 >= LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
 				- LocalDateTime.parse(systemVariableMap.get(OtherVariablesRulesImpl.LAST_BATCH_RUN_VARIABLE_NAME), DateTimeFormatter.ofPattern(OtherVariablesRulesImpl.LAST_BATCH_RUN_DATE_FORMAT))
 						.toEpochSecond(ZoneOffset.UTC));
+		assertEquals(""+BigInteger.ZERO , systemVariableMap.get(TimerRuleImpl.TIMER_EVENTS_SYSTEM_VARIABLE_NAME));
 
 	}
 
