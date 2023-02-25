@@ -22,12 +22,15 @@ import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.
 
 class LocalDateValidatorConverterImplTest {
 
+	private static final String INVALID_DATE = "xx.xx.xxxx";
+
 	private final ConstraintValidator<ValidLocalDateModel, LocalDateModel> converter = new LocalDateValidatorConverterImpl(30);
 
 	private final ConstraintValidatorContext constraintValidatorContext = mock(ConstraintValidatorContext.class);
 	private final NodeBuilderCustomizableContext fromContext = mock(NodeBuilderCustomizableContext.class);
 	private final NodeBuilderCustomizableContext toContext = mock(NodeBuilderCustomizableContext.class);
 	private final ConstraintViolationBuilder constraintViolationBuilder = mock(ConstraintViolationBuilder.class);
+
 	@BeforeEach
 	void mockConstraintValidatorContextForProperty() {
 
@@ -82,14 +85,14 @@ class LocalDateValidatorConverterImplTest {
 		localDateModel.setTo("01.01");
 		localDateModel.setFromDate(LocalDate.now());
 		localDateModel.setToDate(LocalDate.now());
-		
+
 		assertFalse(converter.isValid(localDateModel, constraintValidatorContext));
 
 		assertFromDateAndToDateAreNull(localDateModel);
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
 		verify(fromContext).addConstraintViolation();
 		verify(toContext).addConstraintViolation();
-		
+
 	}
 
 	private void assertFromDateAndToDateAreNull(final LocalDateModel localDateModel) {
@@ -104,7 +107,7 @@ class LocalDateValidatorConverterImplTest {
 	private String stringEnglish(final LocalDate date) {
 		return date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
 	}
-	
+
 	@Test
 	void isValidEnglishInvalidFormat() {
 
@@ -113,16 +116,16 @@ class LocalDateValidatorConverterImplTest {
 		localDateModel.setTo("01/01");
 		localDateModel.setFromDate(LocalDate.now());
 		localDateModel.setToDate(LocalDate.now());
-		
+
 		assertFalse(converter.isValid(localDateModel, constraintValidatorContext));
 
 		assertFromDateAndToDateAreNull(localDateModel);
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
 		verify(fromContext).addConstraintViolation();
 		verify(toContext).addConstraintViolation();
-		
+
 	}
-	
+
 	@Test
 	void isValidGermanInvalidDate() {
 
@@ -131,16 +134,16 @@ class LocalDateValidatorConverterImplTest {
 		localDateModel.setTo("30.02.2099");
 		localDateModel.setFromDate(LocalDate.now());
 		localDateModel.setToDate(LocalDate.now());
-		
+
 		assertFalse(converter.isValid(localDateModel, constraintValidatorContext));
 
 		assertFromDateAndToDateAreNull(localDateModel);
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
 		verify(fromContext).addConstraintViolation();
 		verify(toContext).addConstraintViolation();
-		
+
 	}
-	
+
 	@Test
 	void isValidEnglishInvalidDate() {
 
@@ -149,23 +152,23 @@ class LocalDateValidatorConverterImplTest {
 		localDateModel.setTo("02/30/2099");
 		localDateModel.setFromDate(LocalDate.now());
 		localDateModel.setToDate(LocalDate.now());
-		
+
 		assertFalse(converter.isValid(localDateModel, constraintValidatorContext));
 
 		assertFromDateAndToDateAreNull(localDateModel);
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
 		verify(fromContext).addConstraintViolation();
 		verify(toContext).addConstraintViolation();
-		
+
 	}
-	
+
 	@Test
 	void isValidToDateMissing() {
 		final LocalDate date = LocalDate.now();
 
 		final LocalDateModel localDateModel = new LocalDateModel();
 		localDateModel.setFrom(stringGerman(date.plusDays(1)));
-		
+
 		assertTrue(converter.isValid(localDateModel, constraintValidatorContext));
 
 		assertEquals(date.plusDays(1), localDateModel.getFromDate());
@@ -173,14 +176,13 @@ class LocalDateValidatorConverterImplTest {
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
 
 	}
-	
-	
+
 	@Test
 	void isValidfromDateMissing() {
 		final LocalDateModel localDateModel = new LocalDateModel();
 		localDateModel.setFromDate(LocalDate.now());
 		localDateModel.setToDate(LocalDate.now());
-		
+
 		assertFalse(converter.isValid(localDateModel, constraintValidatorContext));
 
 		assertFromDateAndToDateAreNull(localDateModel);
@@ -188,7 +190,7 @@ class LocalDateValidatorConverterImplTest {
 		verify(fromContext).addConstraintViolation();
 		verify(constraintValidatorContext).buildConstraintViolationWithTemplate(LocalDateValidatorConverterImpl.MESSAGE_KEY_MANDATORY);
 	}
-	
+
 	@Test
 	void isValidFromNotInFuture() {
 		final LocalDate date = LocalDate.now();
@@ -204,7 +206,7 @@ class LocalDateValidatorConverterImplTest {
 		verify(fromContext).addConstraintViolation();
 		verify(constraintValidatorContext).buildConstraintViolationWithTemplate(LocalDateValidatorConverterImpl.MESSAGE_KEY_DATE_FUTURE);
 	}
-	
+
 	@Test
 	void isValidGermanToBeforeFrom() {
 		final LocalDate date = LocalDate.now();
@@ -223,7 +225,7 @@ class LocalDateValidatorConverterImplTest {
 		verify(constraintValidatorContext).buildConstraintViolationWithTemplate(LocalDateValidatorConverterImpl.MESSAGE_KEY_TO_BEFORE_FROM);
 
 	}
-	
+
 	@Test
 	void isValidGermanDayLimit() {
 		final LocalDate date = LocalDate.now();
@@ -233,7 +235,7 @@ class LocalDateValidatorConverterImplTest {
 		localDateModel.setTo(stringGerman(date.plusDays(32)));
 		localDateModel.setFromDate(LocalDate.now());
 		localDateModel.setToDate(LocalDate.now());
-		
+
 		assertFalse(converter.isValid(localDateModel, constraintValidatorContext));
 
 		assertFromDateAndToDateAreNull(localDateModel);
@@ -242,7 +244,28 @@ class LocalDateValidatorConverterImplTest {
 		verify(constraintValidatorContext).buildConstraintViolationWithTemplate(LocalDateValidatorConverterImpl.MESSAGE_KEY_DAY_LIMIT);
 
 	}
-	
-	
+
+	@Test
+	void isValidFromInvalid() {
+		final LocalDateModel localDateModel = new LocalDateModel();
+		localDateModel.setFrom(INVALID_DATE);
+
+		assertFalse(converter.isValid(localDateModel, constraintValidatorContext));
+
+		verify(constraintValidatorContext).disableDefaultConstraintViolation();
+		verify(fromContext).addConstraintViolation();
+	}
+
+	@Test
+	void isValidToInvalid() {
+		final LocalDateModel localDateModel = new LocalDateModel();
+		localDateModel.setTo(INVALID_DATE);
+		localDateModel.setFrom(stringGerman(LocalDate.now().plusDays(1)));
+
+		assertFalse(converter.isValid(localDateModel, constraintValidatorContext));
+
+		verify(constraintValidatorContext).disableDefaultConstraintViolation();
+		verify(toContext).addConstraintViolation();
+	}
 
 }
