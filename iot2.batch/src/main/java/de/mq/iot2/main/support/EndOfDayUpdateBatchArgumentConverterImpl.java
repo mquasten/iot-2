@@ -17,10 +17,10 @@ class EndOfDayUpdateBatchArgumentConverterImpl implements Converter<List<String>
 		Assert.isTrue(objects.size() <= 1, MESSAGE_ONE_OPTIONAL_ARGUMENT);
 		final String value = DataAccessUtils.singleResult(objects);
 		if (value == null) {
-			return new Object[] { LocalTime.now()};
+			return new Object[] { LocalTime.now() };
 		}
-		
-		return new Object[] {LocalTime.parse(value, DateTimeFormatter.ofPattern("HH:mm"))};
+
+		return new Object[] { LocalTime.parse(value, DateTimeFormatter.ofPattern("HH:mm")) };
 	}
 
 }

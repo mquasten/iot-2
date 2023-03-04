@@ -45,7 +45,8 @@ class ModelMapperTest {
 
 	@Test
 	void toDomain() {
-		assertEquals(ModelMapper.METHOD_NOT_IMPLEMENTED, assertThrows(UnsupportedOperationException.class, () -> modelMapper.toDomain(resultMap.get(domainList.get(0)))).getMessage());
+		assertEquals(ModelMapper.METHOD_NOT_IMPLEMENTED,
+				assertThrows(UnsupportedOperationException.class, () -> modelMapper.toDomain(resultMap.get(domainList.get(0)))).getMessage());
 	}
 
 	@Test

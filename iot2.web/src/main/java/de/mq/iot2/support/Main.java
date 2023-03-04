@@ -7,8 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-
-
 @SpringBootApplication
 @EnableJpaRepositories("de.mq.iot2")
 @EntityScan(basePackages = "de.mq.iot2")
@@ -16,8 +14,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement()
 public abstract class Main {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
-    }
-   
+	public static void main(String[] args) {
+		SpringApplication.run(Main.class, args);
+	}
+
 }

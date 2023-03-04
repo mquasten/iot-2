@@ -15,7 +15,7 @@ import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.RandomTestUtil;
 
-class AbstractParameterTest { 
+class AbstractParameterTest {
 
 	private static final String CONFIGURATION_FIELD_NAME = "configuration";
 	private static final String VALUE_FIELD_NAME = "value";
@@ -24,22 +24,20 @@ class AbstractParameterTest {
 	private static final String VALUE = RandomTestUtil.randomString();
 	private final Configuration configuration = Mockito.mock(Configuration.class);
 
-
-	
 	@Test
 	void create() {
-		final Key key= Key.MaxSunUpTime;
+		final Key key = Key.MaxSunUpTime;
 		final var parameter = newParameter(configuration, key, VALUE);
 		assertEquals(VALUE, parameter.value());
 		assertEquals(key, parameter.key());
 		assertEquals(configuration, parameter.configuration());
 		assertEquals(compareableDigitsFromTimestamp(IdUtil.id()), compareableDigitsFromTimestamp((String) ReflectionTestUtils.getField(parameter, ID_FIELD_NAME)));
 	}
-	
+
 	private String compareableDigitsFromTimestamp(final String uuid) {
 		final var values = uuid.split("[-]");
 		final var last = values[values.length - 1];
-		return values[values.length - 2] +"-"+ last.substring(0, last.length() - 2);
+		return values[values.length - 2] + "-" + last.substring(0, last.length() - 2);
 	}
 
 	@Test

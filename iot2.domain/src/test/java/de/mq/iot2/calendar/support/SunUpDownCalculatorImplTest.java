@@ -22,10 +22,10 @@ public class SunUpDownCalculatorImplTest {
 	final void sunDownTime() {
 		assertEquals(Optional.of(LocalTime.of(19, 57)), newSunUpDownCalculator(TwilightType.Mathematical).sunDownTime(86, 2));
 	}
-	
+
 	private SunUpDownCalculatorImpl newSunUpDownCalculator(final TwilightType twilightType) {
 		return new SunUpDownCalculatorImpl(51.1423399, 6.2815922, twilightType);
-    } 
+	}
 
 	@Test
 	final void sunUpTime() {
@@ -124,6 +124,5 @@ public class SunUpDownCalculatorImplTest {
 
 		return 2;
 	}
-	
 
 }

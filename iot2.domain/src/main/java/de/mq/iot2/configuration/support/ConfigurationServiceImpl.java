@@ -35,7 +35,7 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	static final String OTHER_TIMES_CYCLE_NOT_FOUND_MESSAGE = "Other Times Cycle not found.";
 
 	static final String PARAMETER_ID_NOT_FOUND_MESSAGE_PATTERN = "Parameter with id %s not found.";
-	
+
 	private static final long CLEAN_UP_CONFIGURATION_ID = 2L;
 	static final long OTHER_TIMES_CYCLE_ID = 3L;
 	static final long WORKING_DAY_CYCLE_ID = 2L;
@@ -57,7 +57,8 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	@Transactional
 	public void createDefaultConfigurationsAndParameters() {
 
-		final var nonWorkingDayCycle = cycleRepository.findById(IdUtil.id(NON_WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException(NON_WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE));
+		final var nonWorkingDayCycle = cycleRepository.findById(IdUtil.id(NON_WORKING_DAY_CYCLE_ID))
+				.orElseThrow(() -> new EntityNotFoundException(NON_WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE));
 		final var workingDayCycle = cycleRepository.findById(IdUtil.id(WORKING_DAY_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException(WORKINGDAY_CYCLE_NOT_FOUND_MESSAGE));
 		final var otherTimesCycle = cycleRepository.findById(IdUtil.id(OTHER_TIMES_CYCLE_ID)).orElseThrow(() -> new EntityNotFoundException(OTHER_TIMES_CYCLE_NOT_FOUND_MESSAGE));
 		saveEndOfDayConfiguration(nonWorkingDayCycle, workingDayCycle, otherTimesCycle);
@@ -91,12 +92,13 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	public Map<Key, Object> parameters(final RuleKey ruleKey, final Cycle cycle) {
 		Assert.notNull(ruleKey, "Key is required");
 		Assert.notNull(cycle, "Cycle is required");
-		final var configuration = configurationRepository.findByKey(ruleKey).orElseThrow(() -> new EntityNotFoundException(String.format(CONFIGURATION_KEY_NOT_FOUND_MESSAGE_PATTERN, ruleKey)));
+		final var configuration = configurationRepository.findByKey(ruleKey)
+				.orElseThrow(() -> new EntityNotFoundException(String.format(CONFIGURATION_KEY_NOT_FOUND_MESSAGE_PATTERN, ruleKey)));
 
 		final Collection<? extends Parameter> parameters = parameterRepository.findByConfiguration(configuration);
 
-		final Map<Key, Parameter> cycleParameters = parameters.stream().filter(parameter -> parameter instanceof CycleParameter).filter(parameter -> ((CycleParameter) parameter).cycle().equals(cycle))
-				.collect(Collectors.toMap(Parameter::key, Function.identity()));
+		final Map<Key, Parameter> cycleParameters = parameters.stream().filter(parameter -> parameter instanceof CycleParameter)
+				.filter(parameter -> ((CycleParameter) parameter).cycle().equals(cycle)).collect(Collectors.toMap(Parameter::key, Function.identity()));
 
 		final Collection<Parameter> globalParameters = parameters.stream().filter(parameter -> !cycleParameters.containsKey(parameter.key())).collect(Collectors.toList());
 
@@ -111,27 +113,27 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	@Transactional
 	@Override
 	public <T> Optional<T> parameter(final RuleKey ruleKey, final Key key, final Class<T> clazz) {
-		 return   parameterRepository.findByRuleKeyAndKey(ruleKey, key).map(parameter -> conversionService.convert(parameter.value(), clazz));
+		return parameterRepository.findByRuleKeyAndKey(ruleKey, key).map(parameter -> conversionService.convert(parameter.value(), clazz));
 	}
-	
+
 	@Transactional
 	@Override
-	public Collection<Configuration> configurations(){
+	public Collection<Configuration> configurations() {
 		return configurationRepository.findAll();
 	}
-	
+
 	@Transactional
 	@Override
 	public Collection<Parameter> parameters(final String configurationId) {
 		Assert.hasText(configurationId, "ConfigurationId is required.");
 		return parameterRepository.findByConfigurationId(configurationId);
 	}
+
 	@Transactional()
 	@Override
-	public  void save(final Parameter parmeter) {
+	public void save(final Parameter parmeter) {
 		Assert.notNull(parmeter, "Parameter is required.");
 		parameterRepository.save(parmeter);
 	}
-	
 
 }

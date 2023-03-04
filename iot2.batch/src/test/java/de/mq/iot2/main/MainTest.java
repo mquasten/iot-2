@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.util.Base64Utils;
-
 
 import de.mq.iot2.main.support.EndOfDayBatchImpl;
 import de.mq.iot2.main.support.ReflectionCommandLineRunnerArgumentsImpl;
@@ -37,7 +36,8 @@ class MainTest {
 		Main.process(new String[] { "-cend-of-day", "13.06.1831" }, ((CommandLineRunner) args -> ARGUMENTS.add(args[0])).getClass());
 
 		assertEquals(1, ARGUMENTS.size());
-		final var reflectionCommandLineRunnerArguments = (ReflectionCommandLineRunnerArgumentsImpl) SerializationUtils.deserialize(Base64Utils.decodeFromString(ARGUMENTS.stream().findFirst().get()));
+		final var reflectionCommandLineRunnerArguments = (ReflectionCommandLineRunnerArgumentsImpl) SerializationUtils
+				.deserialize(new Base64().decode(ARGUMENTS.stream().findFirst().get()));
 		assertEquals(LocalDate.of(1831, 6, 13), reflectionCommandLineRunnerArguments.getParameterValues()[0]);
 		assertEquals(EndOfDayBatchImpl.class, reflectionCommandLineRunnerArguments.getExecutedBean());
 		assertEquals("execute", reflectionCommandLineRunnerArguments.getMethodName());

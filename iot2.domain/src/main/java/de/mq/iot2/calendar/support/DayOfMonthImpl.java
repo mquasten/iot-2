@@ -3,8 +3,6 @@ package de.mq.iot2.calendar.support;
 import java.time.LocalDate;
 import java.time.MonthDay;
 
-
-
 import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.DayGroup;

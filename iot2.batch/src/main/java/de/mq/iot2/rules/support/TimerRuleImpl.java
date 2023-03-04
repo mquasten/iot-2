@@ -25,15 +25,14 @@ import de.mq.iot2.sysvars.SystemVariable;
 @Rule(name = "Timer-Rule", description = "Timer-Rule", priority = Integer.MIN_VALUE)
 public class TimerRuleImpl {
 
-	private final  static Logger LOGGER = LoggerFactory.getLogger(TimerRuleImpl.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(TimerRuleImpl.class);
 	static final String DAILY_EVENTS_SYSTEM_VARIABLE_NAME = "DailyEvents";
-	
+
 	static final String EVENT_EXECUTION = "EventExecutions";
 	static final String TIMER_EVENTS_SYSTEM_VARIABLE_NAME = "TimerEvents";
-	
-	
+
 	private static final int DEFAULT_PRIORITY = 2;
-	
+
 	@ParameterValue(Key.MaxSunUpTime)
 	private final LocalTime maxSunUpTime = LocalTime.of(10, 0);
 	@ParameterValue(Key.MinSunUpTime)
@@ -45,10 +44,9 @@ public class TimerRuleImpl {
 	@ParameterValue(Key.UpTime)
 	private final LocalTime upTime = null;
 	@ParameterValue(Key.ShadowTime)
-	private final LocalTime shadowTime=null;
+	private final LocalTime shadowTime = null;
 	@ParameterValue(Key.ShadowTemperature)
-	private final Double shadowTemperature=Double.MAX_VALUE;
-	
+	private final Double shadowTemperature = Double.MAX_VALUE;
 
 	@Condition
 	public final boolean evaluate() {
@@ -58,7 +56,7 @@ public class TimerRuleImpl {
 	@Action(order = Integer.MIN_VALUE)
 	public final void setup(final Facts facts) {
 		facts.put(EndOfDayArguments.Timer.name(), new ArrayList<>());
-		facts.put(EndOfDayArguments.SystemVariables.name(),new ArrayList<>());
+		facts.put(EndOfDayArguments.SystemVariables.name(), new ArrayList<>());
 	}
 
 	@Action(order = DEFAULT_PRIORITY)
@@ -93,24 +91,23 @@ public class TimerRuleImpl {
 		}
 		return time;
 	}
-	
+
 	@Action(order = DEFAULT_PRIORITY)
-	public final void timerShadowTemperature(@Fact("MaxForecastTemperature") final Optional<Double> maxForecastTemperature, @Fact("Timer") Collection<Entry<String, LocalTime>> timerList) {
-		if( shadowTime==null) {
+	public final void timerShadowTemperature(@Fact("MaxForecastTemperature") final Optional<Double> maxForecastTemperature,
+			@Fact("Timer") Collection<Entry<String, LocalTime>> timerList) {
+		if (shadowTime == null) {
 			return;
 		}
-		if( maxForecastTemperature.isEmpty()) {
+		if (maxForecastTemperature.isEmpty()) {
 			return;
 		}
 		final var timerName = "T2";
-		if(maxForecastTemperature.get()>= shadowTemperature) {
+		if (maxForecastTemperature.get() >= shadowTemperature) {
 			LOGGER.debug("Add Timer {} {}.", timerName, shadowTime);
 			timerList.add(new AbstractMap.SimpleImmutableEntry<>(timerName, shadowTime));
 		}
-	
-	}
 
-	
+	}
 
 	@Action(order = DEFAULT_PRIORITY)
 	public final void timerDown(@Fact("SunDownTime") final Optional<LocalTime> sunDownTime, @Fact("Timer") Collection<Entry<String, LocalTime>> timerList) {
@@ -130,22 +127,25 @@ public class TimerRuleImpl {
 		}
 		return time;
 	}
-	
+
 	@Action(order = DEFAULT_PRIORITY)
 	public final void resetTimerEvents(@Fact("SystemVariables") final Collection<SystemVariable> systemVariables) {
 		systemVariables.add(new SystemVariable(TIMER_EVENTS_SYSTEM_VARIABLE_NAME, String.valueOf(BigInteger.ZERO.intValue())));
 	}
-	
+
 	@Action(order = Integer.MAX_VALUE)
-	public final void addSystemVariable(@Fact("Timer") Collection<Entry<String, LocalTime>> timerList,@Fact("UpdateTime") final Optional<LocalTime> updateTime,  @Fact("SystemVariables") final Collection<SystemVariable> systemVariables ) {
-		final var variableName = updateTime.isEmpty() ? DAILY_EVENTS_SYSTEM_VARIABLE_NAME: EVENT_EXECUTION ;
-		final var  minTime = updateTime.orElse(LocalTime.of(0, 0));
+	public final void addSystemVariable(@Fact("Timer") Collection<Entry<String, LocalTime>> timerList, @Fact("UpdateTime") final Optional<LocalTime> updateTime,
+			@Fact("SystemVariables") final Collection<SystemVariable> systemVariables) {
+		final var variableName = updateTime.isEmpty() ? DAILY_EVENTS_SYSTEM_VARIABLE_NAME : EVENT_EXECUTION;
+		final var minTime = updateTime.orElse(LocalTime.of(0, 0));
 		final var stringBuilder = new StringBuilder();
-		final var orderedTimers = timerList.stream().filter(entry -> entry.getValue().isAfter(minTime)).sorted(( e1, e2 )-> e1.getValue().compareTo(e2.getValue())).collect(Collectors.toList());
-		
-		IntStream.range(0, orderedTimers.size()).forEach(i -> stringBuilder.append(String.format("%s:%s%s", orderedTimers.get(i).getKey(), orderedTimers.get(i).getValue().getHour() + 0.01*orderedTimers.get(i).getValue().getMinute(),  i<orderedTimers.size()-1? ";" :"" )));
+		final var orderedTimers = timerList.stream().filter(entry -> entry.getValue().isAfter(minTime)).sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+				.collect(Collectors.toList());
+
+		IntStream.range(0, orderedTimers.size()).forEach(i -> stringBuilder.append(String.format("%s:%s%s", orderedTimers.get(i).getKey(),
+				orderedTimers.get(i).getValue().getHour() + 0.01 * orderedTimers.get(i).getValue().getMinute(), i < orderedTimers.size() - 1 ? ";" : "")));
 		systemVariables.add(new SystemVariable(variableName, stringBuilder.toString()));
-		
+
 		LOGGER.debug("Add {} Timer to SystemVariable {} value='{}'.", timerList.size(), variableName, stringBuilder);
 	}
 

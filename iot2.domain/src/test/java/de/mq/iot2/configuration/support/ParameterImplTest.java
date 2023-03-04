@@ -17,7 +17,6 @@ class ParameterImplTest {
 	private final Configuration configuration = Mockito.mock(Configuration.class);
 	private static final String VALUE = RandomTestUtil.randomString();
 
-
 	@Test
 	void createConstructorWithoutArgs() {
 		assertTrue(BeanUtils.instantiateClass(ParameterImpl.class) instanceof Parameter);
@@ -29,9 +28,10 @@ class ParameterImplTest {
 		assertThrows(IllegalArgumentException.class, () -> new ParameterImpl(configuration, null, VALUE));
 		assertThrows(IllegalArgumentException.class, () -> new ParameterImpl(configuration, Key.DaysBack, null));
 	}
+
 	@Test
 	void create() {
-		final var parameter =  new ParameterImpl(configuration, Key.DaysBack, VALUE);
+		final var parameter = new ParameterImpl(configuration, Key.DaysBack, VALUE);
 		assertEquals(configuration, parameter.configuration());
 		assertEquals(Key.DaysBack, parameter.key());
 		assertEquals(VALUE, parameter.value());

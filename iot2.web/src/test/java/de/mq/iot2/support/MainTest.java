@@ -5,7 +5,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.SpringApplication;
 
-
 class MainTest {
 
 	@Test
@@ -16,7 +15,7 @@ class MainTest {
 			mocked.verify(() -> SpringApplication.run(Main.class, args));
 		}
 	}
-	
+
 	@Test
 	void newServingWebContentApplication() {
 		BeanUtils.instantiateClass(Mockito.mock(Main.class).getClass());

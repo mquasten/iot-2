@@ -11,8 +11,9 @@ import jakarta.validation.Valid;
 public interface UserRepository {
 
 	User save(@Valid final User dayGroup);
+
 	Optional<User> findByName(final String name);
-	
+
 	void delete(final User user);
 
 }

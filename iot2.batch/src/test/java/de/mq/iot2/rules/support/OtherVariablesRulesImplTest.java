@@ -63,7 +63,7 @@ class OtherVariablesRulesImplTest {
 		assertEquals(OtherVariablesRulesImpl.TIME_TYP_SYSTEM_VARIABLE_NAME, systemVariables.stream().findAny().get().getName());
 		assertEquals(String.valueOf(0), systemVariables.stream().findAny().get().getValue());
 	}
-	
+
 	@Test
 	void timerTypeSummer() {
 		otherVariablesRules.timeType(LocalDate.of(2023, 3, 31), systemVariables);
@@ -94,23 +94,23 @@ class OtherVariablesRulesImplTest {
 		assertThrows(IllegalArgumentException.class, () -> otherVariablesRules.month(null, new ArrayList<>()));
 		assertThrows(IllegalArgumentException.class, () -> otherVariablesRules.month(LocalDate.now(), null));
 	}
-	
+
 	@Test
 	void maxTemperature() {
-		final var temperature=11.11d;
+		final var temperature = 11.11d;
 		otherVariablesRules.maxTemperature(Optional.of(temperature), systemVariables);
-		
+
 		assertEquals(1, systemVariables.size());
 		assertEquals(OtherVariablesRulesImpl.TEMPERATURE_SYSTEM_VARIABLE_NAME, systemVariables.stream().findAny().get().getName());
 		assertEquals(OtherVariablesRulesImpl.DECIMAL_FORMAT_CCU2.format(temperature), systemVariables.stream().findAny().get().getValue());
 	}
-	
+
 	@Test
 	void maxTemperatureNoForecast() {
 		otherVariablesRules.maxTemperature(Optional.empty(), systemVariables);
-		
+
 		assertEquals(0, systemVariables.size());
-		
+
 	}
 
 	@Test
@@ -119,8 +119,9 @@ class OtherVariablesRulesImplTest {
 
 		assertEquals(1, systemVariables.size());
 		assertEquals(OtherVariablesRulesImpl.LAST_BATCH_RUN_VARIABLE_NAME, systemVariables.stream().findAny().get().getName());
-		assertTrue(1 >= LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - LocalDateTime
-				.parse(systemVariables.stream().findAny().get().getValue(), DateTimeFormatter.ofPattern(OtherVariablesRulesImpl.LAST_BATCH_RUN_DATE_FORMAT)).toEpochSecond(ZoneOffset.UTC));
+		assertTrue(1 >= LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+				- LocalDateTime.parse(systemVariables.stream().findAny().get().getValue(), DateTimeFormatter.ofPattern(OtherVariablesRulesImpl.LAST_BATCH_RUN_DATE_FORMAT))
+						.toEpochSecond(ZoneOffset.UTC));
 	}
 
 }

@@ -2,6 +2,7 @@ package de.mq.iot2.main.support;
 
 import java.lang.reflect.Method;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,9 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.Assert;
-import org.springframework.util.Base64Utils;
 import org.springframework.util.ReflectionUtils;
-
 
 @SpringBootApplication
 @EnableJpaRepositories("de.mq.iot2")
@@ -31,7 +30,7 @@ public class SimpleReflectionCommandLineRunner implements CommandLineRunner {
 
 	@Override
 	public final void run(final String... args) throws Exception {
-		final var arguments = (ReflectionCommandLineRunnerArgumentsImpl) SerializationUtils.deserialize(Base64Utils.decodeFromString(args[0]));
+		final var arguments = (ReflectionCommandLineRunnerArgumentsImpl) SerializationUtils.deserialize(new Base64().decode(args[0]));
 
 		final var bean = applicationContext.getBean(arguments.getExecutedBean());
 		final Method method = ReflectionUtils.findMethod(arguments.getExecutedBean(), arguments.getMethodName(), arguments.getParameterTypes());

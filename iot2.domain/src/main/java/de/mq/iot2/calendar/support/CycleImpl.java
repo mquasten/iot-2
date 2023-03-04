@@ -1,6 +1,5 @@
 package de.mq.iot2.calendar.support;
 
-
 import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.Cycle;
@@ -19,10 +18,10 @@ public class CycleImpl implements Cycle {
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
-	@Size(min=36, max=36)
+	@Size(min = 36, max = 36)
 	private String id;
 	@Column(name = "NAME", length = 25, nullable = false)
-	@Size(max=25)
+	@Size(max = 25)
 	@NotBlank
 	private String name;
 	@Column(name = "PRIORITY", nullable = false)
@@ -82,7 +81,6 @@ public class CycleImpl implements Cycle {
 		return defaultCycle;
 	}
 
-
 	@Override
 	public int hashCode() {
 		if (name == null) {
@@ -105,12 +103,12 @@ public class CycleImpl implements Cycle {
 
 		return other.name.equals(name);
 	}
-	
+
 	@Override
 	public String toString() {
-		if( name == null) {
-		return super.toString();
-		} 
+		if (name == null) {
+			return super.toString();
+		}
 		return name;
 	}
 

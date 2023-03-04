@@ -91,7 +91,8 @@ class ParameterMapperTest {
 
 	@Test
 	void toDomainNotFound() {
-		assertEquals(String.format(PARAMETER_NOT_FOUND_MESSAGE, PARAMETER_ID), assertThrows(EntityNotFoundException.class, () -> parameterMapper.toDomain(PARAMETER_ID)).getMessage());
+		assertEquals(String.format(PARAMETER_NOT_FOUND_MESSAGE, PARAMETER_ID),
+				assertThrows(EntityNotFoundException.class, () -> parameterMapper.toDomain(PARAMETER_ID)).getMessage());
 	}
 
 	@Test

@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.function.Supplier;
 
-
 import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.DayGroup;

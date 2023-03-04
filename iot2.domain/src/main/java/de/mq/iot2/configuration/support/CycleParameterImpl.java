@@ -1,7 +1,5 @@
 package de.mq.iot2.configuration.support;
 
-
-
 import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.Cycle;
@@ -35,8 +33,6 @@ class CycleParameterImpl extends AbstractParameter implements CycleParameter {
 		cycleRequiredGuard(cycle);
 		this.cycle = cycle;
 	}
-
-	
 
 	private void cycleRequiredGuard(final Cycle cycle) {
 		Assert.notNull(cycle, "Cycle required.");

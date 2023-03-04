@@ -24,8 +24,8 @@ class MeteorologicalDataImplTest {
 
 	private final ZonedDateTime dateTime = ZonedDateTime.now();
 
-	private final MeteorologicalData meteorologicalData = new MeteorologicalDataImpl(lowestTemperature, temperature,
-			highestTemperature, windVelocityAmount, windVelocityAngleInDegrees, dateTime);
+	private final MeteorologicalData meteorologicalData = new MeteorologicalDataImpl(lowestTemperature, temperature, highestTemperature, windVelocityAmount,
+			windVelocityAngleInDegrees, dateTime);
 
 	private final double random() {
 		return Math.random() * 30d;
@@ -63,14 +63,9 @@ class MeteorologicalDataImplTest {
 
 	@Test
 	final void compareTo1() {
-		assertEquals(0, new MeteorologicalDataImpl(random(), random(), random(), random(), 12 * random(), dateTime)
-				.compareTo(meteorologicalData));
-		assertEquals(-1,
-				new MeteorologicalDataImpl(random(), random(), random(), random(), 12 * random(), dateTime.minusDays(2))
-						.compareTo(meteorologicalData));
-		assertEquals(1,
-				new MeteorologicalDataImpl(random(), random(), random(), random(), 12 * random(), dateTime.plusDays(2))
-						.compareTo(meteorologicalData));
+		assertEquals(0, new MeteorologicalDataImpl(random(), random(), random(), random(), 12 * random(), dateTime).compareTo(meteorologicalData));
+		assertEquals(-1, new MeteorologicalDataImpl(random(), random(), random(), random(), 12 * random(), dateTime.minusDays(2)).compareTo(meteorologicalData));
+		assertEquals(1, new MeteorologicalDataImpl(random(), random(), random(), random(), 12 * random(), dateTime.plusDays(2)).compareTo(meteorologicalData));
 	}
 
 	@Test

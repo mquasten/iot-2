@@ -25,23 +25,22 @@ import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder;
 import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext;
 
 class DayValidatorConverterImplTest {
-	
+
 	private final ConstraintValidator<ValidDayModel, DayModel> converter = new DayValidatorConverterImpl();
 
 	private final ConstraintValidatorContext constraintValidatorContext = mock(ConstraintValidatorContext.class);
-	
 
 	@ParameterizedTest
 	@EnumSource
-    void dayOfWeek(final DayOfWeek dayOfWeek) {
-		
+	void dayOfWeek(final DayOfWeek dayOfWeek) {
+
 		final var dayModel = newDayOfWeekDayModel("" + dayOfWeek.getValue());
-		
+
 		assertTrue(converter.isValid(dayModel, constraintValidatorContext));
-		
+
 		assertEquals(dayOfWeek, dayModel.getTargetValue());
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
-    }
+	}
 
 	private DayModel newDayOfWeekDayModel(final String value) {
 		final var dayModel = new DayModel();
@@ -50,20 +49,21 @@ class DayValidatorConverterImplTest {
 		dayModel.setTargetValue("targetValue");
 		return dayModel;
 	}
-	
+
 	@ParameterizedTest
 	@NullSource
-	@ValueSource(strings = {" ", ""})
+	@ValueSource(strings = { " ", "" })
 	void dayOfWeekMandatory(final String value) {
 		final var dayModel = newDayOfWeekDayModel(value);
-		final NodeBuilderCustomizableContext valueContext= mockConstraintValidatorContext(MESSAGE_KEY_MANDATORY); 
-		
+		final NodeBuilderCustomizableContext valueContext = mockConstraintValidatorContext(MESSAGE_KEY_MANDATORY);
+
 		assertFalse(converter.isValid(dayModel, constraintValidatorContext));
-		
+
 		assertNull(dayModel.getTargetValue());
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
 		verify(valueContext).addConstraintViolation();
 	}
+
 	private NodeBuilderCustomizableContext mockConstraintValidatorContext(final String key) {
 		final NodeBuilderCustomizableContext nodeBuilderCustomizableContext = mock(NodeBuilderCustomizableContext.class);
 		final ConstraintViolationBuilder constraintViolationBuilder = mock(ConstraintViolationBuilder.class);
@@ -71,31 +71,31 @@ class DayValidatorConverterImplTest {
 		when(constraintViolationBuilder.addPropertyNode(VALUE_FIELD_NAME)).thenReturn(nodeBuilderCustomizableContext);
 		return nodeBuilderCustomizableContext;
 	}
-	
+
 	@Test
 	void dayOfWeekInvalid() {
 		final var dayModel = newDayOfWeekDayModel("0");
-		final NodeBuilderCustomizableContext valueContext= mockConstraintValidatorContext(DayValidatorConverterImpl.MESSAGE_KEY_DAYOFWEEK_INVALID); 
-		
+		final NodeBuilderCustomizableContext valueContext = mockConstraintValidatorContext(DayValidatorConverterImpl.MESSAGE_KEY_DAYOFWEEK_INVALID);
+
 		assertFalse(converter.isValid(dayModel, constraintValidatorContext));
-		
+
 		assertNull(dayModel.getTargetValue());
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
 		verify(valueContext).addConstraintViolation();
 	}
-	
+
 	@ParameterizedTest
-	@ValueSource(strings = {"13.06", "06/13"})
+	@ValueSource(strings = { "13.06", "06/13" })
 	void dayOfMonth(final String value) {
-		
-		final var dayModel = newDayOfMonthDayModel(value );
-		
+
+		final var dayModel = newDayOfMonthDayModel(value);
+
 		assertTrue(converter.isValid(dayModel, constraintValidatorContext));
-		
+
 		assertEquals(MonthDay.of(6, 13), dayModel.getTargetValue());
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
-    }
-	
+	}
+
 	private DayModel newDayOfMonthDayModel(final String value) {
 		final var dayModel = new DayModel();
 		dayModel.setType(DayOfMonthImpl.class.getName());
@@ -103,47 +103,45 @@ class DayValidatorConverterImplTest {
 		dayModel.setTargetValue("targetValue");
 		return dayModel;
 	}
-	
+
 	@ParameterizedTest
 	@NullSource
-	@ValueSource(strings = {" ", ""})
+	@ValueSource(strings = { " ", "" })
 	void dayOfMonthMandatory(final String value) {
 		final var dayModel = newDayOfMonthDayModel(value);
-		final NodeBuilderCustomizableContext valueContext= mockConstraintValidatorContext(MESSAGE_KEY_MANDATORY); 
-		
+		final NodeBuilderCustomizableContext valueContext = mockConstraintValidatorContext(MESSAGE_KEY_MANDATORY);
+
 		assertFalse(converter.isValid(dayModel, constraintValidatorContext));
-		
+
 		assertNull(dayModel.getTargetValue());
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
 		verify(valueContext).addConstraintViolation();
 	}
-	
+
 	@ParameterizedTest
-	@ValueSource(strings = {"13.06.1831", "06/13/1831"})
+	@ValueSource(strings = { "13.06.1831", "06/13/1831" })
 	void dayOfMonthWrongFormat(final String value) {
 		final var dayModel = newDayOfMonthDayModel(value);
-		final NodeBuilderCustomizableContext valueContext= mockConstraintValidatorContext(DayValidatorConverterImpl.MESSAGE_KEY_DAYOFMONTH_INVALID); 
-		
+		final NodeBuilderCustomizableContext valueContext = mockConstraintValidatorContext(DayValidatorConverterImpl.MESSAGE_KEY_DAYOFMONTH_INVALID);
+
 		assertFalse(converter.isValid(dayModel, constraintValidatorContext));
-		
+
 		assertNull(dayModel.getTargetValue());
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
 		verify(valueContext).addConstraintViolation();
 	}
-	
-	
+
 	@ParameterizedTest
-	@ValueSource(strings = {"30.02", "02/30"})
+	@ValueSource(strings = { "30.02", "02/30" })
 	void dayOfMonthParseError(final String value) {
 		final var dayModel = newDayOfMonthDayModel(value);
-		final NodeBuilderCustomizableContext valueContext= mockConstraintValidatorContext(DayValidatorConverterImpl.MESSAGE_KEY_DAYOFMONTH_INVALID); 
-		
+		final NodeBuilderCustomizableContext valueContext = mockConstraintValidatorContext(DayValidatorConverterImpl.MESSAGE_KEY_DAYOFMONTH_INVALID);
+
 		assertFalse(converter.isValid(dayModel, constraintValidatorContext));
-		
+
 		assertNull(dayModel.getTargetValue());
 		verify(constraintValidatorContext).disableDefaultConstraintViolation();
 		verify(valueContext).addConstraintViolation();
 	}
-	
-	
+
 }

@@ -84,10 +84,11 @@ class GaussDayImplTest {
 
 	static Collection<LocalDate> esterdatesWki() {
 		return Arrays.asList(LocalDate.of(2017, Month.APRIL, 16), LocalDate.of(2018, Month.APRIL, 1), LocalDate.of(2019, Month.APRIL, 21), LocalDate.of(2020, Month.APRIL, 12),
-				LocalDate.of(2021, Month.APRIL, 4), LocalDate.of(2022, Month.APRIL, 17), LocalDate.of(2023, Month.APRIL, 9), LocalDate.of(2024, Month.MARCH, 31), LocalDate.of(2025, Month.APRIL, 20),
-				LocalDate.of(2026, Month.APRIL, 5), LocalDate.of(2027, Month.MARCH, 28), LocalDate.of(2028, Month.APRIL, 16), LocalDate.of(2029, Month.APRIL, 1), LocalDate.of(2030, Month.APRIL, 21),
-				LocalDate.of(2031, Month.APRIL, 13), LocalDate.of(2032, Month.MARCH, 28), LocalDate.of(2033, Month.APRIL, 17), LocalDate.of(2034, Month.APRIL, 9), LocalDate.of(2035, Month.MARCH, 25),
-				LocalDate.of(2036, Month.APRIL, 13), LocalDate.of(2037, Month.APRIL, 5));
+				LocalDate.of(2021, Month.APRIL, 4), LocalDate.of(2022, Month.APRIL, 17), LocalDate.of(2023, Month.APRIL, 9), LocalDate.of(2024, Month.MARCH, 31),
+				LocalDate.of(2025, Month.APRIL, 20), LocalDate.of(2026, Month.APRIL, 5), LocalDate.of(2027, Month.MARCH, 28), LocalDate.of(2028, Month.APRIL, 16),
+				LocalDate.of(2029, Month.APRIL, 1), LocalDate.of(2030, Month.APRIL, 21), LocalDate.of(2031, Month.APRIL, 13), LocalDate.of(2032, Month.MARCH, 28),
+				LocalDate.of(2033, Month.APRIL, 17), LocalDate.of(2034, Month.APRIL, 9), LocalDate.of(2035, Month.MARCH, 25), LocalDate.of(2036, Month.APRIL, 13),
+				LocalDate.of(2037, Month.APRIL, 5));
 	}
 
 	@ParameterizedTest

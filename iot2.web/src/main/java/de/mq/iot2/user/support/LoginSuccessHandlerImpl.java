@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 class LoginSuccessHandlerImpl extends SavedRequestAwareAuthenticationSuccessHandler {
-	
+
 	private final UserService userService;
 
 	LoginSuccessHandlerImpl(final UserService userService) {
@@ -22,8 +22,10 @@ class LoginSuccessHandlerImpl extends SavedRequestAwareAuthenticationSuccessHand
 	}
 
 	@Override
-	public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response, final Authentication authentication) throws ServletException, IOException {
-		userService.user(authentication.getName()).ifPresent(user -> user.language().ifPresent(language ->  request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME , language)));
+	public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response, final Authentication authentication)
+			throws ServletException, IOException {
+		userService.user(authentication.getName())
+				.ifPresent(user -> user.language().ifPresent(language -> request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, language)));
 		super.onAuthenticationSuccess(request, response, authentication);
 	}
 }

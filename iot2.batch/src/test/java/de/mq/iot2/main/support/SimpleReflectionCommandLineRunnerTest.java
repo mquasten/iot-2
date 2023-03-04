@@ -3,11 +3,11 @@ package de.mq.iot2.main.support;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.LocalDate;
 
+import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.util.Base64Utils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.SerializationUtils;
 
@@ -29,7 +29,7 @@ class SimpleReflectionCommandLineRunnerTest {
 		assertEquals(1, methods.length);
 		final var date = LocalDate.of(1831, 6, 13);
 		final var longValue = 4711L;
-		final String arg = Base64Utils.encodeToString(SerializationUtils.serialize(new ReflectionCommandLineRunnerArgumentsImpl(methods[0], new Object[] { date, longValue })));
+		final String arg = new Base64().encodeAsString(SerializationUtils.serialize(new ReflectionCommandLineRunnerArgumentsImpl(methods[0], new Object[] { date, longValue })));
 
 		commandLineRunner.run(arg);
 

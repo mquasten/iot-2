@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-
 import org.springframework.util.Assert;
 
 import de.mq.iot2.calendar.Day;
@@ -38,7 +37,7 @@ abstract class AbstractDay<T> implements Day<T> {
 	static final int SIGNUM_POSITIV_INT = 1;
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
-	@Size(min=36, max=36)
+	@Size(min = 36, max = 36)
 	private String id;
 
 	@Column(name = "DAY_VALUE", nullable = false)
@@ -46,7 +45,7 @@ abstract class AbstractDay<T> implements Day<T> {
 	private Integer value;
 
 	@Column(name = "DESCRIPTION", length = 25)
-	@Size(max=25)
+	@Size(max = 25)
 	private String description;
 
 	@ManyToOne(targetEntity = DayGroupImpl.class)

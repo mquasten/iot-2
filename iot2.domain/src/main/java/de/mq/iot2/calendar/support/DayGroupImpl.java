@@ -1,7 +1,5 @@
 package de.mq.iot2.calendar.support;
 
-
-
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -25,17 +23,17 @@ class DayGroupImpl implements DayGroup {
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
-	@Size(min=36, max=36)
+	@Size(min = 36, max = 36)
 	private String id;
 
 	@Column(name = "NAME", length = 25, nullable = false)
 	@NotBlank
-	@Size(max=25)
+	@Size(max = 25)
 	private String name;
 
 	@Column(name = "READ_ONLY", nullable = false)
 	private boolean readOnly;
-	
+
 	@ManyToOne(targetEntity = CycleImpl.class)
 	@JoinColumn(name = "CYCLE_ID", nullable = false)
 	@NotNull
@@ -48,7 +46,7 @@ class DayGroupImpl implements DayGroup {
 	}
 
 	DayGroupImpl(final Cycle cycle, final long id, final String name) {
-		this(cycle,id, name, true);
+		this(cycle, id, name, true);
 	}
 
 	DayGroupImpl(final Cycle cycle, final long id, final String name, boolean readolny) {
@@ -56,20 +54,20 @@ class DayGroupImpl implements DayGroup {
 	}
 
 	DayGroupImpl(final Cycle cycle, final String name) {
-		this(cycle,name, true);
+		this(cycle, name, true);
 	}
 
-	DayGroupImpl(final Cycle cycle,final String name, boolean readolny) {
+	DayGroupImpl(final Cycle cycle, final String name, boolean readolny) {
 		this(cycle, IdUtil.id(), name, readolny);
 	}
-	
+
 	private DayGroupImpl(final Cycle cycle, final String id, final String name, boolean readolny) {
 		cycleRequiredGuard(cycle);
 		nameRequiredGuard(name);
 		this.name = name;
 		this.readOnly = readolny;
 		this.id = id;
-		this.cycle=cycle;
+		this.cycle = cycle;
 	}
 
 	private void cycleRequiredGuard(final Cycle cycle) {
@@ -82,13 +80,14 @@ class DayGroupImpl implements DayGroup {
 
 	@Override
 	public final String name() {
-		return name!=null ? name : "";
+		return name != null ? name : "";
 	}
 
 	@Override
 	public final boolean readOnly() {
 		return readOnly;
 	}
+
 	@Override
 	public final Cycle cycle() {
 		return cycle;

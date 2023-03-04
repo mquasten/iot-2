@@ -67,7 +67,8 @@ class ConfigurationController implements ErrorController {
 		final Map<String, ConfigurationModel> configurationMap = configurationService.configurations().stream().map(configuration -> configurationMapper.toWeb(configuration))
 				.collect(Collectors.toMap(ConfigurationModel::getId, Function.identity()));
 
-		final Collection<ConfigurationModel> configurations = configurationMap.values().stream().sorted((c1, c2) -> c1.getName().compareTo(c2.getName())).collect(Collectors.toList());
+		final Collection<ConfigurationModel> configurations = configurationMap.values().stream().sorted((c1, c2) -> c1.getName().compareTo(c2.getName()))
+				.collect(Collectors.toList());
 		attributes.put(CONFIGURATION_LIST_NAME, configurations);
 
 		configurationId.ifPresentOrElse(

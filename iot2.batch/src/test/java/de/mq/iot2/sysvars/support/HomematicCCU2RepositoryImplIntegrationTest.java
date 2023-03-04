@@ -15,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import de.mq.iot2.sysvars.SystemVariable;
+
 @Disabled
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { SystemVariablesConfiguration.class, HomematicCCU2RepositoryImpl.class })
@@ -22,18 +23,18 @@ public class HomematicCCU2RepositoryImplIntegrationTest {
 
 	@Autowired
 	private SystemVariableRepository systemVariableRepository;
+
 	@Disabled
 	@Test
 	void readSystemVariables() {
-		final var expectedSystemVariables = Set.of("DailyEvents", "LastBatchrun", "Month", "Temperature", "Time",
-				"Workingday");
-		final Set<String> systemVariables = systemVariableRepository.readSystemVariables().stream()
-				.map(SystemVariable::getName).collect(Collectors.toSet());
+		final var expectedSystemVariables = Set.of("DailyEvents", "LastBatchrun", "Month", "Temperature", "Time", "Workingday");
+		final Set<String> systemVariables = systemVariableRepository.readSystemVariables().stream().map(SystemVariable::getName).collect(Collectors.toSet());
 
 		assertTrue(systemVariables.size() >= expectedSystemVariables.size());
 		assertTrue(systemVariables.containsAll(expectedSystemVariables));
 
 	}
+
 	@Disabled
 	@Test
 	void updateSystemVariable() {

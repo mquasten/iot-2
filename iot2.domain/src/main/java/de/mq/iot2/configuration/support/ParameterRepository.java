@@ -16,16 +16,15 @@ import jakarta.validation.Valid;
 @RepositoryDefinition(domainClass = AbstractParameter.class, idClass = String.class)
 public interface ParameterRepository {
 	Optional<Parameter> findById(final String id);
-	
+
 	Collection<Parameter> findByConfiguration(final Configuration configuration);
 
 	@Query("select p  from GlobalParameter p where p.configuration.key= ?1 and p.key= ?2")
-	Optional<Parameter> findByRuleKeyAndKey(final RuleKey ruleKey, final Key key );
-	
+	Optional<Parameter> findByRuleKeyAndKey(final RuleKey ruleKey, final Key key);
+
 	@Query("select p  from Parameter p where p.configuration.id= ?1 order by p.key")
-	Collection<Parameter> findByConfigurationId(final String configurationId );
-	
-	
+	Collection<Parameter> findByConfigurationId(final String configurationId);
+
 	Parameter save(@Valid Parameter parameter);
 
 	@Modifying

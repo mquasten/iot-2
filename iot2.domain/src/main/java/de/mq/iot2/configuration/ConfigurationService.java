@@ -12,7 +12,7 @@ public interface ConfigurationService {
 
 	void createDefaultConfigurationsAndParameters();
 
-	Map<Key,Object> parameters(final RuleKey key, final Cycle cycle);
+	Map<Key, Object> parameters(final RuleKey key, final Cycle cycle);
 
 	<T> Optional<T> parameter(final RuleKey ruleKey, final Key key, final Class<T> clazz);
 

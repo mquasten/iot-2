@@ -10,10 +10,12 @@ import jakarta.validation.Valid;
 
 @RepositoryDefinition(domainClass = CycleImpl.class, idClass = String.class)
 public interface CycleRepository {
-	Collection<Cycle>findAll();
-	Collection<Cycle>findByDefaultCycle(final boolean defaultCycle);
+	Collection<Cycle> findAll();
+
+	Collection<Cycle> findByDefaultCycle(final boolean defaultCycle);
+
 	Cycle save(@Valid final Cycle cycle);
-	
+
 	Optional<Cycle> findById(final String id);
 
 }

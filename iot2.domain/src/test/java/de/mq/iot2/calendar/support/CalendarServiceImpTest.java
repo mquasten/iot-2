@@ -48,7 +48,8 @@ class CalendarServiceImpTest {
 	private final DayRepository dayRepository = Mockito.mock(DayRepository.class);
 	private final static int DAY_LIMIT = 30;
 
-	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, LATITUDE, LONGITUDE, DAY_LIMIT,  ZoneUtil.ZONE_ID_EUROPEAN_SUMMERTIME.getId());
+	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, LATITUDE, LONGITUDE, DAY_LIMIT,
+			ZoneUtil.ZONE_ID_EUROPEAN_SUMMERTIME.getId());
 
 	@Test
 	void createDefaultCyclesGroupsAndDays() {

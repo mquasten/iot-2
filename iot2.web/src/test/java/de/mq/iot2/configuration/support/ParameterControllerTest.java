@@ -50,7 +50,8 @@ class ParameterControllerTest {
 		final var parameterModel = newParameterModelWithIdAndConfigurationId();
 		when(parameterMapper.toDomain(parameterModel)).thenReturn(parameter);
 
-		assertEquals(String.format(REDIRECT_CONFIGURATION_PATTERN, parameterModel.getConfigurationId()), parameterController.updateParameter(parameterModel, mock(BindingResult.class)));
+		assertEquals(String.format(REDIRECT_CONFIGURATION_PATTERN, parameterModel.getConfigurationId()),
+				parameterController.updateParameter(parameterModel, mock(BindingResult.class)));
 
 		verify(configurationService).save(parameter);
 	}

@@ -8,7 +8,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@PropertySource(value="classpath:/application.properties" ,ignoreResourceNotFound=true)
+@PropertySource(value = "classpath:/application.properties", ignoreResourceNotFound = true)
 class SystemVariablesConfiguration {
 
 	@Bean

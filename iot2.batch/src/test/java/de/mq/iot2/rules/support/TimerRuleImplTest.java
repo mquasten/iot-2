@@ -111,7 +111,7 @@ class TimerRuleImplTest {
 		assertEquals("T1", timerList.get(0).getKey());
 		assertEquals(getParameter(Key.MinSunUpTime), timerList.get(0).getValue());
 	}
-	
+
 	@Test
 	void timerShadowTemperature() {
 		final List<Entry<String, LocalTime>> timerList = new ArrayList<>();
@@ -119,27 +119,27 @@ class TimerRuleImplTest {
 		final var time = LocalTime.of(9, 0);
 		injectParameter(Key.ShadowTemperature, temperature);
 		injectParameter(Key.ShadowTime, time);
-		
+
 		timerRules.timerShadowTemperature(Optional.of(temperature), timerList);
-		
+
 		assertEquals(1, timerList.size());
 		assertEquals("T2", timerList.get(0).getKey());
 		assertEquals(time, timerList.get(0).getValue());
-		
+
 	}
-	
+
 	@Test
 	void timerShadowTemperatureTemperatorLessThanLimit() {
 		final List<Entry<String, LocalTime>> timerList = new ArrayList<>();
 		final var time = LocalTime.of(9, 0);
 		injectParameter(Key.ShadowTemperature, 25d);
 		injectParameter(Key.ShadowTime, time);
-		
+
 		timerRules.timerShadowTemperature(Optional.of(24d), timerList);
-		
+
 		assertEquals(0, timerList.size());
 	}
-	
+
 	@Test
 	void timerShadowTemperatureNoForeCast() {
 		final List<Entry<String, LocalTime>> timerList = new ArrayList<>();
@@ -147,22 +147,21 @@ class TimerRuleImplTest {
 		final var time = LocalTime.of(9, 0);
 		injectParameter(Key.ShadowTemperature, temperature);
 		injectParameter(Key.ShadowTime, time);
-		
+
 		timerRules.timerShadowTemperature(Optional.empty(), timerList);
-		
+
 		assertEquals(0, timerList.size());
 	}
-	
+
 	@Test
 	void timerShadowTemperatureShadowTimeNull() {
 		final List<Entry<String, LocalTime>> timerList = new ArrayList<>();
 		final var temperature = 25d;
-		
+
 		injectParameter(Key.ShadowTemperature, temperature);
-		
-		
+
 		timerRules.timerShadowTemperature(Optional.of(temperature), timerList);
-		
+
 		assertEquals(0, timerList.size());
 	}
 
@@ -223,38 +222,39 @@ class TimerRuleImplTest {
 	@Test
 	void addSystemVariable() {
 
-		final Collection<Entry<String, LocalTime>> timer = List.of(new SimpleImmutableEntry<String, LocalTime>("T6", LocalTime.of(17,15)), new SimpleImmutableEntry<String, LocalTime>("T0", LocalTime.of(7, 15)), new SimpleImmutableEntry<String, LocalTime>("T1", LocalTime.of(8, 5)));
+		final Collection<Entry<String, LocalTime>> timer = List.of(new SimpleImmutableEntry<String, LocalTime>("T6", LocalTime.of(17, 15)),
+				new SimpleImmutableEntry<String, LocalTime>("T0", LocalTime.of(7, 15)), new SimpleImmutableEntry<String, LocalTime>("T1", LocalTime.of(8, 5)));
 		final Collection<SystemVariable> systemVariables = new ArrayList<>();
-		
-		timerRules.addSystemVariable(timer,Optional.empty() ,systemVariables);
-		
+
+		timerRules.addSystemVariable(timer, Optional.empty(), systemVariables);
+
 		assertEquals(1, systemVariables.size());
 		assertEquals(TimerRuleImpl.DAILY_EVENTS_SYSTEM_VARIABLE_NAME, systemVariables.iterator().next().getName());
 		assertEquals("T0:7.15;T1:8.05;T6:17.15", systemVariables.iterator().next().getValue());
 	}
-	
+
 	@Test
 	void addSystemVariableUpdate() {
 
-		final Collection<Entry<String, LocalTime>> timer = List.of(new SimpleImmutableEntry<String, LocalTime>("T6", LocalTime.of(17,15)), new SimpleImmutableEntry<String, LocalTime>("T0", LocalTime.of(7, 15)), new SimpleImmutableEntry<String, LocalTime>("T1", LocalTime.of(8, 5)));
+		final Collection<Entry<String, LocalTime>> timer = List.of(new SimpleImmutableEntry<String, LocalTime>("T6", LocalTime.of(17, 15)),
+				new SimpleImmutableEntry<String, LocalTime>("T0", LocalTime.of(7, 15)), new SimpleImmutableEntry<String, LocalTime>("T1", LocalTime.of(8, 5)));
 		final Collection<SystemVariable> systemVariables = new ArrayList<>();
-		
-		timerRules.addSystemVariable(timer,Optional.of(LocalTime.of(8, 10)) ,systemVariables);
-		
+
+		timerRules.addSystemVariable(timer, Optional.of(LocalTime.of(8, 10)), systemVariables);
+
 		assertEquals(1, systemVariables.size());
 		assertEquals(TimerRuleImpl.EVENT_EXECUTION, systemVariables.iterator().next().getName());
 		assertEquals("T6:17.15", systemVariables.iterator().next().getValue());
 	}
-	
+
 	@Test
 	void reset() {
 		final List<SystemVariable> systemVariables = new ArrayList<>();
 		timerRules.resetTimerEvents(systemVariables);
-		
+
 		assertEquals(1, systemVariables.size());
 		assertEquals(TimerRuleImpl.TIMER_EVENTS_SYSTEM_VARIABLE_NAME, systemVariables.get(0).getName());
-		assertEquals(""+ BigInteger.ZERO, systemVariables.get(0).getValue());
+		assertEquals("" + BigInteger.ZERO, systemVariables.get(0).getValue());
 	}
-
 
 }

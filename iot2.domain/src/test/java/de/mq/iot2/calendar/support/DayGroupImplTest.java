@@ -22,10 +22,10 @@ class DayGroupImplTest {
 
 	private static final String ID_FIELD_NAME = "id";
 
-	private  final Long id = RandomTestUtil.randomLong();
+	private final Long id = RandomTestUtil.randomLong();
 
-	private  final String name =  RandomTestUtil.randomString();
-	
+	private final String name = RandomTestUtil.randomString();
+
 	private final Cycle cycle = Mockito.mock(Cycle.class);
 
 	@Test
@@ -70,18 +70,17 @@ class DayGroupImplTest {
 		assertNotNull(id);
 		assertEquals(cycle, dayGroup.cycle());
 	}
-	
-	
+
 	private DayGroupImpl newDayGroup() {
-		return new DayGroupImpl(cycle,name);
+		return new DayGroupImpl(cycle, name);
 	}
-	
+
 	@Test
 	final void name() {
 		final var dayGroup = BeanUtils.instantiateClass(DayGroupImpl.class);
-		
+
 		assertTrue(dayGroup.name().isEmpty());
-		
+
 		ReflectionTestUtils.setField(dayGroup, NAME_FIELD_NAME, name);
 		assertEquals(name, dayGroup.name());
 	}

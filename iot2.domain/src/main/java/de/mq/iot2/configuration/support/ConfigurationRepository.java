@@ -12,8 +12,8 @@ import jakarta.validation.Valid;
 @RepositoryDefinition(domainClass = ConfigurationImpl.class, idClass = String.class)
 public interface ConfigurationRepository {
 	Collection<Configuration> findAll();
-	
+
 	Optional<Configuration> findByKey(final RuleKey key);
-	
+
 	Configuration save(@Valid final Configuration cycle);
 }

@@ -61,15 +61,17 @@ class DayGroupBatchConverterImplTest {
 
 	@Test
 	void convertDayLimit() {
-		assertEquals(String.format(MAX_DAYS_LIMIT_MESSAGE, MAX_DAY_LIMIT), assertThrows(IllegalArgumentException.class, () -> new DayGroupBatchConverterImpl().convert(List.of(GROUP, LocalDate.now().plusDays(1).format(DATE_FORMATTER), LocalDate.now().plusDays(31).format(DATE_FORMATTER)))).getMessage());
+		assertEquals(String.format(MAX_DAYS_LIMIT_MESSAGE, MAX_DAY_LIMIT), assertThrows(IllegalArgumentException.class, () -> new DayGroupBatchConverterImpl()
+				.convert(List.of(GROUP, LocalDate.now().plusDays(1).format(DATE_FORMATTER), LocalDate.now().plusDays(31).format(DATE_FORMATTER)))).getMessage());
 	}
 
 	@Test
 	void convertFromBeforeNow() {
 		final var date = LocalDate.now();
 		final var converter = new DayGroupBatchConverterImpl(() -> date);
-		
-		assertEquals(DATE_NOT_IN_THE_FUTURE_MESSAGE, assertThrows(IllegalArgumentException.class, () -> converter.convert(List.of(GROUP, date.format(DATE_FORMATTER)))).getMessage());
+
+		assertEquals(DATE_NOT_IN_THE_FUTURE_MESSAGE,
+				assertThrows(IllegalArgumentException.class, () -> converter.convert(List.of(GROUP, date.format(DATE_FORMATTER)))).getMessage());
 	}
 
 }

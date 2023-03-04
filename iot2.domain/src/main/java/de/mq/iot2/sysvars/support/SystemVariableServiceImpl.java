@@ -17,7 +17,7 @@ import de.mq.iot2.sysvars.SystemVariableService;
 class SystemVariableServiceImpl implements SystemVariableService {
 	private static Logger LOGGER = LoggerFactory.getLogger(SystemVariableServiceImpl.class);
 	private final SystemVariableRepository systemVariableRepository;
-	
+
 	SystemVariableServiceImpl(SystemVariableRepository systemVariableRepository) {
 		this.systemVariableRepository = systemVariableRepository;
 	}
@@ -28,17 +28,17 @@ class SystemVariableServiceImpl implements SystemVariableService {
 		final var existingSystemVariables = systemVariableRepository.readSystemVariables().stream().collect(Collectors.toMap(SystemVariable::getName, Function.identity()));
 		LOGGER.debug("{} Systemvariables read from ccu2 '{}'.", existingSystemVariables.size(), existingSystemVariables.keySet());
 		final Collection<SystemVariable> systemVariables4Update = new ArrayList<>();
-		for(final SystemVariable systemVariable: systemVariables) {
+		for (final SystemVariable systemVariable : systemVariables) {
 			systemVariableNameAndValueRequiredGuard(systemVariable);
-			if(! existingSystemVariables.containsKey(systemVariable.getName())) {
+			if (!existingSystemVariables.containsKey(systemVariable.getName())) {
 				LOGGER.warn("SystemVariable {} doesn't exist at ccu2.");
 				continue;
 			}
-			
+
 			final SystemVariable existingSystemVariable = existingSystemVariables.get(systemVariable.getName());
 			systemVariableNameAndValueRequiredGuard(systemVariable);
 			idRequiredGuard(existingSystemVariable);
-			if( identical(systemVariable, existingSystemVariable)) {
+			if (identical(systemVariable, existingSystemVariable)) {
 				continue;
 			}
 
@@ -46,10 +46,10 @@ class SystemVariableServiceImpl implements SystemVariableService {
 			systemVariable4Update.setId(existingSystemVariable.getId());
 			systemVariables4Update.add(systemVariable4Update);
 		}
-		LOGGER.debug("{} SystemVariables need update." , systemVariables4Update.size()  );
-		
+		LOGGER.debug("{} SystemVariables need update.", systemVariables4Update.size());
+
 		systemVariables4Update.forEach(systemVariableRepository::updateSystemVariable);
-		
+
 	}
 
 	private void idRequiredGuard(final SystemVariable existingSystemVariable) {

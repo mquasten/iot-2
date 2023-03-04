@@ -106,7 +106,7 @@ class DayControllerTest {
 		final var dayGroupModel = newDayGroupModelWithId();
 
 		assertEquals(DAY_MODEL_AND_VIEW_NAME, dayController.addDayMonth(dayGroupModel, model));
-		
+
 		final DayModel dayModel = (DayModel) model.getAttribute(DAY_MODEL_AND_VIEW_NAME);
 		assertEquals(IdUtil.getId(dayGroup), dayModel.getDayGroupId());
 		assertEquals(DayOfMonthImpl.class.getName(), dayModel.getType());
@@ -125,7 +125,7 @@ class DayControllerTest {
 		when(calendarService.addLocalDateDays(dayGroup.name(), fromDate, toDate)).thenReturn(2);
 
 		assertEquals(String.format(REDIRECT_CALENDAR_PATTERN, IdUtil.getId(dayGroup)), dayController.addLocalDate(localDateModel, bindingResult));
-		
+
 		verify(calendarService).addLocalDateDays(dayGroup.name(), fromDate, toDate);
 	}
 
@@ -225,14 +225,14 @@ class DayControllerTest {
 		assertEquals(DayOfWeek.SUNDAY.getDisplayName(TextStyle.SHORT_STANDALONE, locale), days.iterator().next().getValue());
 
 		verify(calendarService).unUsedDaysOfWeek();
-		
+
 		final ArgumentCaptor<ObjectError> errorCaptor = ArgumentCaptor.forClass(ObjectError.class);
 		verify(bindingResult).addError(errorCaptor.capture());
 		assertEquals(DAY_MODEL_AND_VIEW_NAME, errorCaptor.getValue().getObjectName());
 		assertEquals(1, errorCaptor.getValue().getCodes().length);
 		assertEquals(DayController.MESSAGE_KEY_DAY_EXISTS, errorCaptor.getValue().getCodes()[0]);
 		assertNull(errorCaptor.getValue().getArguments());
-		assertEquals("{" +DayController.MESSAGE_KEY_DAY_EXISTS+"}", errorCaptor.getValue().getDefaultMessage());
+		assertEquals("{" + DayController.MESSAGE_KEY_DAY_EXISTS + "}", errorCaptor.getValue().getDefaultMessage());
 	}
 
 	@Test
@@ -248,14 +248,14 @@ class DayControllerTest {
 		assertNull(model.getAttribute(DAY_OF_WEEK_LIST));
 
 		verify(calendarService, never()).unUsedDaysOfWeek();
-		
+
 		final ArgumentCaptor<ObjectError> errorCaptor = ArgumentCaptor.forClass(ObjectError.class);
 		verify(bindingResult).addError(errorCaptor.capture());
 		assertEquals(DAY_MODEL_AND_VIEW_NAME, errorCaptor.getValue().getObjectName());
 		assertEquals(1, errorCaptor.getValue().getCodes().length);
 		assertEquals(DayController.MESSAGE_KEY_DAY_EXISTS, errorCaptor.getValue().getCodes()[0]);
 		assertNull(errorCaptor.getValue().getArguments());
-		assertEquals("{" +DayController.MESSAGE_KEY_DAY_EXISTS+"}", errorCaptor.getValue().getDefaultMessage());
+		assertEquals("{" + DayController.MESSAGE_KEY_DAY_EXISTS + "}", errorCaptor.getValue().getDefaultMessage());
 	}
 
 	@Test

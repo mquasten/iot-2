@@ -14,15 +14,16 @@ import jakarta.validation.Valid;
 
 @RepositoryDefinition(domainClass = AbstractDay.class, idClass = String.class)
 public interface DayRepository {
-	
+
 	Optional<Day<?>> findById(final String id);
-	
+
 	Collection<Day<?>> findAll();
+
 	@Query("select d from LocaldateDay d")
-	Collection<Day<LocalDate>> findAllLocalDateDays(); 
-	
+	Collection<Day<LocalDate>> findAllLocalDateDays();
+
 	@Query("select d from DayOfWeekDay d")
-	Collection<Day<DayOfWeek>> findAllDayOfWeekDays(); 
+	Collection<Day<DayOfWeek>> findAllDayOfWeekDays();
 
 	Collection<Day<?>> findByDayGroup(final DayGroup dayGroup);
 

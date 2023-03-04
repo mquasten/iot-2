@@ -23,8 +23,4 @@ public class SystemVariables {
 		this.systemVariables = systemVariables;
 	}
 
-	
-
-	
-
 }

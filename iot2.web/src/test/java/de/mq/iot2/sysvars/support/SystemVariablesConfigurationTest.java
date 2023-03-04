@@ -7,12 +7,11 @@ import org.springframework.web.client.RestTemplate;
 
 class SystemVariablesConfigurationTest {
 
-	
-	private final  SystemVariablesConfiguration systemVariablesConfiguration = new  SystemVariablesConfiguration();
-	
+	private final SystemVariablesConfiguration systemVariablesConfiguration = new SystemVariablesConfiguration();
+
 	@Test
 	void restOperations() {
-		assertTrue (systemVariablesConfiguration.restOperations() instanceof RestTemplate);
+		assertTrue(systemVariablesConfiguration.restOperations() instanceof RestTemplate);
 	}
 
 }

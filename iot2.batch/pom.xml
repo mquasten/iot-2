@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.2</version>
+		<version>3.0.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<properties>
@@ -16,6 +16,8 @@
 		<maven.compiler.target>19</maven.compiler.target>
 		<org.jeasy.version>4.1.0</org.jeasy.version>
 		<commons.cli.version>1.5.0</commons.cli.version>
+		<jacoco.maven.version>0.8.9-SNAPSHOT</jacoco.maven.version>
+		<iot2.domain.version>0.0.1-SNAPSHOT</iot2.domain.version>
 	</properties>
 	<pluginRepositories>
 		<pluginRepository>
@@ -63,7 +65,7 @@
 		<dependency>
 			<groupId>mq</groupId>
 			<artifactId>iot2.domain</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${iot2.domain.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -101,7 +103,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.9-SNAPSHOT</version>
+				<version>${jacoco.maven.version}</version>
 				<executions>
 					<execution>
 						<goals>

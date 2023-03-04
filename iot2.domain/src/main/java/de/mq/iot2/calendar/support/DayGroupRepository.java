@@ -14,9 +14,9 @@ public interface DayGroupRepository {
 	DayGroup save(@Valid final DayGroup dayGroup);
 
 	Optional<DayGroup> findById(final String id);
-	
+
 	Optional<DayGroup> findByName(final String name);
-	
+
 	Collection<DayGroup> findAll();
 
 }

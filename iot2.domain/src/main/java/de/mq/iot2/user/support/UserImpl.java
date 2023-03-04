@@ -27,24 +27,24 @@ class UserImpl implements User {
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
-	@Size(min=36, max=36)
+	@Size(min = 36, max = 36)
 	private String id;
 
 	@Column(name = "NAME", length = 25, nullable = false)
-	@Size(max=25)
+	@Size(max = 25)
 	@NotBlank
 	private String name;
 	@Column(name = "PASSWORD_HASH", length = 128, nullable = false)
-	@Size(max=128)
+	@Size(max = 128)
 	@NotBlank
 	private String password;
 
 	@Column(name = "ALGORITHM", length = 15)
-	@Size(max=15)
+	@Size(max = 15)
 	private String algorithm;
-	
+
 	@Column(name = "LANGUAGE", length = 2)
-	@Size(max=2)
+	@Size(max = 2)
 	private String language;
 
 	@SuppressWarnings("unused")
@@ -52,12 +52,12 @@ class UserImpl implements User {
 
 	}
 
-	UserImpl(final String name, final String rawPassword,final Optional<String> algorithm) {
-		this( IdUtil.id() ,name, rawPassword, algorithm);
+	UserImpl(final String name, final String rawPassword, final Optional<String> algorithm) {
+		this(IdUtil.id(), name, rawPassword, algorithm);
 	}
-	
-	UserImpl(final long id, final String name, final String rawPassword,final Optional<String> algorithm) {
-		this( IdUtil.id(id) ,name, rawPassword, algorithm);
+
+	UserImpl(final long id, final String name, final String rawPassword, final Optional<String> algorithm) {
+		this(IdUtil.id(id), name, rawPassword, algorithm);
 	}
 
 	private UserImpl(final String id, final String name, final String rawPassword, final Optional<String> algorithm) {
@@ -65,7 +65,7 @@ class UserImpl implements User {
 		nameRequiredGuard(name);
 		Assert.notNull(algorithm, "Algorithm should not be null.");
 		this.name = name;
-		
+
 		algorithm.ifPresentOrElse(value -> assingPassword(rawPassword, value), () -> assingPassword(rawPassword));
 	}
 
@@ -77,7 +77,7 @@ class UserImpl implements User {
 	public void assingPassword(final String rawPassword, final String algorithm) {
 		passwordRequiredGuard(rawPassword);
 		Assert.hasText(algorithm, "Algorithm should not be null.");
-		
+
 		password = new DigestUtils(algorithm).digestAsHex(rawPassword);
 		this.algorithm = algorithm;
 	}
@@ -115,27 +115,27 @@ class UserImpl implements User {
 	public final Optional<String> algorithm() {
 		return StringUtils.hasText(algorithm) ? Optional.of(algorithm) : Optional.empty();
 	}
-	
+
 	@Override
 	public final Optional<Locale> language() {
-		if( !StringUtils.hasText(language)) {
+		if (!StringUtils.hasText(language)) {
 			return Optional.empty();
 		}
 		validLanguageGuard(language);
-		return  Optional.of(Locale.of(language));
+		return Optional.of(Locale.of(language));
 	}
 
 	private void validLanguageGuard(final String language) {
 		Assert.isTrue(Arrays.asList(Locale.getISOLanguages()).contains(language), String.format(LANGUAGE_INVALID_MESSAGE, language));
 	}
-	
+
 	@Override
 	public final void assignLanguage(final Locale locale) {
 		Assert.notNull(locale, "Locale is required");
 		validLanguageGuard(locale.getLanguage());
-		language=locale.getLanguage();
+		language = locale.getLanguage();
 	}
-	
+
 	@Override
 	public int hashCode() {
 		if (name == null) {
@@ -143,7 +143,7 @@ class UserImpl implements User {
 		}
 		return name.hashCode();
 	}
-	
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (!(obj instanceof UserImpl)) {

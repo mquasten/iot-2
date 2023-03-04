@@ -1,10 +1,9 @@
 package de.mq.iot2.configuration;
 
 public interface Configuration {
-	
+
 	public enum RuleKey {
-		EndOfDay,
-		CleanUp
+		EndOfDay, CleanUp
 	}
 
 	RuleKey key();

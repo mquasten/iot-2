@@ -18,14 +18,11 @@ import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.support.RandomTestUtil;
 
 class CycleParameterImplTest {
- 
+
 	private static final String CYCLE_FIELD_NAME = "cycle";
 	private final Configuration configuration = Mockito.mock(Configuration.class);
 	private static final String VALUE = RandomTestUtil.randomString();
 	private final Cycle cycle = Mockito.mock(Cycle.class);
-	
-
-	
 
 	@ParameterizedTest
 	@EnumSource(Key.class)
@@ -36,8 +33,6 @@ class CycleParameterImplTest {
 		assertEquals(VALUE, cycleParameter.value());
 		assertEquals(cycle, cycleParameter.cycle());
 	}
-
-
 
 	@Test
 	void createWithOutCycle() {

@@ -10,7 +10,7 @@ public class TimerModel {
 	private String shadowTime;
 	@ValidTime
 	private String sunDownTime;
-	
+
 	private boolean update;
 
 	public boolean isUpdate() {
@@ -52,6 +52,5 @@ public class TimerModel {
 	public void setSunDownTime(final String sunDownTime) {
 		this.sunDownTime = sunDownTime;
 	}
-	
 
 }

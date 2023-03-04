@@ -29,13 +29,15 @@ class DayMapper implements ModelMapper<Day<?>, DayModel> {
 
 	static final String DAY_NOT_FOUND_MESSAGE = "Day with id %s not found.";
 
-	private final Map<Class<?>, BiFunction<Object, Locale, String>> valueConverters = Map.of(LocalDate.class, (date, locale) -> ((LocalDate) date).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)),
-			MonthDay.class, (date, locale) -> ((MonthDay) date).atYear(Year.now().getValue()).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)).replaceFirst("[/.][0-9][0-9]$", ""),
+	private final Map<Class<?>, BiFunction<Object, Locale, String>> valueConverters = Map.of(LocalDate.class,
+			(date, locale) -> ((LocalDate) date).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)), MonthDay.class,
+			(date, locale) -> ((MonthDay) date).atYear(Year.now().getValue()).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale))
+					.replaceFirst("[/.][0-9][0-9]$", ""),
 			DayOfWeek.class, (day, locale) -> ((DayOfWeek) day).getDisplayName(TextStyle.SHORT_STANDALONE, locale));
 
-	private final Map<Class<?>, Converter<Object, String>> sortedValueConverters = Map.of(LocalDate.class,date -> ((LocalDate) date).format(DateTimeFormatter.ofPattern("yyyyMMdd")), 
-			MonthDay.class, date -> ((MonthDay) date).atYear(Year.now().getValue()).format(DateTimeFormatter.ofPattern("yyyyMMdd")), 
-			DayOfWeek.class, day -> "" + ((DayOfWeek) day).name()
+	private final Map<Class<?>, Converter<Object, String>> sortedValueConverters = Map.of(LocalDate.class,
+			date -> ((LocalDate) date).format(DateTimeFormatter.ofPattern("yyyyMMdd")), MonthDay.class,
+			date -> ((MonthDay) date).atYear(Year.now().getValue()).format(DateTimeFormatter.ofPattern("yyyyMMdd")), DayOfWeek.class, day -> "" + ((DayOfWeek) day).name()
 
 	);
 
@@ -76,7 +78,7 @@ class DayMapper implements ModelMapper<Day<?>, DayModel> {
 	}
 
 	@Override
-	public Day<?> toDomain(final DayModel dayModel) { 
+	public Day<?> toDomain(final DayModel dayModel) {
 		Assert.notNull(dayModel, "DayModel is redired.");
 		Assert.hasText(dayModel.getDayGroupId(), "DayGroup is required.");
 		Assert.notNull(dayModel.getType(), "Type is required.");

@@ -14,38 +14,43 @@ import de.mq.iot2.sysvars.SystemVariable;
 public class VariableModel {
 
 	private final LocalDate today = LocalDate.now();
-	private String  twilightType;
-	private  String  sunUpToday;
-	private  String  sunDownToday;
-	private  String  sunUpTomorrow;
-	private  String  sunDownTomorrow;
-	private  String maxTemperatureToday;
-	private  String maxTemperatureTomorrow;
-	private  Locale locale = Locale.getDefault();
-	private  boolean showVariables;
-	
-	private  final Collection<SystemVariable> variables = new ArrayList<>();
-	
+	private String twilightType;
+	private String sunUpToday;
+	private String sunDownToday;
+	private String sunUpTomorrow;
+	private String sunDownTomorrow;
+	private String maxTemperatureToday;
+	private String maxTemperatureTomorrow;
+	private Locale locale = Locale.getDefault();
+	private boolean showVariables;
+
+	private final Collection<SystemVariable> variables = new ArrayList<>();
+
 	public Collection<SystemVariable> getVariables() {
 		return variables;
 	}
+
 	public void setVariables(final Collection<SystemVariable> variables) {
 		this.variables.clear();
 		this.variables.addAll(variables);
 	}
+
 	public boolean isShowVariables() {
 		return showVariables;
 	}
+
 	public void setShowVariables(boolean showVariables) {
 		this.showVariables = showVariables;
 	}
+
 	public VariableModel() {
-	
+
 	}
-	 public final LocalDate getDate() {
-		 return today;
-	 }
-	
+
+	public final LocalDate getDate() {
+		return today;
+	}
+
 	public String getToday() {
 		return dateToString(today);
 	}
@@ -57,12 +62,12 @@ public class VariableModel {
 	public String getTomorrow() {
 		return dateToString(today.plusDays(1));
 	}
-	
+
 	void setLocale(final Locale locale) {
 		Assert.notNull(locale, "Locale is required.");
 		this.locale = locale;
 	}
-	
+
 	public String getTwilightType() {
 		return twilightType;
 	}

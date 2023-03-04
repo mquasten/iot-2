@@ -90,8 +90,7 @@ class VariableControllerTest {
 		return DateTimeFormatter.ofPattern(TIME_PATTERN).format(time);
 
 	}
-	
-	
+
 	@Test
 	void variableWithSystemVariables() {
 		final var date = LocalDate.now();
@@ -124,19 +123,19 @@ class VariableControllerTest {
 
 		verify(systemVariableService).read();
 	}
-	
+
 	@Test
 	void updateTimerToday() {
-		assertEquals(String.format(REDIRECT_TIMER_VIEW_NAME, true), variableController.updateTimerToday()) ; 
+		assertEquals(String.format(REDIRECT_TIMER_VIEW_NAME, true), variableController.updateTimerToday());
 	}
-	
+
 	@Test
 	void updateTimerTomorrow() {
-		assertEquals(String.format(REDIRECT_TIMER_VIEW_NAME, false), variableController.updateTimerTomorrow()) ; 
+		assertEquals(String.format(REDIRECT_TIMER_VIEW_NAME, false), variableController.updateTimerTomorrow());
 	}
-	
+
 	@Test
 	void variables() {
-		assertEquals( REDIRECT_VARIABLE_VIEW_NAME_READ_SYSTEM_VARIABLES, variableController.variables());
+		assertEquals(REDIRECT_VARIABLE_VIEW_NAME_READ_SYSTEM_VARIABLES, variableController.variables());
 	}
 }

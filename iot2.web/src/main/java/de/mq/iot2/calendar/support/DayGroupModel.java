@@ -16,7 +16,7 @@ public class DayGroupModel {
 	private boolean readonly;
 
 	private String cycleId;
-	
+
 	private Collection<DayModel> days = new ArrayList<>();
 
 	public boolean isReadonly() {

@@ -1,7 +1,5 @@
 package de.mq.iot2.configuration.support;
 
-
-
 import org.springframework.util.Assert;
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Parameter;
@@ -28,15 +26,15 @@ abstract class AbstractParameter implements Parameter {
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
-	@Size(min=36, max=36)
+	@Size(min = 36, max = 36)
 	private String id;
 
 	@Column(name = "PARAMETER_KEY", nullable = false)
 	@Enumerated(EnumType.STRING)
 	@NotNull
 	private Key key;
-	@Column(name = "PARAMETER_VALUE", nullable = false , length = 50)
-	@Size(max=50)
+	@Column(name = "PARAMETER_VALUE", nullable = false, length = 50)
+	@Size(max = 50)
 	@NotBlank
 	private String value;
 

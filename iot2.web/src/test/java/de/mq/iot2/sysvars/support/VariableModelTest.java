@@ -135,7 +135,7 @@ class VariableModelTest {
 
 		assertEquals(time, variableModel.getSunUpTomorrow());
 	}
-	
+
 	@Test
 	void sunDownTomorrow() {
 		assertNull(variableModel.getSunDownTomorrow());
@@ -145,28 +145,29 @@ class VariableModelTest {
 
 		assertEquals(time, variableModel.getSunDownTomorrow());
 	}
+
 	@Test
 	void maxTemperatureToday() {
 		assertNull(variableModel.getMaxTemperatureToday());
-		
+
 		final var temperature = randomTemperature();
 		variableModel.setMaxTemperatureToday(temperature);
-		
+
 		assertEquals(temperature, variableModel.getMaxTemperatureToday());
-		
+
 	}
 
 	private String randomTemperature() {
 		return new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.US)).format(new Random().nextDouble(-10d, 40d));
 	}
-	
+
 	@Test
 	void maxTemperatureTomorrow() {
 		assertNull(variableModel.getMaxTemperatureTomorrow());
-		
+
 		final var temperature = randomTemperature();
 		variableModel.setMaxTemperatureTomorrow(temperature);
-		
+
 		assertEquals(temperature, variableModel.getMaxTemperatureTomorrow());
 	}
 

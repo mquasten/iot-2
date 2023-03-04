@@ -22,31 +22,30 @@ class SimpleMessageDigestPasswordEncoderImpl implements PasswordEncoder {
 
 	@Override
 	public boolean matches(final CharSequence rawPassword, final String encodedPassword) {
-		
-		final String[] values = Objects.requireNonNullElse(encodedPassword,StringUtils.EMPTY).split(String.format("[%s]" , DELIMITER), 2);
+
+		final String[] values = Objects.requireNonNullElse(encodedPassword, StringUtils.EMPTY).split(String.format("[%s]", DELIMITER), 2);
 		final Optional<String> algorithm = algorithm(values);
-			
+
 		return values[0].equalsIgnoreCase(encode(rawPassword, algorithm));
 	}
 
 	private Optional<String> algorithm(final String[] values) {
-		if( values.length<=1) {
-			return  Optional.empty();
+		if (values.length <= 1) {
+			return Optional.empty();
 		}
-		if( ! org.springframework.util.StringUtils.hasText(values[1])) {
-			return  Optional.empty();
+		if (!org.springframework.util.StringUtils.hasText(values[1])) {
+			return Optional.empty();
 		}
 		return Optional.of(values[1]);
 	}
-	
-	
+
 	private String encode(final CharSequence rawPassword, final Optional<String> algorithm) {
-		if( algorithm.isEmpty() ) {
-			return Hex.encodeHexString( Objects.requireNonNullElse(rawPassword, StringUtils.EMPTY).toString().getBytes());
+		if (algorithm.isEmpty()) {
+			return Hex.encodeHexString(Objects.requireNonNullElse(rawPassword, StringUtils.EMPTY).toString().getBytes());
 		}
-		
+
 		final DigestUtils digestUtils = new DigestUtils(algorithm.get());
-		return  digestUtils.digestAsHex(Objects.requireNonNullElse(rawPassword, StringUtils.EMPTY).toString());
+		return digestUtils.digestAsHex(Objects.requireNonNullElse(rawPassword, StringUtils.EMPTY).toString());
 	}
 
 }

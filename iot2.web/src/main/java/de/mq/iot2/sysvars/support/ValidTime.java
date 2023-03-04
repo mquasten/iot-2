@@ -10,11 +10,11 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 @Constraint(validatedBy = LocalTimeValidatorImpl.class)
-@Target({ElementType.FIELD})
+@Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface ValidTime {
-	
+
 	String message() default "{error.time}";
 
 	Class<?>[] groups() default {};

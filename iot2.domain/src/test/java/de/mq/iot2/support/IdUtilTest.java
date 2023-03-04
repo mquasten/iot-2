@@ -19,8 +19,7 @@ class IdUtilTest {
 	}
 
 	private long string2Long(final String name) {
-		return UUID.nameUUIDFromBytes(name.getBytes()).getMostSignificantBits()
-				^ UUID.nameUUIDFromBytes(name.getBytes()).getLeastSignificantBits();
+		return UUID.nameUUIDFromBytes(name.getBytes()).getMostSignificantBits() ^ UUID.nameUUIDFromBytes(name.getBytes()).getLeastSignificantBits();
 	}
 
 	@Test
@@ -35,8 +34,7 @@ class IdUtilTest {
 
 	@Test
 	void idRandomWithTimeStamp() {
-		assertEquals(compareableDigitsFromTimestamp(new UUID(0, System.currentTimeMillis()).toString()),
-				compareableDigitsFromTimestamp(IdUtil.id()));
+		assertEquals(compareableDigitsFromTimestamp(new UUID(0, System.currentTimeMillis()).toString()), compareableDigitsFromTimestamp(IdUtil.id()));
 
 	}
 

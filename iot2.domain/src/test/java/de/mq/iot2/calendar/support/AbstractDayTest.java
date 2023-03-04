@@ -40,9 +40,8 @@ class AbstractDayTest {
 	@SuppressWarnings("unchecked")
 	AbstractDay<Integer> newAbstractDay(final DayGroup dayGroup, final int[] values, final int[] digits, final int signum) {
 		try {
-			return BeanUtils.instantiateClass(
-					((AbstractDay<Integer>) Mockito.mock(AbstractDay.class)).getClass().getDeclaredConstructor(DayGroup.class, int[].class, int[].class, int.class, String.class, String.class),
-					dayGroup, values, digits, signum, AbstractDay.ENTITY_NAME, DESCRIPTION);
+			return BeanUtils.instantiateClass(((AbstractDay<Integer>) Mockito.mock(AbstractDay.class)).getClass().getDeclaredConstructor(DayGroup.class, int[].class, int[].class,
+					int.class, String.class, String.class), dayGroup, values, digits, signum, AbstractDay.ENTITY_NAME, DESCRIPTION);
 		} catch (final Exception exception) {
 			throw runtimeExceptionn(exception);
 		}

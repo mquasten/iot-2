@@ -19,11 +19,11 @@ class UserServiceImpl implements UserService {
 	static final String USER_NOT_FOUND_MESSAGE = "User %s not found.";
 	private static final String MESSAGE_DIGEST = "MessageDigest";
 	private final UserRepository userRepository;
-	
-	UserServiceImpl(final UserRepository userRepository){
-		this.userRepository=userRepository;
+
+	UserServiceImpl(final UserRepository userRepository) {
+		this.userRepository = userRepository;
 	}
-	
+
 	@Transactional
 	@Override
 	public Optional<User> user(final String name) {
@@ -34,19 +34,20 @@ class UserServiceImpl implements UserService {
 	private void nameRequiredGuard(final String name) {
 		Assert.hasText(name, "Name is required.");
 	}
+
 	@Override
 	@Transactional
-	public void update(final String name, final String rawPassword, final Optional<String> algorithm ) {
+	public void update(final String name, final String rawPassword, final Optional<String> algorithm) {
 		nameRequiredGuard(name);
 		Assert.hasText(rawPassword, "Password is required.");
 		Assert.notNull(algorithm, "Algorithm should not be null.");
-		
-		userRepository.findByName(name).ifPresentOrElse(user -> { 
+
+		userRepository.findByName(name).ifPresentOrElse(user -> {
 			algorithm.ifPresentOrElse(value -> user.assingPassword(rawPassword, value), () -> user.assingPassword(rawPassword));
 			userRepository.save(user);
 		}, () -> userRepository.save(new UserImpl(name, rawPassword, algorithm)));
 	}
-	
+
 	@Override
 	@Transactional
 	public void update(final String name, final Locale language) {
@@ -56,19 +57,20 @@ class UserServiceImpl implements UserService {
 		user.assignLanguage(language);
 		userRepository.save(user);
 	}
+
 	@Override
 	@Transactional
 	public boolean delete(final String name) {
 		nameRequiredGuard(name);
 		final Optional<User> user = userRepository.findByName(name);
-		if(user.isEmpty()) {
+		if (user.isEmpty()) {
 			return false;
 		}
-		
+
 		userRepository.delete(user.get());
 		return true;
 	}
-	
+
 	@Override
 	public Collection<String> algorithms() {
 		return Security.getAlgorithms(MESSAGE_DIGEST).stream().sorted().collect(Collectors.toList());

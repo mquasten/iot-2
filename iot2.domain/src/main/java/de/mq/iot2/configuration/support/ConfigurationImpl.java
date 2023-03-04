@@ -1,7 +1,5 @@
 package de.mq.iot2.configuration.support;
 
-
-
 import org.springframework.util.Assert;
 
 import de.mq.iot2.configuration.Configuration;
@@ -21,7 +19,7 @@ import jakarta.validation.constraints.Size;
 class ConfigurationImpl implements Configuration {
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
-	@Size(min=36, max=36)
+	@Size(min = 36, max = 36)
 	private String id;
 
 	@Enumerated(EnumType.STRING)
@@ -31,7 +29,7 @@ class ConfigurationImpl implements Configuration {
 
 	@Column(name = "NAME", length = 25, nullable = false)
 	@NotBlank
-	@Size( max=25)
+	@Size(max = 25)
 	private String name;
 
 	@SuppressWarnings("unused")

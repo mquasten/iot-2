@@ -31,10 +31,11 @@ class EndOfDayUpdateBatchArgumentConverterImplTest {
 		assertTrue(((LocalTime) results[0]).until(LocalTime.now(), ChronoUnit.MILLIS) < 50);
 
 	}
-	
+
 	@Test
 	void convertWrongNumberOfArguments() {
-		assertEquals(EndOfDayUpdateBatchArgumentConverterImpl.MESSAGE_ONE_OPTIONAL_ARGUMENT, assertThrows(IllegalArgumentException.class, () -> converter.convert(List.of("11:11", "12:12"))).getMessage());
+		assertEquals(EndOfDayUpdateBatchArgumentConverterImpl.MESSAGE_ONE_OPTIONAL_ARGUMENT,
+				assertThrows(IllegalArgumentException.class, () -> converter.convert(List.of("11:11", "12:12"))).getMessage());
 	}
 
 }

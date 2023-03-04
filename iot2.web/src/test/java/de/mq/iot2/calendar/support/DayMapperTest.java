@@ -91,35 +91,35 @@ class DayMapperTest {
 		final Day<Integer> day = mock(AbstractDay.class);
 		IdUtil.assignId(day, randomString());
 		final int value = 4711;
-		
+
 		when(day.value()).thenReturn(value);
 
 		final var dayModel = dayMapper.toWeb(day);
 		assertEquals(String.valueOf(value), dayModel.getValue());
 		assertEquals(String.valueOf(value), ReflectionTestUtils.getField(dayModel, VALUE_SORTED_FIELD_NAME));
 	}
-	
+
 	@Test
 	void toDomainFromId() {
 		final var id = randomString();
 		final Day<?> day = mock(Day.class);
 		when(dayRepository.findById(id)).thenReturn(Optional.of(day));
-		
+
 		assertEquals(day, dayMapper.toDomain(id));
 	}
 
 	private String randomString() {
 		return UUID.randomUUID().toString();
 	}
-	
+
 	@Test
 	void toDomainFromIdNotFound() {
 		final var id = randomString();
 		when(dayRepository.findById(id)).thenReturn(Optional.empty());
-		
-		assertEquals(String.format(DayMapper.DAY_NOT_FOUND_MESSAGE, id), assertThrows(EntityNotFoundException.class, ()-> dayMapper.toDomain(id)).getMessage());
+
+		assertEquals(String.format(DayMapper.DAY_NOT_FOUND_MESSAGE, id), assertThrows(EntityNotFoundException.class, () -> dayMapper.toDomain(id)).getMessage());
 	}
-	
+
 	@Test
 	void toDomain() {
 		final var dayGroupId = randomString();
@@ -132,14 +132,14 @@ class DayMapperTest {
 		when(dayModel.getTargetValue()).thenReturn(value);
 		doReturn(DayOfMonthImpl.class).when(dayModel).targetEntity();
 		when(dayGroupRepository.findById(dayGroupId)).thenReturn(Optional.of(dayGroup));
-		
+
 		final Day<?> day = dayMapper.toDomain(dayModel);
-		
+
 		assertEquals(dayGroup, day.dayGroup());
 		assertEquals(value, day.value());
 		assertEquals(Optional.of(description), day.description());
 	}
-	
+
 	@Test
 	void toDomainDayGroupNotFound() {
 		final var dayGroupId = randomString();
@@ -147,10 +147,11 @@ class DayMapperTest {
 		when(dayModel.getDayGroupId()).thenReturn(dayGroupId);
 		when(dayModel.getType()).thenReturn(DayOfMonthImpl.class.getName());
 		when(dayGroupRepository.findById(dayGroupId)).thenReturn(Optional.empty());
-		
-		assertEquals(String.format(CalendarServiceImp.DAY_GROUP_NOT_FOUND_MESSAGE, dayGroupId), assertThrows(EntityNotFoundException.class, ()->  dayMapper.toDomain(dayModel)).getMessage());
+
+		assertEquals(String.format(CalendarServiceImp.DAY_GROUP_NOT_FOUND_MESSAGE, dayGroupId),
+				assertThrows(EntityNotFoundException.class, () -> dayMapper.toDomain(dayModel)).getMessage());
 	}
-	
+
 	@Test
 	void toDomainCanNotCreateEntity() {
 		final var dayGroupId = randomString();
@@ -163,7 +164,7 @@ class DayMapperTest {
 		when(dayModel.getTargetValue()).thenReturn(value);
 		doReturn(LocalDate.class).when(dayModel).targetEntity();
 		when(dayGroupRepository.findById(dayGroupId)).thenReturn(Optional.of(dayGroup));
-		
+
 		assertThrows(IllegalStateException.class, () -> dayMapper.toDomain(dayModel));
 	}
 

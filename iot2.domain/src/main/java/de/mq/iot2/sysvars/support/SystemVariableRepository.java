@@ -5,7 +5,7 @@ import java.util.Collection;
 import de.mq.iot2.sysvars.SystemVariable;
 
 public interface SystemVariableRepository {
-	 Collection<SystemVariable> readSystemVariables();
-	 
-	 public void updateSystemVariable(final SystemVariable systemVariable);
+	Collection<SystemVariable> readSystemVariables();
+
+	public void updateSystemVariable(final SystemVariable systemVariable);
 }

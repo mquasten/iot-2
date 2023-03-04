@@ -154,20 +154,20 @@ class TimerControllerTest {
 	}
 
 	private double time(final LocalTime time) {
-		return time.getHour() + time.getMinute()/100d;
+		return time.getHour() + time.getMinute() / 100d;
 	}
-	
+
 	private LocalTime time(InvocationOnMock a) {
 		final var values = a.getArgument(0, String.class).split("[:]");
 		return LocalTime.of(Integer.parseInt(values[0]), Integer.parseInt(values[1]));
 	}
-	
+
 	@Test
 	void timerEmpty() {
 		final var timerModel = new TimerModel();
 		perpareConversionService();
 
-		assertEquals(REDIRECT_VARIABLE_VIEW_NAME,timerController.timer(timerModel, bindingResults));
+		assertEquals(REDIRECT_VARIABLE_VIEW_NAME, timerController.timer(timerModel, bindingResults));
 
 		@SuppressWarnings("unchecked")
 		final ArgumentCaptor<List<SystemVariable>> systemVariablesListCapture = ArgumentCaptor.forClass(List.class);
@@ -182,10 +182,10 @@ class TimerControllerTest {
 	}
 
 	private void perpareConversionService() {
-		doAnswer(a -> time(a)).when(conversionService).convert(anyString(),any());
+		doAnswer(a -> time(a)).when(conversionService).convert(anyString(), any());
 		doAnswer(a -> "" + a.getArgument(0, Double.class)).when(conversionService).convert(anyDouble(), any());
 	}
-	
+
 	@Test
 	void timerUpdate() {
 		final TimerModel timerModel = timerModel();
@@ -193,7 +193,7 @@ class TimerControllerTest {
 		ReflectionTestUtils.setField(timerController, "now", (Supplier<?>) () -> LocalDateTime.of(LocalDate.now(), UPTIME.minusMinutes(MINUTES_IN_FUTURE)));
 		perpareConversionService();
 
-		assertEquals(REDIRECT_VARIABLE_VIEW_NAME,timerController.timer(timerModel, bindingResults));
+		assertEquals(REDIRECT_VARIABLE_VIEW_NAME, timerController.timer(timerModel, bindingResults));
 
 		@SuppressWarnings("unchecked")
 		final ArgumentCaptor<List<SystemVariable>> systemVariablesListCapture = ArgumentCaptor.forClass(List.class);
@@ -206,8 +206,7 @@ class TimerControllerTest {
 		assertEquals("0", results.get(1).getValue());
 
 	}
-	
-	
+
 	@Test
 	void timerUpdateEventsBeforeNowExists() {
 		final TimerModel timerModel = timerModel();
@@ -215,18 +214,18 @@ class TimerControllerTest {
 		ReflectionTestUtils.setField(timerController, "now", (Supplier<?>) () -> LocalDateTime.of(LocalDate.now(), UPTIME));
 		perpareConversionService();
 
-		assertEquals(TIMER_MODEL_AND_VIEW_NAME,timerController.timer(timerModel, bindingResults));
-		
+		assertEquals(TIMER_MODEL_AND_VIEW_NAME, timerController.timer(timerModel, bindingResults));
+
 		final ArgumentCaptor<ObjectError> errorCaptor = ArgumentCaptor.forClass(ObjectError.class);
 		verify(systemVariableService, never()).update(any());
 		verify(bindingResults).addError(errorCaptor.capture());
 		assertEquals(errorCaptor.getValue().getObjectName(), TIMER_MODEL_AND_VIEW_NAME);
-		assertEquals("{" +I18N_TIME_INFUTURE+"}" , errorCaptor.getValue().getDefaultMessage());
+		assertEquals("{" + I18N_TIME_INFUTURE + "}", errorCaptor.getValue().getDefaultMessage());
 		assertEquals(1, errorCaptor.getValue().getArguments().length);
 		assertEquals(MINUTES_IN_FUTURE, errorCaptor.getValue().getArguments()[0]);
-		assertEquals(I18N_TIME_INFUTURE,  errorCaptor.getValue().getCode());
+		assertEquals(I18N_TIME_INFUTURE, errorCaptor.getValue().getCode());
 	}
-	
+
 	@Test
 	void timerBindingErrors() {
 		when(bindingResults.hasErrors()).thenReturn(true);

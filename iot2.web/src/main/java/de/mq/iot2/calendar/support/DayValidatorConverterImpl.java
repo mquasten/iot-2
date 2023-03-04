@@ -46,7 +46,7 @@ class DayValidatorConverterImpl implements ConstraintValidator<ValidDayModel, Da
 			context.buildConstraintViolationWithTemplate(MESSAGE_KEY_DAYOFWEEK_INVALID).addPropertyNode(VALUE_FIELD_NAME).addConstraintViolation();
 			return false;
 		}
- 
+
 	}
 
 	private Boolean dayOfMonthConverter(final DayModel dayModel, final ConstraintValidatorContext context) {

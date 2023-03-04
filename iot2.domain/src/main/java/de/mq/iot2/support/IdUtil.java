@@ -11,8 +11,6 @@ import org.springframework.util.ReflectionUtils;
 
 import jakarta.persistence.Id;
 
-
-
 public interface IdUtil {
 
 	public static long string2Long(final String string) {
@@ -32,11 +30,10 @@ public interface IdUtil {
 	public static String id() {
 		return new UUID(randomLong(), System.currentTimeMillis()).toString();
 	}
-	
 
-	public  static  String getId(final Object object) {
+	public static String getId(final Object object) {
 		final Collection<String> ids = new ArrayList<>();
-		ReflectionUtils.doWithFields(object.getClass(), field-> {
+		ReflectionUtils.doWithFields(object.getClass(), field -> {
 			field.setAccessible(true);
 			ids.add((String) ReflectionUtils.getField(field, object));
 		}, field -> field.isAnnotationPresent(Id.class));
@@ -47,11 +44,11 @@ public interface IdUtil {
 		final var random = new Random();
 		return random.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
 	}
-	
+
 	public static void assignId(final Object entity, final String id) {
 		ReflectionUtils.doWithFields(entity.getClass(), field -> {
 			field.setAccessible(true);
-		    ReflectionUtils.setField(field, entity, id) ;	
+			ReflectionUtils.setField(field, entity, id);
 		}, field -> field.isAnnotationPresent(Id.class));
 	}
 }

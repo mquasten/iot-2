@@ -16,12 +16,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-
 import de.mq.iot2.weather.MeteorologicalData;
+
 @Disabled
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { TestSystemVariablesConfiguration.class, OpenWeatherRepositoryImpl.class,
-		MapToMeteorologicalDataConverterImpl.class })
+@ContextConfiguration(classes = { TestSystemVariablesConfiguration.class, OpenWeatherRepositoryImpl.class, MapToMeteorologicalDataConverterImpl.class })
 class OpenWeatherRepositoryImplIntegrationTest {
 
 	@Autowired
@@ -32,9 +31,8 @@ class OpenWeatherRepositoryImplIntegrationTest {
 
 		final Collection<MeteorologicalData> results = openWeatherRepository.forecast();
 		// results.forEach(m -> System.out.println(m.dateTime()+":" + m.temperature()));
-		
-		assertEquals(8, results.stream().filter(m -> m.hasDate(LocalDate.now().plusDays(1)))
-				.collect(Collectors.toList()).size());
+
+		assertEquals(8, results.stream().filter(m -> m.hasDate(LocalDate.now().plusDays(1))).collect(Collectors.toList()).size());
 		assertEquals(40, results.size());
 	}
 
@@ -42,12 +40,12 @@ class OpenWeatherRepositoryImplIntegrationTest {
 	void weather() {
 		final MeteorologicalData meteorologicalData = openWeatherRepository.weather();
 		assertTrue(ZonedDateTime.now().toEpochSecond() - meteorologicalData.dateTime().toEpochSecond() < 1000);
-		//System.out.println(meteorologicalData.dateTime());
+		// System.out.println(meteorologicalData.dateTime());
 	}
-	
+
 }
 
 @ComponentScan("de.mq.iot2.sysvars.support")
 class TestSystemVariablesConfiguration {
-	
+
 }

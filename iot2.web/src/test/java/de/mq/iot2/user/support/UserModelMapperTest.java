@@ -30,8 +30,6 @@ class UserModelMapperTest {
 		assertNull(userModel.getConfirmedPassword());
 	}
 
-	
-
 	private String random() {
 		return UUID.randomUUID().toString();
 	}

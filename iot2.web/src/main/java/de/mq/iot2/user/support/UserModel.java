@@ -3,27 +3,25 @@ package de.mq.iot2.user.support;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-
 public class UserModel {
 
 	private String name;
 
 	private String algorithm;
-	
+
 	@NotNull
 	private String locale;
-	
-	@Size(min = 5, max=15)
+
+	@Size(min = 5, max = 15)
 	private String password;
-	
-	@Size(min = 5, max=15)
+
+	@Size(min = 5, max = 15)
 	private String confirmedPassword;
-	
+
 	private boolean passwordChanged;
-	
+
 	private boolean loginRequired;
-	
-	
+
 	public void setLoginRequired(boolean loginRequired) {
 		this.loginRequired = loginRequired;
 	}

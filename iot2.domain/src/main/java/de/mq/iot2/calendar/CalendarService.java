@@ -40,14 +40,14 @@ public interface CalendarService {
 	int deleteLocalDateDays(final String name, final LocalDate fromDate, final LocalDate toDate);
 
 	int deleteLocalDateDays(final int daysBack);
-	
+
 	Collection<DayGroup> dayGroups();
 
 	Collection<Cycle> cycles();
 
 	Collection<Day<?>> days(final DayGroup dayGroup);
 
-    void deleteDay(final Day<?> day);
+	void deleteDay(final Day<?> day);
 
 	Collection<DayOfWeek> unUsedDaysOfWeek();
 

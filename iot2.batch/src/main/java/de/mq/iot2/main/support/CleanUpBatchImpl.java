@@ -26,11 +26,11 @@ class CleanUpBatchImpl {
 	@BatchMethod(value = "cleanup", converterClass = NoArgumentConverterImpl.class)
 	final void cleanUpLocalDateDays() {
 		final Optional<Integer> daysBack = configurationService.parameter(RuleKey.CleanUp, Key.DaysBack, Integer.class);
-		if(daysBack.isEmpty()) {
+		if (daysBack.isEmpty()) {
 			LOGGER.warn("Configuration for cleanup is missing. Nothing will be deleted.");
 			return;
 		}
-		
+
 		LOGGER.info("Delete localDateDays elder or equals {} days back.", daysBack.get());
 		final var numberOfDaysDeleted = calendarService.deleteLocalDateDays(daysBack.get());
 		LOGGER.info("{} days deleted.", numberOfDaysDeleted);
