@@ -9,16 +9,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.MonthDay;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -28,8 +33,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.CollectionUtils;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.CalendarService.TwilightType;
@@ -46,9 +53,11 @@ class CalendarServiceImpTest {
 	private final CycleRepository cycleRepository = Mockito.mock(CycleRepository.class);
 	private final DayGroupRepository dayGroupRepository = Mockito.mock(DayGroupRepository.class);
 	private final DayRepository dayRepository = Mockito.mock(DayRepository.class);
+	@SuppressWarnings("unchecked")
+	private final Converter<Day<?>, String> dayCsvConverter = Mockito.mock(Converter.class);
 	private final static int DAY_LIMIT = 30;
 
-	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, LATITUDE, LONGITUDE, DAY_LIMIT,
+	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, dayCsvConverter, LATITUDE, LONGITUDE, DAY_LIMIT,
 			ZoneUtil.ZONE_ID_EUROPEAN_SUMMERTIME.getId());
 
 	@Test
@@ -472,6 +481,44 @@ class CalendarServiceImpTest {
 		Mockito.when(dayGroup.readOnly()).thenReturn(true);
 		final Day<MonthDay> day = new DayOfMonthImpl(dayGroup, MonthDay.of(12, 25));
 		assertEquals(CalendarServiceImp.DAY_GROUP_READONLY_MESSAGE, assertThrows(IllegalArgumentException.class, () -> calendarService.createDayIfNotExists(day)).getMessage());
+	}
+
+	@Test
+	void export() throws IOException {
+		final Cycle cycle = new CycleImpl("Freizeit", 101);
+		final DayGroup dayGroupPublicHoliday = new DayGroupImpl(cycle, 1L, "Feiertage");
+		final DayGroup dayGroupWeekend = new DayGroupImpl(cycle, 2L, "Wochenende");
+		final DayGroup dayGroupVacation = new DayGroupImpl(cycle, 3L, "Urlaub");
+		final DayGroup dayGroupOtherTimes = new DayGroupImpl(new CycleImpl("abweichender Tagesbeginn", 100), 4L, "Sonderzeiten");
+		final Day<?> easterDay = new GaussDayImpl(dayGroupPublicHoliday, 0, "Ostersonntag");
+		final Day<?> laborDay = new DayOfMonthImpl(dayGroupPublicHoliday, MonthDay.of(Month.MAY, 1), "Tag der Arbeit");
+		final Day<?> sunDay = new DayOfWeekDayImpl(dayGroupWeekend, DayOfWeek.SUNDAY, DayOfWeek.SUNDAY.getDisplayName(TextStyle.FULL, Locale.GERMAN));
+		Mockito.when(dayRepository.findAll()).thenReturn(List.of(sunDay, laborDay, easterDay));
+		Mockito.when(dayGroupRepository.findAll()).thenReturn(List.of(dayGroupPublicHoliday, dayGroupWeekend, dayGroupVacation, dayGroupOtherTimes));
+		Mockito.doAnswer(a -> id(a.getArgument(0, Day.class)) + ";" + ((Day<?>) a.getArgument(0, Day.class)).dayGroup().name() + ";...").when(dayCsvConverter)
+				.convert(Mockito.any());
+		try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+
+			calendarService.export(os);
+
+			final Map<String, String> results = CollectionUtils.arrayToList(new String(os.toByteArray()).split("\n")).stream().map(Object::toString)
+					.collect(Collectors.toMap(x -> x.split(";")[0], x -> x.split(";")[1]));
+			assertEquals(5, results.size());
+			assertEquals(results.get(id(easterDay)), dayGroupPublicHoliday.name());
+			assertEquals(results.get(id(laborDay)), dayGroupPublicHoliday.name());
+			assertEquals(results.get(id(sunDay)), dayGroupWeekend.name());
+			assertEquals(results.get(id(0)), dayGroupOtherTimes.name());
+			assertEquals(results.get(id(1)), dayGroupVacation.name());
+			
+		}
+	}
+
+	
+	private String id(int dayOffset) {
+		return id(new LocalDateDayImp(Mockito.mock(DayGroup.class), LocalDate.of(1900, 1, 1).plusDays(dayOffset)));
+	}
+	private String id(final Object entity) {
+		return (String) ReflectionTestUtils.getField(entity, "id");
 	}
 
 }

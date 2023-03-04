@@ -1,5 +1,7 @@
 package de.mq.iot2.calendar.support;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,15 +16,18 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Service;
@@ -45,6 +50,7 @@ class CalendarServiceImp implements CalendarService {
 	private final CycleRepository cycleRepository;
 	private final DayGroupRepository dayGroupRepository;
 	private final DayRepository dayRepository;
+	private final Converter<Day<?>, String> dayCsvConverter;
 	private final double longitude;
 	private final double latitude;
 	private final int dayLimit;
@@ -61,11 +67,12 @@ class CalendarServiceImp implements CalendarService {
 
 	@Autowired
 	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository,
-			@Value("${iot2.calendar.latitude}") final double latitude, @Value("${iot2.calendar.longitude}") final double longitude,
+			final Converter<Day<?>, String> dayCsvConverter, @Value("${iot2.calendar.latitude}") final double latitude, @Value("${iot2.calendar.longitude}") final double longitude,
 			@Value("${iot2.calendar.dayslimit:30}") final int dayLimit, @Value("${iot2.calendar.zone:Europe/Berlin}") final String zone) {
 		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
+		this.dayCsvConverter = dayCsvConverter;
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.dayLimit = dayLimit;
@@ -246,6 +253,23 @@ class CalendarServiceImp implements CalendarService {
 		}
 		dayRepository.save(day);
 		return true;
+	}
+
+	@Override
+	@Transactional
+	public void export(final OutputStream os) {
+		try (final PrintWriter writer = new PrintWriter(os)) {
+			final Map<String, DayGroup> dayGroups = dayGroupRepository.findAll().stream().collect(Collectors.toMap(DayGroup::name, Function.identity()));
+			dayRepository.findAll().stream().sorted((day1, day2) -> day1.dayGroup().name().compareTo(day2.dayGroup().name())).forEach(day -> {
+				dayGroups.remove(day.dayGroup().name());
+				writer.println(dayCsvConverter.convert(day));
+			});
+
+			final List<DayGroup> dayGroupsList = dayGroups.values().stream().sorted((group1, group2) -> group1.name().compareTo(group1.name())).collect(Collectors.toList());
+			IntStream.range(0, dayGroupsList.size()).forEach(i -> writer.println(
+					dayCsvConverter.convert(new LocalDateDayImp(dayGroupsList.get(i), LocalDate.of(1900, 1, 1).plusDays(i), "Dummy-Eintrag: " + dayGroupsList.get(i).name()))));
+		}
+
 	}
 
 }
