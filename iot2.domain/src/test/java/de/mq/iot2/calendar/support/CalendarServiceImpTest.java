@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -39,7 +38,6 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.util.Pair;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
 
 import de.mq.iot2.calendar.CalendarService;
@@ -506,16 +504,13 @@ class CalendarServiceImpTest {
 			return new String[] { id(pair.getFirst()), !pair.getSecond()[0] ? pair.getFirst().dayGroup().name() : "",
 					!pair.getSecond()[1] ? pair.getFirst().dayGroup().cycle().name() : "", pair.getFirst().description().orElse(""), ".öä.." };
 		}).when(dayCsvConverter).convert(Mockito.any());
-
 		try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+			
 			calendarService.export(os);
-			File file = new File("C:\\mq/test.csv");
-			FileCopyUtils.copy(os.toByteArray(), file);
-
+			
 			final Map<String, Pair<String, String>> results = CollectionUtils.arrayToList(os.toString().split("\n")).stream().map(Object::toString)
 					.collect(Collectors.toMap(x -> x.split(String.format("[%s]", CSV_DELIMITER))[0],
 							x -> Pair.of(x.split(String.format("[%s]", CSV_DELIMITER))[1], x.split(String.format("[%s]", CSV_DELIMITER))[2])));
-
 			assertEquals(5, results.size());
 			assertEquals(dayGroupPublicHoliday.name(), results.get(id(easterDay)).getFirst());
 			assertEquals(cycleFreizeit.name(), results.get(id(easterDay)).getSecond());
