@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,9 +31,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import org.springframework.util.StringUtils;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.Cycle;
@@ -47,10 +51,11 @@ class CalendarServiceImp implements CalendarService {
 	static final String LIMIT_OF_DAYS_MESSAGE = "Limit of days is %s.";
 	static final String DAY_GROUP_READONLY_MESSAGE = "DayGroup is readonly.";
 	static final String DAY_GROUP_NOT_FOUND_MESSAGE = "DayGroup %s not found";
+	
 	private final CycleRepository cycleRepository;
 	private final DayGroupRepository dayGroupRepository;
 	private final DayRepository dayRepository;
-	private final Converter<Day<?>, String> dayCsvConverter;
+	private final Converter<Pair<Day<?>, boolean[]>, String[]> dayCsvConverter;
 	private final double longitude;
 	private final double latitude;
 	private final int dayLimit;
@@ -64,11 +69,13 @@ class CalendarServiceImp implements CalendarService {
 			new SimpleImmutableEntry<>(MonthDay.of(12, 26), "2. Weihnachtsfeiertag"));
 
 	private final ZoneId zoneId;
+	private final String  csvDelimiter;
 
 	@Autowired
 	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository,
-			final Converter<Day<?>, String> dayCsvConverter, @Value("${iot2.calendar.latitude}") final double latitude, @Value("${iot2.calendar.longitude}") final double longitude,
-			@Value("${iot2.calendar.dayslimit:30}") final int dayLimit, @Value("${iot2.calendar.zone:Europe/Berlin}") final String zone) {
+			final Converter<Pair<Day<?>, boolean[]>, String[]> dayCsvConverter, @Value("${iot2.calendar.latitude}") final double latitude,
+			@Value("${iot2.calendar.longitude}") final double longitude, @Value("${iot2.calendar.dayslimit:30}") final int dayLimit,
+			@Value("${iot2.calendar.zone:Europe/Berlin}") final String zone, @Value("${iot2.csv.delimiter:;}") final String  csvDelimiter) {
 		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
@@ -77,6 +84,7 @@ class CalendarServiceImp implements CalendarService {
 		this.longitude = longitude;
 		this.dayLimit = dayLimit;
 		this.zoneId = ZoneId.of(zone);
+		this.csvDelimiter=csvDelimiter.strip();
 	}
 
 	@Override
@@ -260,14 +268,30 @@ class CalendarServiceImp implements CalendarService {
 	public void export(final OutputStream os) {
 		try (final PrintWriter writer = new PrintWriter(os)) {
 			final Map<String, DayGroup> dayGroups = dayGroupRepository.findAll().stream().collect(Collectors.toMap(DayGroup::name, Function.identity()));
-			dayRepository.findAll().stream().sorted((day1, day2) -> day1.dayGroup().name().compareTo(day2.dayGroup().name())).forEach(day -> {
+			final Collection<String> dayGroupIdsProcessed = new HashSet<>();
+			final Collection<String> cycleIdsProcessed = new HashSet<>();
+			dayRepository.findAll().stream().sorted((day1, day2) -> {
+				final int result = day1.dayGroup().name().compareTo(day2.dayGroup().name());
+				if (result != 0) {
+					return result;
+				}
+				return IdUtil.getId(day1).compareTo(IdUtil.getId(day2));
+
+			}).forEach(day -> {
 				dayGroups.remove(day.dayGroup().name());
-				writer.println(dayCsvConverter.convert(day));
+				final var dayGroupId = IdUtil.getId(day.dayGroup());
+				final var cycleId = IdUtil.getId(day.dayGroup().cycle());
+				writer.println(StringUtils.arrayToDelimitedString(
+						dayCsvConverter.convert(Pair.of(day, new boolean[] { dayGroupIdsProcessed.contains(dayGroupId), cycleIdsProcessed.contains(cycleId) })), csvDelimiter));
+				dayGroupIdsProcessed.add(dayGroupId);
+				cycleIdsProcessed.add(cycleId);
 			});
 
 			final List<DayGroup> dayGroupsList = dayGroups.values().stream().sorted((group1, group2) -> group1.name().compareTo(group1.name())).collect(Collectors.toList());
-			IntStream.range(0, dayGroupsList.size()).forEach(i -> writer.println(
-					dayCsvConverter.convert(new LocalDateDayImp(dayGroupsList.get(i), LocalDate.of(1900, 1, 1).plusDays(i), "Dummy-Eintrag: " + dayGroupsList.get(i).name()))));
+			IntStream.range(0, dayGroupsList.size()).forEach(i -> writer.println(StringUtils.arrayToDelimitedString(dayCsvConverter.convert(Pair.of(
+					new LocalDateDayImp(dayGroupsList.get(i), LocalDate.of(1900, 1, 1).plusDays(i), "Dummy-Eintrag: " + dayGroupsList.get(i).name()),
+					new boolean[] { dayGroupIdsProcessed.contains(IdUtil.getId(dayGroupsList.get(i))), cycleIdsProcessed.contains(IdUtil.getId(dayGroupsList.get(i).cycle())) })),
+					csvDelimiter)));
 		}
 
 	}
