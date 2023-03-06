@@ -14,9 +14,9 @@
 	<properties>
 		<maven.compiler.source>19</maven.compiler.source>
 		<maven.compiler.target>19</maven.compiler.target>
+		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<jacoco.maven.version>0.8.9-SNAPSHOT</jacoco.maven.version>
 	</properties>
-	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>oss-sonatype</id>
@@ -82,7 +82,6 @@
 	</dependencies>
 	<build>
 		<plugins>
-		
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -102,8 +101,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			
 		</plugins>
 	</build>
 </project>

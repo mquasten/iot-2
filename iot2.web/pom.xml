@@ -15,6 +15,7 @@
 	<properties>
 		<maven.compiler.source>19</maven.compiler.source>
 		<maven.compiler.target>19</maven.compiler.target>
+		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jacoco.maven.version>0.8.9-SNAPSHOT</jacoco.maven.version>
 		<iot2.domain.version>0.0.1-SNAPSHOT</iot2.domain.version>
