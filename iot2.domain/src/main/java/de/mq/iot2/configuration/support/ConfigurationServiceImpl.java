@@ -1,9 +1,10 @@
 package de.mq.iot2.configuration.support;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -11,10 +12,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
@@ -46,13 +51,15 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	private final ParameterRepository parameterRepository;
 	private final CycleRepository cycleRepository;
 	private final ConversionService conversionService;
-
-	ConfigurationServiceImpl(ConfigurationRepository configurationRepository, final ParameterRepository parameterRepository, final CycleRepository cycleRepository,
-			final ConversionService conversionService) {
+	private  final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter; 
+	private final String csvDelimiter;
+	ConfigurationServiceImpl(ConfigurationRepository configurationRepository, final ParameterRepository parameterRepository, final CycleRepository cycleRepository, final ConversionService conversionService, final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter, @Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
 		this.configurationRepository = configurationRepository;
 		this.parameterRepository = parameterRepository;
 		this.cycleRepository = cycleRepository;
 		this.conversionService = conversionService;
+		this.parameterCsvConverter= parameterCsvConverter;
+		this.csvDelimiter=csvDelimiter;
 	}
 
 	@Override
@@ -142,7 +149,21 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	@Transactional
 	public void export(final OutputStream os) {
 		try (final PrintWriter writer = new PrintWriter(os)) {
-			
+			final Collection<String> configurationsIdsProcessed = new HashSet<>();
+			parameterRepository.findAll().stream().sorted((p1, p2) -> {
+				final int result = p1.configuration().name().compareTo(p2.configuration().name());
+				if (result != 0) {
+					return result;
+				}
+				return IdUtil.getId(p1).compareTo(IdUtil.getId(p2));
+
+			}).forEach(parameter -> {
+				final String configurationId = IdUtil.getId(parameter.configuration());
+				writer.println(StringUtils.arrayToDelimitedString(parameterCsvConverter.convert(Pair.of(parameter, configurationsIdsProcessed.contains(configurationId) )), csvDelimiter));
+				configurationsIdsProcessed.add(configurationId);
+			});
 		}
+
+			
 	}
 }

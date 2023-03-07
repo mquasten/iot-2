@@ -16,6 +16,8 @@ import jakarta.validation.Valid;
 @RepositoryDefinition(domainClass = AbstractParameter.class, idClass = String.class)
 public interface ParameterRepository {
 	Optional<Parameter> findById(final String id);
+	
+	Collection<Parameter>findAll();
 
 	Collection<Parameter> findByConfiguration(final Configuration configuration);
 

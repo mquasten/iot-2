@@ -4,12 +4,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.time.Month;
+import java.time.MonthDay;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,10 +27,16 @@ import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
+import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.util.Pair;
+import org.springframework.util.CollectionUtils;
 
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
+import de.mq.iot2.calendar.Day;
+import de.mq.iot2.calendar.support.CycleImpl;
 import de.mq.iot2.calendar.support.CycleRepository;
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Configuration.RuleKey;
@@ -37,6 +50,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 class ConfigurationServiceImplTest {
 
+	private static final String CSV_DELIMITER = ";";
 	private final ConversionService conversionService = Mockito.mock(ConversionService.class);
 	private final Cycle workingDayCycle = Mockito.mock(Cycle.class);
 	private final Cycle nonWorkingDayCycle = Mockito.mock(Cycle.class);
@@ -44,7 +58,9 @@ class ConfigurationServiceImplTest {
 	private final CycleRepository cycleRepository = Mockito.mock(CycleRepository.class);
 	private final ConfigurationRepository configurationRepository = Mockito.mock(ConfigurationRepository.class);
 	private final ParameterRepository parameterRepository = Mockito.mock(ParameterRepository.class);
-	private final ConfigurationService configurationService = new ConfigurationServiceImpl(configurationRepository, parameterRepository, cycleRepository, conversionService);
+	@SuppressWarnings("unchecked")
+	private  final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter = Mockito.mock(Converter.class);
+	private final ConfigurationService configurationService = new ConfigurationServiceImpl(configurationRepository, parameterRepository, cycleRepository, conversionService, parameterCsvConverter, CSV_DELIMITER);
 
 	@Test
 	void createDefaultConfigurationsAndParameters() {
@@ -62,7 +78,7 @@ class ConfigurationServiceImplTest {
 
 		final Collection<Parameter> savedParameter = new ArrayList<>();
 
-		Mockito.doAnswer(answer -> {
+		Mockito.doAnswer(answer -> { 
 			final var parameter = answer.getArgument(0, Parameter.class);
 			savedParameter.add(parameter);
 			return parameter;
@@ -226,6 +242,58 @@ class ConfigurationServiceImplTest {
 	@NullSource
 	void saveNull(final Parameter parameter) {
 		assertThrows(IllegalArgumentException.class, () -> configurationService.save(parameter));
+	}
+	
+	@Test
+	void export() throws IOException {
+		final Configuration configurationEndOfDay = new ConfigurationImpl(1L, RuleKey.EndOfDay, "EndofDayBatch");
+		final Configuration configurationCeanup = new ConfigurationImpl(2L, RuleKey.CleanUp, "Cleanup");
+		final Cycle cycleFreizeit =  BeanUtils.instantiateClass(CycleImpl.class);
+		final Cycle cycleArbeitsZeit =  BeanUtils.instantiateClass(CycleImpl.class);
+		final Cycle cycleAbweichendeZeiten =  BeanUtils.instantiateClass(CycleImpl.class);
+		final Parameter globalParameter = new ParameterImpl(configurationEndOfDay,Key.UpTime,"07:15" );
+		final Parameter freizeitParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "07:00", cycleFreizeit);
+		final Parameter arbeitszeitParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "05:15", cycleArbeitsZeit);
+		final Parameter abweichendeZeitenParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "06:00", cycleAbweichendeZeiten);
+		
+		final Parameter daysBackParameter = new ParameterImpl(configurationCeanup, Key.DaysBack, "30");
+		
+	
+		
+		Mockito.when(parameterRepository.findAll()).thenReturn(List.of(daysBackParameter, abweichendeZeitenParameter, arbeitszeitParameter, freizeitParameter, globalParameter));
+
+		Mockito.doAnswer(a -> {
+			@SuppressWarnings("unchecked")
+			final Pair<Parameter, Boolean> pair = a.getArgument(0, Pair.class);
+			return new String[] { IdUtil.getId(pair.getFirst()), !pair.getSecond() ? pair.getFirst().configuration().name() : "",  "..." };
+		}).when(parameterCsvConverter).convert(Mockito.any());
+		try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+			
+			configurationService.export(os);
+			
+			final Map<String, Pair<String, String>> results = CollectionUtils.arrayToList(os.toString().split("\n")).stream().map(Object::toString)
+					.collect(Collectors.toMap(x -> x.split(String.format("[%s]", CSV_DELIMITER))[0],
+							x -> {
+								System.out.println(x);
+								return Pair.of(x.split(String.format("[%s]", CSV_DELIMITER))[1], x.split(String.format("[%s]", CSV_DELIMITER))[2]);
+								}));
+			assertEquals(5, results.size());
+			
+		//	System.out.println(results.values());
+			
+		/*	assertEquals(dayGroupPublicHoliday.name(), results.get(id(easterDay)).getFirst());
+			assertEquals(cycleFreizeit.name(), results.get(id(easterDay)).getSecond());
+			assertTrue(results.get(id(laborDay)).getFirst().isEmpty());
+			assertTrue(results.get(id(laborDay)).getSecond().isEmpty());
+			assertEquals(results.get(id(sunDay)).getFirst(), dayGroupWeekend.name());
+			assertTrue(results.get(id(sunDay)).getSecond().isEmpty());
+			assertEquals(results.get(id(0)).getFirst(), dayGroupOtherTimes.name());
+			assertEquals(results.get(id(0)).getSecond(), cycleSonderzeiten.name());
+			assertEquals(results.get(id(1)).getFirst(), dayGroupVacation.name());
+			assertTrue(results.get(id(1)).getSecond().isEmpty()); */
+
+		}
+		
 	}
 
 }
