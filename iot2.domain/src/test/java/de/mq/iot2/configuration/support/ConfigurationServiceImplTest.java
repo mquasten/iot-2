@@ -6,20 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.time.Month;
-import java.time.MonthDay;
-import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,7 +31,6 @@ import org.springframework.util.CollectionUtils;
 
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
-import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.support.CycleImpl;
 import de.mq.iot2.calendar.support.CycleRepository;
 import de.mq.iot2.configuration.Configuration;
@@ -255,13 +250,9 @@ class ConfigurationServiceImplTest {
 		final Parameter freizeitParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "07:00", cycleFreizeit);
 		final Parameter arbeitszeitParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "05:15", cycleArbeitsZeit);
 		final Parameter abweichendeZeitenParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "06:00", cycleAbweichendeZeiten);
-		
 		final Parameter daysBackParameter = new ParameterImpl(configurationCeanup, Key.DaysBack, "30");
-		
-	
-		
-		Mockito.when(parameterRepository.findAll()).thenReturn(List.of(daysBackParameter, abweichendeZeitenParameter, arbeitszeitParameter, freizeitParameter, globalParameter));
 
+		Mockito.when(parameterRepository.findAll()).thenReturn(List.of(daysBackParameter, abweichendeZeitenParameter, arbeitszeitParameter, freizeitParameter, globalParameter));
 		Mockito.doAnswer(a -> {
 			@SuppressWarnings("unchecked")
 			final Pair<Parameter, Boolean> pair = a.getArgument(0, Pair.class);
@@ -271,26 +262,17 @@ class ConfigurationServiceImplTest {
 			
 			configurationService.export(os);
 			
-			final Map<String, Pair<String, String>> results = CollectionUtils.arrayToList(os.toString().split("\n")).stream().map(Object::toString)
+			final Map<String, String> results = CollectionUtils.arrayToList(os.toString().split("\n")).stream().map(Object::toString)
 					.collect(Collectors.toMap(x -> x.split(String.format("[%s]", CSV_DELIMITER))[0],
 							x -> {
-								System.out.println(x);
-								return Pair.of(x.split(String.format("[%s]", CSV_DELIMITER))[1], x.split(String.format("[%s]", CSV_DELIMITER))[2]);
+							System.out.println(x.split(String.format("[%s]", CSV_DELIMITER))[1]);
+								return x.split(String.format("[%s]", CSV_DELIMITER))[1];
 								}));
 			assertEquals(5, results.size());
-			
-		//	System.out.println(results.values());
-			
-		/*	assertEquals(dayGroupPublicHoliday.name(), results.get(id(easterDay)).getFirst());
-			assertEquals(cycleFreizeit.name(), results.get(id(easterDay)).getSecond());
-			assertTrue(results.get(id(laborDay)).getFirst().isEmpty());
-			assertTrue(results.get(id(laborDay)).getSecond().isEmpty());
-			assertEquals(results.get(id(sunDay)).getFirst(), dayGroupWeekend.name());
-			assertTrue(results.get(id(sunDay)).getSecond().isEmpty());
-			assertEquals(results.get(id(0)).getFirst(), dayGroupOtherTimes.name());
-			assertEquals(results.get(id(0)).getSecond(), cycleSonderzeiten.name());
-			assertEquals(results.get(id(1)).getFirst(), dayGroupVacation.name());
-			assertTrue(results.get(id(1)).getSecond().isEmpty()); */
+			assertEquals(configurationCeanup.name(), results.get(IdUtil.getId(daysBackParameter)));
+			final List<Parameter> endOfDayParameters = List.of(abweichendeZeitenParameter, arbeitszeitParameter, freizeitParameter, globalParameter).stream().sorted((p1, p2) -> IdUtil.getId(p1).compareTo(IdUtil.getId(p2))).collect(Collectors.toList());
+			assertEquals(configurationEndOfDay.name() ,  results.get(IdUtil.getId(endOfDayParameters.get(0))));
+			IntStream.range(1, endOfDayParameters.size()).forEach(i ->  assertTrue(results.get(IdUtil.getId(endOfDayParameters.get(i))).isEmpty()));	
 
 		}
 		

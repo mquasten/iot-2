@@ -501,7 +501,7 @@ class CalendarServiceImpTest {
 		Mockito.doAnswer(a -> {
 			@SuppressWarnings("unchecked")
 			final Pair<Day<?>, boolean[]> pair = a.getArgument(0, Pair.class);
-			return new String[] { id(pair.getFirst()), !pair.getSecond()[0] ? pair.getFirst().dayGroup().name() : "",
+			return new String[] { IdUtil.getId(pair.getFirst()), !pair.getSecond()[0] ? pair.getFirst().dayGroup().name() : "",
 					!pair.getSecond()[1] ? pair.getFirst().dayGroup().cycle().name() : "", pair.getFirst().description().orElse(""), ".öä.." };
 		}).when(dayCsvConverter).convert(Mockito.any());
 		try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
@@ -512,12 +512,12 @@ class CalendarServiceImpTest {
 					.collect(Collectors.toMap(x -> x.split(String.format("[%s]", CSV_DELIMITER))[0],
 							x -> Pair.of(x.split(String.format("[%s]", CSV_DELIMITER))[1], x.split(String.format("[%s]", CSV_DELIMITER))[2])));
 			assertEquals(5, results.size());
-			assertEquals(dayGroupPublicHoliday.name(), results.get(id(easterDay)).getFirst());
-			assertEquals(cycleFreizeit.name(), results.get(id(easterDay)).getSecond());
-			assertTrue(results.get(id(laborDay)).getFirst().isEmpty());
-			assertTrue(results.get(id(laborDay)).getSecond().isEmpty());
-			assertEquals(results.get(id(sunDay)).getFirst(), dayGroupWeekend.name());
-			assertTrue(results.get(id(sunDay)).getSecond().isEmpty());
+			assertEquals(dayGroupPublicHoliday.name(), results.get(IdUtil.getId(easterDay)).getFirst());
+			assertEquals(cycleFreizeit.name(), results.get(IdUtil.getId(easterDay)).getSecond());
+			assertTrue(results.get(IdUtil.getId(laborDay)).getFirst().isEmpty());
+			assertTrue(results.get(IdUtil.getId(laborDay)).getSecond().isEmpty());
+			assertEquals(results.get(IdUtil.getId(sunDay)).getFirst(), dayGroupWeekend.name());
+			assertTrue(results.get(IdUtil.getId(sunDay)).getSecond().isEmpty());
 			assertEquals(results.get(id(0)).getFirst(), dayGroupOtherTimes.name());
 			assertEquals(results.get(id(0)).getSecond(), cycleSonderzeiten.name());
 			assertEquals(results.get(id(1)).getFirst(), dayGroupVacation.name());
@@ -527,11 +527,7 @@ class CalendarServiceImpTest {
 	}
 
 	private String id(int dayOffset) {
-		return id(new LocalDateDayImp(Mockito.mock(DayGroup.class), LocalDate.of(1900, 1, 1).plusDays(dayOffset)));
-	}
-
-	private String id(final Object entity) {
-		return (String) ReflectionTestUtils.getField(entity, "id");
+		return IdUtil.getId(new LocalDateDayImp(Mockito.mock(DayGroup.class), LocalDate.of(1900, 1, 1).plusDays(dayOffset)));
 	}
 
 	@Test
