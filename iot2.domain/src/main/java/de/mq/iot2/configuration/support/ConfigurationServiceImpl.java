@@ -1,6 +1,8 @@
 package de.mq.iot2.configuration.support;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -135,5 +137,12 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		Assert.notNull(parmeter, "Parameter is required.");
 		parameterRepository.save(parmeter);
 	}
-
+	
+	@Override
+	@Transactional
+	public void export(final OutputStream os) {
+		try (final PrintWriter writer = new PrintWriter(os)) {
+			
+		}
+	}
 }

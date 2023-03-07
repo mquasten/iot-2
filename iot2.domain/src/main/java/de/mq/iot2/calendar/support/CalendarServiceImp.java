@@ -51,7 +51,7 @@ class CalendarServiceImp implements CalendarService {
 	static final String LIMIT_OF_DAYS_MESSAGE = "Limit of days is %s.";
 	static final String DAY_GROUP_READONLY_MESSAGE = "DayGroup is readonly.";
 	static final String DAY_GROUP_NOT_FOUND_MESSAGE = "DayGroup %s not found";
-	
+
 	private final CycleRepository cycleRepository;
 	private final DayGroupRepository dayGroupRepository;
 	private final DayRepository dayRepository;
@@ -69,13 +69,13 @@ class CalendarServiceImp implements CalendarService {
 			new SimpleImmutableEntry<>(MonthDay.of(12, 26), "2. Weihnachtsfeiertag"));
 
 	private final ZoneId zoneId;
-	private final String  csvDelimiter;
+	private final String csvDelimiter;
 
 	@Autowired
 	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository,
 			final Converter<Pair<Day<?>, boolean[]>, String[]> dayCsvConverter, @Value("${iot2.calendar.latitude}") final double latitude,
 			@Value("${iot2.calendar.longitude}") final double longitude, @Value("${iot2.calendar.dayslimit:30}") final int dayLimit,
-			@Value("${iot2.calendar.zone:Europe/Berlin}") final String zone, @Value("${iot2.csv.delimiter:;}") final String  csvDelimiter) {
+			@Value("${iot2.calendar.zone:Europe/Berlin}") final String zone, @Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
 		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
@@ -84,7 +84,7 @@ class CalendarServiceImp implements CalendarService {
 		this.longitude = longitude;
 		this.dayLimit = dayLimit;
 		this.zoneId = ZoneId.of(zone);
-		this.csvDelimiter=csvDelimiter.strip();
+		this.csvDelimiter = csvDelimiter.strip();
 	}
 
 	@Override
