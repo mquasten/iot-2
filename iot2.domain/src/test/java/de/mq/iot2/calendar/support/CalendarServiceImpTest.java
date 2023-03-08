@@ -59,10 +59,12 @@ class CalendarServiceImpTest {
 	private final DayRepository dayRepository = Mockito.mock(DayRepository.class);
 	@SuppressWarnings("unchecked")
 	private final Converter<Pair<Day<?>, boolean[]>, String[]> dayCsvConverter = Mockito.mock(Converter.class);
+	@SuppressWarnings("unchecked")
+	private final Converter<Pair<String[], Pair<Map<String, DayGroup>, Map<String, Cycle>>>, Day<?>> arrayCsvConverter = Mockito.mock(Converter.class);
 	private final static int DAY_LIMIT = 30;
 
-	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, dayCsvConverter, LATITUDE, LONGITUDE, DAY_LIMIT,
-			ZoneUtil.ZONE_ID_EUROPEAN_SUMMERTIME.getId(), CSV_DELIMITER);
+	private final CalendarService calendarService = new CalendarServiceImp(cycleRepository, dayGroupRepository, dayRepository, dayCsvConverter, arrayCsvConverter, LATITUDE,
+			LONGITUDE, DAY_LIMIT, ZoneUtil.ZONE_ID_EUROPEAN_SUMMERTIME.getId(), CSV_DELIMITER);
 
 	@Test
 	void createDefaultCyclesGroupsAndDays() {
@@ -506,9 +508,9 @@ class CalendarServiceImpTest {
 					!pair.getSecond()[1] ? pair.getFirst().dayGroup().cycle().name() : "", pair.getFirst().description().orElse(""), ".öä.." };
 		}).when(dayCsvConverter).convert(Mockito.any());
 		try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-			
+
 			calendarService.export(os);
-			
+
 			final Map<String, Pair<String, String>> results = CollectionUtils.arrayToList(os.toString().split("\n")).stream().map(Object::toString)
 					.collect(Collectors.toMap(x -> x.split(String.format("[%s]", CSV_DELIMITER))[0],
 							x -> Pair.of(x.split(String.format("[%s]", CSV_DELIMITER))[1], x.split(String.format("[%s]", CSV_DELIMITER))[2])));
@@ -543,13 +545,49 @@ class CalendarServiceImpTest {
 		}
 
 	}
+
 	@Test
 	void importCsv() throws IOException {
-		try ( final InputStream is = getClass().getClassLoader().getResourceAsStream("calendar.csv")) {
-			 calendarService.importCsv(is);
-		}
-		 
-System.out.println("äüö");
-	}
+		final Cycle freizeit = new CycleImpl(1L, "Freizeit", 102);
+		final DayGroup feiertage = new DayGroupImpl(freizeit, 1L, "Feiertage");
 
+		final Day<?> ostern = new GaussDayImpl(feiertage, 0);
+		final Day<?> tagDerArbeit = new DayOfMonthImpl(feiertage, MonthDay.of(5, 1));
+		final Day<?> sonntag = new DayOfWeekDayImpl(feiertage, DayOfWeek.SUNDAY);
+
+		final Cycle arbeitstage = new CycleImpl(2L, "Arbeitstage", 100, true);
+		final DayGroup arbeitszeit = new DayGroupImpl(arbeitstage, 5L, "Arbeitszeit");
+		final Day<?> dummyDayArbeitszeit = new LocalDateDayImp(arbeitszeit, LocalDate.of(1, 1, 1));
+
+		final Cycle abweichenderTagesbeginn = new CycleImpl(3L, "abweichender Tagesbeginn", 101, false);
+		final DayGroup sonderzeiten = new DayGroupImpl(abweichenderTagesbeginn, 4L, "Sonderzeiten");
+		final Day<?> dummyDaySonderzeiten = new LocalDateDayImp(sonderzeiten, LocalDate.of(2, 1, 1));
+
+		final DayGroup urlaub = new DayGroupImpl(freizeit, 3L, "Urlaub");
+		final Day<?> dummyDayUrlaub = new LocalDateDayImp(urlaub, LocalDate.of(3, 1, 1));
+
+		final Map<String, Day<?>> days = Map.of("0", ostern, "01.05", tagDerArbeit, "7", sonntag, "01.01.1900", dummyDayArbeitszeit, "02.01.1900", dummyDaySonderzeiten,
+				"03.01.1900", dummyDayUrlaub);
+
+		Mockito.doAnswer(answer -> {
+			@SuppressWarnings("unchecked")
+			final Pair<String[], Pair<Map<String, DayGroup>, Map<String, Cycle>>> pair = answer.getArgument(0, Pair.class);
+			return days.get(pair.getFirst()[1]);
+		}).when(arrayCsvConverter).convert(Mockito.any());
+
+		try (final InputStream is = getClass().getClassLoader().getResourceAsStream("calendar.csv")) {
+			calendarService.importCsv(is);
+		}
+
+		Mockito.verify(cycleRepository, Mockito.times(1)).save(freizeit);
+		Mockito.verify(cycleRepository, Mockito.times(1)).save(arbeitstage);
+		Mockito.verify(cycleRepository, Mockito.times(1)).save(abweichenderTagesbeginn);
+
+		Mockito.verify(dayGroupRepository, Mockito.times(1)).save(feiertage);
+		Mockito.verify(dayGroupRepository, Mockito.times(1)).save(arbeitszeit);
+		Mockito.verify(dayGroupRepository, Mockito.times(1)).save(sonderzeiten);
+		Mockito.verify(dayGroupRepository, Mockito.times(1)).save(urlaub);
+
+		days.values().forEach(day -> Mockito.verify(dayRepository, Mockito.times(1)).save(day));
+	}
 }

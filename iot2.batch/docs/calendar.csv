@@ -13,6 +13,6 @@ DayOfMonth;25.12;1. Weihnachtsfeiertag;1;;;1;;;
 DayOfMonth;26.12;2. Weihnachtsfeiertag;1;;;1;;;
 DayOfWeekDay;6;Samstag;2;Wochenende;true;1;;;
 DayOfWeekDay;7;Sonntag;2;;;1;;;
-LocaldateDay;1.01.1900;Dummy-Eintrag: Arbeitszeit;5;Arbeitszeit;false;2;Arbeitstage;100;true
-LocaldateDay;2.01.1900;Dummy-Eintrag: Sonderzeiten;4;Sonderzeiten;false;3;abweichender Tagesbeginn;101;false
-LocaldateDay;3.01.1900;Dummy-Eintrag: Urlaub;3;Urlaub;false;1;;;
+LocaldateDay;01.01.1900;Dummy-Eintrag: Arbeitszeit;5;Arbeitszeit;false;2;Arbeitstage;100;true
+LocaldateDay;02.01.1900;Dummy-Eintrag: Sonderzeiten;4;Sonderzeiten;false;3;abweichender Tagesbeginn;101;false
+LocaldateDay;03.01.1900;Dummy-Eintrag: Urlaub;3;Urlaub;false;1;;;

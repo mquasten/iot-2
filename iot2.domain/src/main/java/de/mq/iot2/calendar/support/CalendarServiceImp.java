@@ -74,17 +74,19 @@ class CalendarServiceImp implements CalendarService {
 
 	private final ZoneId zoneId;
 	private final String csvDelimiter;
-	private Converter<Pair<String[],Pair<Map<String,DayGroup>,Map<String,Cycle>>>, Day<?> > arrayCsvConverter;
- 
+	private final Converter<Pair<String[], Pair<Map<String, DayGroup>, Map<String, Cycle>>>, Day<?>> arrayCsvConverter;
+
 	@Autowired
 	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository,
-			final Converter<Pair<Day<?>, boolean[]>, String[]> dayCsvConverter, @Value("${iot2.calendar.latitude}") final double latitude,
+			final Converter<Pair<Day<?>, boolean[]>, String[]> dayCsvConverter,
+			final Converter<Pair<String[], Pair<Map<String, DayGroup>, Map<String, Cycle>>>, Day<?>> arrayCsvConverter, @Value("${iot2.calendar.latitude}") final double latitude,
 			@Value("${iot2.calendar.longitude}") final double longitude, @Value("${iot2.calendar.dayslimit:30}") final int dayLimit,
 			@Value("${iot2.calendar.zone:Europe/Berlin}") final String zone, @Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
 		this.cycleRepository = cycleRepository;
 		this.dayGroupRepository = dayGroupRepository;
 		this.dayRepository = dayRepository;
 		this.dayCsvConverter = dayCsvConverter;
+		this.arrayCsvConverter = arrayCsvConverter;
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.dayLimit = dayLimit;
@@ -306,6 +308,8 @@ class CalendarServiceImp implements CalendarService {
 	public void importCsv(final InputStream in) throws IOException {
 
 		try (final InputStreamReader streamReader = new InputStreamReader(in); final BufferedReader reader = new BufferedReader(streamReader)) {
+			final Map<String, DayGroup> dayGroups = new HashMap<>();
+			final Map<String, Cycle> cycles = new HashMap<>();
 
 			for (int i = 1; reader.ready(); i++) {
 				final String pattern = String.format("[%s](?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", csvDelimiter);
@@ -316,23 +320,20 @@ class CalendarServiceImp implements CalendarService {
 						.toArray(size -> new String[size]);
 
 				Assert.isTrue(cols.length == 10, String.format("Wrong number of Columns in line %s.", i));
-				System.out.println(i + ": " + line + cols.length);
-				final Map<String,DayGroup> dayGroups = new HashMap<>();
-				final Map<String,Cycle> cycles = new HashMap<>();
-				/*
+
 				final Day<?> day = arrayCsvConverter.convert(Pair.of(cols, Pair.of(dayGroups, cycles)));
-				if(!cycles.containsKey(IdUtil.getId(day.dayGroup().cycle()))) {
+				if (!cycles.containsKey(IdUtil.getId(day.dayGroup().cycle()))) {
 					cycles.put(IdUtil.getId(day.dayGroup().cycle()), day.dayGroup().cycle());
 					cycleRepository.save(day.dayGroup().cycle());
 				}
-				
-				if(!dayGroups.containsKey(IdUtil.getId(day.dayGroup()))) {
-					
+
+				if (!dayGroups.containsKey(IdUtil.getId(day.dayGroup()))) {
+
 					dayGroups.put(IdUtil.getId(day.dayGroup()), day.dayGroup());
 					dayGroupRepository.save(day.dayGroup());
 				}
-				
-				dayRepository.save(day); */
+
+				dayRepository.save(day);
 				i++;
 			}
 		}

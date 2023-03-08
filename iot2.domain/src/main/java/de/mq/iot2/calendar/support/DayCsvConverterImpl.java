@@ -45,7 +45,7 @@ class DayCsvConverterImpl implements Converter<Pair<Day<?>, boolean[]>, String[]
 
 	private String localDateDay(final AbstractDay<?> day) {
 		final int[] values = day.split(4, 2);
-		return values[2] + "." + lpadNumberValue(values[1], 2) + "." + lpadNumberValue(values[0], 2);
+		return  lpadNumberValue(values[2],2) + "." + lpadNumberValue(values[1], 2) + "." + values[0];
 	}
 
 	@Override
