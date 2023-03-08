@@ -23,10 +23,10 @@ class SetupDatabaseImpl {
 
 	@BatchMethod("setup")
 	final void execute() {
-		LOG.info("Setup database DayGroups and Days.");
+		LOG.info("Setup database: DayGroups, days, cycles, configurations and parameters.");
 		calendarService.createDefaultCyclesGroupsAndDays();
 		configurationService.createDefaultConfigurationsAndParameters();
-
+		LOG.info("Setup database finished");
 	}
 
 }

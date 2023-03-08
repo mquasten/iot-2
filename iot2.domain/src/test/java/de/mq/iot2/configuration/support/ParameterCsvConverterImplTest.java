@@ -20,9 +20,11 @@ import de.mq.iot2.support.RandomTestUtil;
 
 class ParameterCsvConverterImplTest {
 	
+	private final long configurationId = RandomTestUtil.randomLong();
+	long cycleId = RandomTestUtil.randomLong();
 	private static final String CSV_DELIMITER = ";";
 	private final Converter<Pair<Parameter, Boolean>, String[]> converter = new ParameterCsvConverterImpl(CSV_DELIMITER);
-	private final Configuration configurationEndOfDay = new ConfigurationImpl(RandomTestUtil.randomLong(), RuleKey.EndOfDay, "EndofDayBatch");
+	private final Configuration configurationEndOfDay = new ConfigurationImpl(configurationId, RuleKey.EndOfDay, "EndofDayBatch");
 	
 	@Test
 	final void convertFull() {
@@ -34,10 +36,10 @@ class ParameterCsvConverterImplTest {
 		assertEquals(CycleParameterImpl.CYCLE_PARAMETER_ENTITY_NAME, results[0]);
 		assertEquals(parameter.key().name(), results[1]);
 		assertEquals(parameter.value(), results[2]);
-		assertEquals(IdUtil.getId(parameter.configuration()), results[3]);
+		assertEquals(""+configurationId, results[3]);
 		assertEquals(parameter.configuration().key().name(), results[4]);
 		assertEquals(parameter.configuration().name(), results[5]);
-		assertEquals(IdUtil.getId(((CycleParameterImpl)parameter).cycle()), results[6]);
+		assertEquals(""+cycleId, results[6]);
 	}
 	
 	@Test
@@ -50,10 +52,10 @@ class ParameterCsvConverterImplTest {
 		assertEquals(CycleParameterImpl.CYCLE_PARAMETER_ENTITY_NAME, results[0]);
 		assertEquals(parameter.key().name(), results[1]);
 		assertEquals(parameter.value(), results[2]);
-		assertEquals(IdUtil.getId(parameter.configuration()), results[3]);
+		assertEquals(""+configurationId, results[3]);
 		assertTrue(results[4].isEmpty());
 		assertTrue(results[5].isEmpty());
-		assertEquals(IdUtil.getId(((CycleParameterImpl)parameter).cycle()), results[6]);
+		assertEquals(""+cycleId, results[6]);
 	}
 	
 	@Test
@@ -66,7 +68,7 @@ class ParameterCsvConverterImplTest {
 		assertEquals(ParameterImpl.GLOBAL_PARAMETER_ENTITY_NAME, results[0]);
 		assertEquals(parameter.key().name(), results[1]);
 		assertEquals(parameter.value(), results[2]);
-		assertEquals(IdUtil.getId(parameter.configuration()), results[3]);
+		assertEquals(""+configurationId, results[3]);
 		assertTrue(results[4].isEmpty());
 		assertTrue(results[5].isEmpty());
 		assertTrue(results[6].isEmpty());
@@ -75,7 +77,7 @@ class ParameterCsvConverterImplTest {
 	
 	private Parameter newCycleParameter() {
 		final Cycle cycle = BeanUtils.instantiateClass(CycleImpl.class);
-		IdUtil.assignId(cycle, IdUtil.id(1L));
+		IdUtil.assignId(cycle, IdUtil.id(cycleId));
 	return new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "07:00", cycle);
 		
 	}

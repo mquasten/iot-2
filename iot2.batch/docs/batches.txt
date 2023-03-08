@@ -36,3 +36,10 @@ password: unverschlüsseltes Password mandatory
 <algorithm> Algorithmus für das Messagedigest, Format: Messagedigest(JDK 19): SHA3-512, SHA-1, SHA-384, SHA3-384, SHA-224, SHA-512/256, SHA-256, MD2, SHA-512/224, SHA3-256, SHA-512, SHA3-224, MD5, optional, default Passwort wird unverschlüsselt als HexString gespeichert  
 Aufruf: -c delete-user name 
 name: Benutzername/login mandatory
+
+Export-Batch
+Exportiert Calendar (Day, DayGroup,Cycle) und Configuration(Parameter, Configuration) als CSV-Datei.
+Aufruf: -c export-calendar file
+file: Dateiname ggf. mit Pfad, mandatory 
+Aufruf: -c export-configuration file 
+file: Dateiname ggf. mit Pfad, mandatory

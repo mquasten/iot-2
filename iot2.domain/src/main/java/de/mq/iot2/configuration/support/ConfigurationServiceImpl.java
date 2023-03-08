@@ -151,9 +151,14 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		try (final PrintWriter writer = new PrintWriter(os)) {
 			final Collection<String> configurationsIdsProcessed = new HashSet<>();
 			parameterRepository.findAll().stream().sorted((p1, p2) -> {
-				final int result = p1.configuration().name().compareTo(p2.configuration().name());
-				if (result != 0) {
-					return result;
+				final int compareConfigurations = p1.configuration().name().compareTo(p2.configuration().name());
+				if (compareConfigurations != 0) {
+					return compareConfigurations;
+				}
+			
+				final int compareParameters = p1.key().name().compareTo(p2.key().name());
+				if ( compareParameters != 0) {
+					return compareParameters;
 				}
 				return IdUtil.getId(p1).compareTo(IdUtil.getId(p2));
 

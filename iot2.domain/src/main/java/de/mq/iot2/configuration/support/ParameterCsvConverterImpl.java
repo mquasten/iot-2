@@ -11,7 +11,6 @@ import org.springframework.util.Assert;
 import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Parameter;
 import de.mq.iot2.support.CsvUtil;
-import de.mq.iot2.support.IdUtil;
 import jakarta.persistence.DiscriminatorValue;
 
 @Component
@@ -29,25 +28,24 @@ class ParameterCsvConverterImpl implements Converter<Pair<Parameter, Boolean>, S
 		final var parameter = pair.getFirst();
 		final var configurationProcessed = pair.getSecond();
 
-		final Stream<String> results =Stream.concat(Stream.concat(Stream.of(parameter.getClass().getAnnotation(DiscriminatorValue.class).value(), parameter.key().name(),
-				CsvUtil.quote(parameter.value(), csvDelimiter)), configuration(parameter.configuration(), configurationProcessed)), cycle(parameter));
+		final Stream<String> results = Stream.concat(Stream.concat(
+				Stream.of(parameter.getClass().getAnnotation(DiscriminatorValue.class).value(), parameter.key().name(), CsvUtil.quote(parameter.value(), csvDelimiter)),
+				configuration(parameter.configuration(), configurationProcessed)), cycle(parameter));
 
 		return results.toArray(size -> new String[size]);
 	}
-	
+
 	private Stream<String> configuration(final Configuration configuration, boolean processed) {
-		if(processed) {
-			return Stream.concat(Stream.of(IdUtil.getId(configuration)), CsvUtil.emptyColumns(2));
+		if (processed) {
+			return Stream.concat(Stream.of(CsvUtil.id(configuration)), CsvUtil.emptyColumns(2));
 		}
-		return Stream.of(IdUtil.getId(configuration),configuration.key().name(),CsvUtil.quote(configuration.name(),csvDelimiter));
-		
+		return Stream.of(CsvUtil.id(configuration), configuration.key().name(), CsvUtil.quote(configuration.name(), csvDelimiter));
 	}
-	
+
 	private Stream<String> cycle(final Parameter parameter) {
-		if ( parameter instanceof CycleParameterImpl) {
-			return Stream.of(IdUtil.getId( ((CycleParameterImpl)parameter).cycle()));
+		if (parameter instanceof CycleParameterImpl) {
+			return Stream.of(CsvUtil.id(((CycleParameterImpl) parameter).cycle()));
 		}
 		return CsvUtil.emptyColumns(1);
 	}
-
 }

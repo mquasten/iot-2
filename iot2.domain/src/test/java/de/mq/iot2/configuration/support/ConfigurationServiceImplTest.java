@@ -250,9 +250,10 @@ class ConfigurationServiceImplTest {
 		final Parameter freizeitParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "07:00", cycleFreizeit);
 		final Parameter arbeitszeitParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "05:15", cycleArbeitsZeit);
 		final Parameter abweichendeZeitenParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "06:00", cycleAbweichendeZeiten);
+		final Parameter otherGlobalParameter = new ParameterImpl(configurationEndOfDay,Key.ShadowTemperature,"25");
 		final Parameter daysBackParameter = new ParameterImpl(configurationCeanup, Key.DaysBack, "30");
 
-		Mockito.when(parameterRepository.findAll()).thenReturn(List.of(daysBackParameter, abweichendeZeitenParameter, arbeitszeitParameter, freizeitParameter, globalParameter));
+		Mockito.when(parameterRepository.findAll()).thenReturn(List.of(daysBackParameter, abweichendeZeitenParameter, arbeitszeitParameter, otherGlobalParameter,freizeitParameter, globalParameter));
 		Mockito.doAnswer(a -> {
 			@SuppressWarnings("unchecked")
 			final Pair<Parameter, Boolean> pair = a.getArgument(0, Pair.class);
@@ -263,14 +264,11 @@ class ConfigurationServiceImplTest {
 			configurationService.export(os);
 			
 			final Map<String, String> results = CollectionUtils.arrayToList(os.toString().split("\n")).stream().map(Object::toString)
-					.collect(Collectors.toMap(x -> x.split(String.format("[%s]", CSV_DELIMITER))[0],
-							x -> {
-							System.out.println(x.split(String.format("[%s]", CSV_DELIMITER))[1]);
-								return x.split(String.format("[%s]", CSV_DELIMITER))[1];
-								}));
-			assertEquals(5, results.size());
+					.collect(Collectors.toMap(x -> x.split(String.format("[%s]", CSV_DELIMITER))[0],x -> x.split(String.format("[%s]", CSV_DELIMITER))[1]));
+			
+			assertEquals(6, results.size());
 			assertEquals(configurationCeanup.name(), results.get(IdUtil.getId(daysBackParameter)));
-			final List<Parameter> endOfDayParameters = List.of(abweichendeZeitenParameter, arbeitszeitParameter, freizeitParameter, globalParameter).stream().sorted((p1, p2) -> IdUtil.getId(p1).compareTo(IdUtil.getId(p2))).collect(Collectors.toList());
+			final List<Parameter> endOfDayParameters = List.of(abweichendeZeitenParameter, arbeitszeitParameter, otherGlobalParameter, freizeitParameter, globalParameter).stream().sorted((p1, p2) -> p1.key().name().compareTo(p2.key().name())).collect(Collectors.toList());
 			assertEquals(configurationEndOfDay.name() ,  results.get(IdUtil.getId(endOfDayParameters.get(0))));
 			IntStream.range(1, endOfDayParameters.size()).forEach(i ->  assertTrue(results.get(IdUtil.getId(endOfDayParameters.get(i))).isEmpty()));	
 

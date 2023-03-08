@@ -53,8 +53,6 @@ class DayCsvConverterImpl implements Converter<Pair<Day<?>, boolean[]>, String[]
 		Assert.notNull(pair, "Value is required.");
 		Assert.isTrue(pair.getSecond().length == 2, BOOLEAN_ARRAY_WRONG_SIZE);
 		final var day = pair.getFirst();
-		Assert.notNull(day, "Day is required.");
-		Assert.notNull(pair.getSecond(), "Flags required.");
 		final var dataGroupProcessed = pair.getSecond()[0];
 		final var cycleProcessed = pair.getSecond()[1];
 		return Stream.concat(Stream.concat(day(day).stream(), dayGroup(day.dayGroup(), dataGroupProcessed)), cycle(day.dayGroup().cycle(), cycleProcessed))

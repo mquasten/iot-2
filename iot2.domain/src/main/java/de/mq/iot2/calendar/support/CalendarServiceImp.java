@@ -91,13 +91,13 @@ class CalendarServiceImp implements CalendarService {
 	@Transactional
 	public void createDefaultCyclesGroupsAndDays() {
 
-		final var cycle = cycleRepository.save(new CycleImpl(1L, "Freizeit", 101));
-		cycleRepository.save(new CycleImpl(2L, "Arbeitstage", 102, true));
-
+		final var cycle = cycleRepository.save(new CycleImpl(1L, "Freizeit", 102));
+		final var cycleArbeitstage= cycleRepository.save(new CycleImpl(2L, "Arbeitstage", 100, true));
+		dayGroupRepository.save(new DayGroupImpl(cycleArbeitstage, 5L, "Arbeitszeit", false));
 		createOrUpdatePublicHolidays(cycle);
 		createOrUpdateWeekend(cycle);
 		createOrUpdateVacation(cycle);
-		final var otherTimesCycle = cycleRepository.save(new CycleImpl(3L, "abweichender Tagesbeginn", 100));
+		final var otherTimesCycle = cycleRepository.save(new CycleImpl(3L, "abweichender Tagesbeginn", 101));
 		dayGroupRepository.save(new DayGroupImpl(otherTimesCycle, 4L, OTHER_UP_TIMES_GROUP_NAME, false));
 	}
 
