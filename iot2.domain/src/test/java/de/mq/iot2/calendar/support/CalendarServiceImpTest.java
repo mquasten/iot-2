@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -541,6 +542,14 @@ class CalendarServiceImpTest {
 			assertFalse(value.contains("\""));
 		}
 
+	}
+	@Test
+	void importCsv() throws IOException {
+		try ( final InputStream is = getClass().getClassLoader().getResourceAsStream("calendar.csv")) {
+			 calendarService.importCsv(is);
+		}
+		 
+System.out.println("äüö");
 	}
 
 }

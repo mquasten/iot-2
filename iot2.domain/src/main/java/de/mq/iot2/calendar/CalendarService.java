@@ -1,5 +1,7 @@
 package de.mq.iot2.calendar;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -55,6 +57,8 @@ public interface CalendarService {
 	boolean createDayIfNotExists(final Day<?> day);
 
 	void export(final OutputStream os);
+
+	void importCsv(final InputStream os) throws IOException;
 
 
 

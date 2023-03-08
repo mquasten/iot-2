@@ -1,5 +1,9 @@
 package de.mq.iot2.calendar.support;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.time.DayOfWeek;
@@ -14,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -35,7 +40,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-
 import org.springframework.util.StringUtils;
 
 import de.mq.iot2.calendar.CalendarService;
@@ -70,7 +74,8 @@ class CalendarServiceImp implements CalendarService {
 
 	private final ZoneId zoneId;
 	private final String csvDelimiter;
-
+	private Converter<Pair<String[],Pair<Map<String,DayGroup>,Map<String,Cycle>>>, Day<?> > arrayCsvConverter;
+ 
 	@Autowired
 	CalendarServiceImp(final CycleRepository cycleRepository, final DayGroupRepository dayGroupRepository, final DayRepository dayRepository,
 			final Converter<Pair<Day<?>, boolean[]>, String[]> dayCsvConverter, @Value("${iot2.calendar.latitude}") final double latitude,
@@ -92,7 +97,7 @@ class CalendarServiceImp implements CalendarService {
 	public void createDefaultCyclesGroupsAndDays() {
 
 		final var cycle = cycleRepository.save(new CycleImpl(1L, "Freizeit", 102));
-		final var cycleArbeitstage= cycleRepository.save(new CycleImpl(2L, "Arbeitstage", 100, true));
+		final var cycleArbeitstage = cycleRepository.save(new CycleImpl(2L, "Arbeitstage", 100, true));
 		dayGroupRepository.save(new DayGroupImpl(cycleArbeitstage, 5L, "Arbeitszeit", false));
 		createOrUpdatePublicHolidays(cycle);
 		createOrUpdateWeekend(cycle);
@@ -296,4 +301,41 @@ class CalendarServiceImp implements CalendarService {
 
 	}
 
+	@Override
+	@Transactional
+	public void importCsv(final InputStream in) throws IOException {
+
+		try (final InputStreamReader streamReader = new InputStreamReader(in); final BufferedReader reader = new BufferedReader(streamReader)) {
+
+			for (int i = 1; reader.ready(); i++) {
+				final String pattern = String.format("[%s](?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", csvDelimiter);
+
+				final String line = reader.readLine();
+
+				final String[] cols = List.of(line.split(pattern, -1)).stream().map(col -> StringUtils.trimTrailingCharacter(StringUtils.trimLeadingCharacter(col, '"'), '"'))
+						.toArray(size -> new String[size]);
+
+				Assert.isTrue(cols.length == 10, String.format("Wrong number of Columns in line %s.", i));
+				System.out.println(i + ": " + line + cols.length);
+				final Map<String,DayGroup> dayGroups = new HashMap<>();
+				final Map<String,Cycle> cycles = new HashMap<>();
+				/*
+				final Day<?> day = arrayCsvConverter.convert(Pair.of(cols, Pair.of(dayGroups, cycles)));
+				if(!cycles.containsKey(IdUtil.getId(day.dayGroup().cycle()))) {
+					cycles.put(IdUtil.getId(day.dayGroup().cycle()), day.dayGroup().cycle());
+					cycleRepository.save(day.dayGroup().cycle());
+				}
+				
+				if(!dayGroups.containsKey(IdUtil.getId(day.dayGroup()))) {
+					
+					dayGroups.put(IdUtil.getId(day.dayGroup()), day.dayGroup());
+					dayGroupRepository.save(day.dayGroup());
+				}
+				
+				dayRepository.save(day); */
+				i++;
+			}
+		}
+
+	}
 }
