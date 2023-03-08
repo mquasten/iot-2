@@ -1,31 +1,53 @@
 package de.mq.iot2.configuration.support;
 
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import de.mq.iot2.configuration.Configuration;
 import de.mq.iot2.configuration.Parameter;
+import de.mq.iot2.support.CsvUtil;
+import de.mq.iot2.support.IdUtil;
+import jakarta.persistence.DiscriminatorValue;
 
 @Component
 class ParameterCsvConverterImpl implements Converter<Pair<Parameter, Boolean>, String[]> {
-	
-	private final String csvDelimiter ;
+
+	private final String csvDelimiter;
+
 	ParameterCsvConverterImpl(@Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
-		this.csvDelimiter=csvDelimiter;
+		this.csvDelimiter = csvDelimiter;
 	}
 
 	@Override
 	public String[] convert(final Pair<Parameter, Boolean> pair) {
 		Assert.notNull(pair, "Value is required.");
 		final var parameter = pair.getFirst();
-		Assert.notNull(parameter, "Parameter is required.");
-		final var configurationProcessed = pair.getSecond() != null ? pair.getSecond() : false;
-		System.out.println(configurationProcessed);
-		System.out.println(csvDelimiter);
+		final var configurationProcessed = pair.getSecond();
 
-		return null;
+		final Stream<String> results =Stream.concat(Stream.concat(Stream.of(parameter.getClass().getAnnotation(DiscriminatorValue.class).value(), parameter.key().name(),
+				CsvUtil.quote(parameter.value(), csvDelimiter)), configuration(parameter.configuration(), configurationProcessed)), cycle(parameter));
+
+		return results.toArray(size -> new String[size]);
+	}
+	
+	private Stream<String> configuration(final Configuration configuration, boolean processed) {
+		if(processed) {
+			return Stream.concat(Stream.of(IdUtil.getId(configuration)), CsvUtil.emptyColumns(2));
+		}
+		return Stream.of(IdUtil.getId(configuration),configuration.key().name(),CsvUtil.quote(configuration.name(),csvDelimiter));
+		
+	}
+	
+	private Stream<String> cycle(final Parameter parameter) {
+		if ( parameter instanceof CycleParameterImpl) {
+			return Stream.of(IdUtil.getId( ((CycleParameterImpl)parameter).cycle()));
+		}
+		return CsvUtil.emptyColumns(1);
 	}
 
 }

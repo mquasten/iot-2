@@ -1,5 +1,8 @@
 package de.mq.iot2.configuration.support;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.converter.Converter;
@@ -19,15 +22,64 @@ class ParameterCsvConverterImplTest {
 	
 	private static final String CSV_DELIMITER = ";";
 	private final Converter<Pair<Parameter, Boolean>, String[]> converter = new ParameterCsvConverterImpl(CSV_DELIMITER);
+	private final Configuration configurationEndOfDay = new ConfigurationImpl(RandomTestUtil.randomLong(), RuleKey.EndOfDay, "EndofDayBatch");
 	
 	@Test
-	final void convert() {
-		final Configuration configurationEndOfDay = new ConfigurationImpl(RandomTestUtil.randomLong(), RuleKey.EndOfDay, "EndofDayBatch");
+	final void convertFull() {
+		final Parameter parameter = newCycleParameter();
+		
+		final String[] results = converter.convert(Pair.of(parameter, false));
+		
+		assertEquals(7, results.length);
+		assertEquals(CycleParameterImpl.CYCLE_PARAMETER_ENTITY_NAME, results[0]);
+		assertEquals(parameter.key().name(), results[1]);
+		assertEquals(parameter.value(), results[2]);
+		assertEquals(IdUtil.getId(parameter.configuration()), results[3]);
+		assertEquals(parameter.configuration().key().name(), results[4]);
+		assertEquals(parameter.configuration().name(), results[5]);
+		assertEquals(IdUtil.getId(((CycleParameterImpl)parameter).cycle()), results[6]);
+	}
+	
+	@Test
+	final void convertWithoutConfiguration() {
+		final Parameter parameter = newCycleParameter();
+		
+		final String[] results = converter.convert(Pair.of(parameter, true));
+		
+		assertEquals(7, results.length);
+		assertEquals(CycleParameterImpl.CYCLE_PARAMETER_ENTITY_NAME, results[0]);
+		assertEquals(parameter.key().name(), results[1]);
+		assertEquals(parameter.value(), results[2]);
+		assertEquals(IdUtil.getId(parameter.configuration()), results[3]);
+		assertTrue(results[4].isEmpty());
+		assertTrue(results[5].isEmpty());
+		assertEquals(IdUtil.getId(((CycleParameterImpl)parameter).cycle()), results[6]);
+	}
+	
+	@Test
+	final void convertGlobal() {
+		final Parameter parameter = new ParameterImpl(configurationEndOfDay, Key.UpTime, "07:00");
+		
+		final String[] results = converter.convert(Pair.of(parameter, true));
+		
+		assertEquals(7, results.length);
+		assertEquals(ParameterImpl.GLOBAL_PARAMETER_ENTITY_NAME, results[0]);
+		assertEquals(parameter.key().name(), results[1]);
+		assertEquals(parameter.value(), results[2]);
+		assertEquals(IdUtil.getId(parameter.configuration()), results[3]);
+		assertTrue(results[4].isEmpty());
+		assertTrue(results[5].isEmpty());
+		assertTrue(results[6].isEmpty());
+	}
+	
+	
+	private Parameter newCycleParameter() {
 		final Cycle cycle = BeanUtils.instantiateClass(CycleImpl.class);
 		IdUtil.assignId(cycle, IdUtil.id(1L));
-		final Parameter parameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "07:00", cycle);
+	return new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "07:00", cycle);
 		
-		converter.convert(Pair.of(parameter, false));
 	}
+	
+	
 
 }

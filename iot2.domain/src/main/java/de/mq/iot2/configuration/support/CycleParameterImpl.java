@@ -13,10 +13,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
-@Entity(name = "CycleParameter")
-@DiscriminatorValue("CycleParameter")
+@Entity(name = CycleParameterImpl.CYCLE_PARAMETER_ENTITY_NAME)
+@DiscriminatorValue(CycleParameterImpl.CYCLE_PARAMETER_ENTITY_NAME)
 class CycleParameterImpl extends AbstractParameter implements CycleParameter {
 
+	static final String CYCLE_PARAMETER_ENTITY_NAME = "CycleParameter";
 	@ManyToOne(targetEntity = CycleImpl.class)
 	@JoinColumn(name = "CYCLE_ID", nullable = false)
 	@NotNull
