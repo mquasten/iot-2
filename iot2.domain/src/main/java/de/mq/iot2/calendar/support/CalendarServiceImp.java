@@ -50,6 +50,7 @@ import de.mq.iot2.support.IdUtil;
 
 @Service
 class CalendarServiceImp implements CalendarService {
+	static final String WRONG_NUMBER_OF_COLUMNS_MESSAGE = "Wrong number of Columns in line %s.";
 	static final String DAYS_BACK_INVALID_MESSAGE = "DaysBack should be > 0.";
 	static final String OTHER_UP_TIMES_GROUP_NAME = "Sonderzeiten";
 	static final String LIMIT_OF_DAYS_MESSAGE = "Limit of days is %s.";
@@ -306,20 +307,17 @@ class CalendarServiceImp implements CalendarService {
 	@Override
 	@Transactional
 	public void importCsv(final InputStream in) throws IOException {
-
 		try (final InputStreamReader streamReader = new InputStreamReader(in); final BufferedReader reader = new BufferedReader(streamReader)) {
 			final Map<String, DayGroup> dayGroups = new HashMap<>();
 			final Map<String, Cycle> cycles = new HashMap<>();
-
 			for (int i = 1; reader.ready(); i++) {
 				final String pattern = String.format("[%s](?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", csvDelimiter);
-
 				final String line = reader.readLine();
 
 				final String[] cols = List.of(line.split(pattern, -1)).stream().map(col -> StringUtils.trimTrailingCharacter(StringUtils.trimLeadingCharacter(col, '"'), '"'))
 						.toArray(size -> new String[size]);
 
-				Assert.isTrue(cols.length == 10, String.format("Wrong number of Columns in line %s.", i));
+				Assert.isTrue(cols.length == 10, String.format(WRONG_NUMBER_OF_COLUMNS_MESSAGE, i));
 
 				final Day<?> day = arrayCsvConverter.convert(Pair.of(cols, Pair.of(dayGroups, cycles)));
 				if (!cycles.containsKey(IdUtil.getId(day.dayGroup().cycle()))) {
@@ -328,7 +326,6 @@ class CalendarServiceImp implements CalendarService {
 				}
 
 				if (!dayGroups.containsKey(IdUtil.getId(day.dayGroup()))) {
-
 					dayGroups.put(IdUtil.getId(day.dayGroup()), day.dayGroup());
 					dayGroupRepository.save(day.dayGroup());
 				}
@@ -337,6 +334,5 @@ class CalendarServiceImp implements CalendarService {
 				i++;
 			}
 		}
-
 	}
 }

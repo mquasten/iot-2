@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -550,10 +551,12 @@ class CalendarServiceImpTest {
 	void importCsv() throws IOException {
 		final Cycle freizeit = new CycleImpl(1L, "Freizeit", 102);
 		final DayGroup feiertage = new DayGroupImpl(freizeit, 1L, "Feiertage");
+		final DayGroup wochenende = new DayGroupImpl(freizeit, 2L, "Wochenende");
 
 		final Day<?> ostern = new GaussDayImpl(feiertage, 0);
 		final Day<?> tagDerArbeit = new DayOfMonthImpl(feiertage, MonthDay.of(5, 1));
-		final Day<?> sonntag = new DayOfWeekDayImpl(feiertage, DayOfWeek.SUNDAY);
+		final Day<?> samstag = new DayOfWeekDayImpl(wochenende, DayOfWeek.SATURDAY);
+		final Day<?> sonntag = new DayOfWeekDayImpl(wochenende, DayOfWeek.SUNDAY);
 
 		final Cycle arbeitstage = new CycleImpl(2L, "Arbeitstage", 100, true);
 		final DayGroup arbeitszeit = new DayGroupImpl(arbeitstage, 5L, "Arbeitszeit");
@@ -566,7 +569,7 @@ class CalendarServiceImpTest {
 		final DayGroup urlaub = new DayGroupImpl(freizeit, 3L, "Urlaub");
 		final Day<?> dummyDayUrlaub = new LocalDateDayImp(urlaub, LocalDate.of(3, 1, 1));
 
-		final Map<String, Day<?>> days = Map.of("0", ostern, "01.05", tagDerArbeit, "7", sonntag, "01.01.1900", dummyDayArbeitszeit, "02.01.1900", dummyDaySonderzeiten,
+		final Map<String, Day<?>> days = Map.of("0", ostern, "01.05", tagDerArbeit, "6", samstag, "7", sonntag, "01.01.1900", dummyDayArbeitszeit, "02.01.1900", dummyDaySonderzeiten,
 				"03.01.1900", dummyDayUrlaub);
 
 		Mockito.doAnswer(answer -> {
@@ -582,12 +585,25 @@ class CalendarServiceImpTest {
 		Mockito.verify(cycleRepository, Mockito.times(1)).save(freizeit);
 		Mockito.verify(cycleRepository, Mockito.times(1)).save(arbeitstage);
 		Mockito.verify(cycleRepository, Mockito.times(1)).save(abweichenderTagesbeginn);
+		Mockito.verifyNoMoreInteractions(cycleRepository);
 
 		Mockito.verify(dayGroupRepository, Mockito.times(1)).save(feiertage);
 		Mockito.verify(dayGroupRepository, Mockito.times(1)).save(arbeitszeit);
 		Mockito.verify(dayGroupRepository, Mockito.times(1)).save(sonderzeiten);
 		Mockito.verify(dayGroupRepository, Mockito.times(1)).save(urlaub);
+		Mockito.verify(dayGroupRepository, Mockito.times(1)).save(wochenende);
+		Mockito.verifyNoMoreInteractions(dayGroupRepository);
 
 		days.values().forEach(day -> Mockito.verify(dayRepository, Mockito.times(1)).save(day));
+		Mockito.verifyNoMoreInteractions(dayRepository);
+		
+		
 	}
+	
+	@Test
+	void importCsvWrongNUmberOfColumns() throws IOException {
+		try(final InputStream is = new ByteArrayInputStream(";".getBytes());) {
+		assertEquals(String.format(CalendarServiceImp.WRONG_NUMBER_OF_COLUMNS_MESSAGE, 1),assertThrows(IllegalArgumentException.class, () ->calendarService.importCsv(is)).getMessage());
+		}
+		}
 }
