@@ -320,6 +320,7 @@ class CalendarServiceImp implements CalendarService {
 				Assert.isTrue(cols.length == 10, String.format(WRONG_NUMBER_OF_COLUMNS_MESSAGE, i));
 
 				final Day<?> day = arrayCsvConverter.convert(Pair.of(cols, Pair.of(dayGroups, cycles)));
+				
 				if (!cycles.containsKey(IdUtil.getId(day.dayGroup().cycle()))) {
 					cycles.put(IdUtil.getId(day.dayGroup().cycle()), day.dayGroup().cycle());
 					cycleRepository.save(day.dayGroup().cycle());
