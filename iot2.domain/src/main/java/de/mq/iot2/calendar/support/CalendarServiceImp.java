@@ -297,7 +297,7 @@ class CalendarServiceImp implements CalendarService {
 
 			final List<DayGroup> dayGroupsList = dayGroups.values().stream().sorted((group1, group2) -> group1.name().compareTo(group1.name())).collect(Collectors.toList());
 			IntStream.range(0, dayGroupsList.size()).forEach(i -> writer.println(StringUtils.arrayToDelimitedString(dayCsvConverter.convert(Pair.of(
-					new LocalDateDayImp(dayGroupsList.get(i), LocalDate.of(1900, 1, 1).plusDays(i), "Dummy-Eintrag: " + dayGroupsList.get(i).name()),
+					new LocalDateDayImp(dayGroupsList.get(i), LocalDate.of(1900, 1, 1).plusDays(i)),
 					new boolean[] { dayGroupIdsProcessed.contains(IdUtil.getId(dayGroupsList.get(i))), cycleIdsProcessed.contains(IdUtil.getId(dayGroupsList.get(i).cycle())) })),
 					csvDelimiter)));
 		}
@@ -314,7 +314,7 @@ class CalendarServiceImp implements CalendarService {
 				final String pattern = String.format("[%s](?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", csvDelimiter);
 				final String line = reader.readLine();
 
-				final String[] cols = List.of(line.split(pattern, -1)).stream().map(col -> StringUtils.trimTrailingCharacter(StringUtils.trimLeadingCharacter(col, '"'), '"'))
+				final String[] cols = List.of(line.split(pattern, -1)).stream().map(col -> StringUtils.trimTrailingCharacter(StringUtils.trimLeadingCharacter(col.strip(), '"'), '"').strip())
 						.toArray(size -> new String[size]);
 
 				Assert.isTrue(cols.length == 10, String.format(WRONG_NUMBER_OF_COLUMNS_MESSAGE, i));

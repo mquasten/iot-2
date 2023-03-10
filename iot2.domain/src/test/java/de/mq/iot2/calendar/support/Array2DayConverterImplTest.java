@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -58,16 +56,6 @@ class Array2DayConverterImplTest {
 	@Test
 	void convertWrongNumberOfColumns(){
 		assertEquals(Array2DayConverterImpl.WRONG_NUMBER_OF_COLUMNS_MESSAGE, assertThrows(IllegalArgumentException.class, () -> converter.convert(Pair.of(new String[] {"x;y"}, Pair.of(Map.of(), Map.of())))).getMessage());
-	}
-	
-	@ParameterizedTest
-	@ValueSource(strings = {"", " "})
-	void convertGausDayFullWithoutDescription(final String description) throws IOException {
-		final String[] columns =getLineFromFile(0);
-		columns[2]=description;
-		final Day<?> day = converter.convert(Pair.of(columns, Pair.of(Map.of(), Map.of())));
-			
-		assertTrue(day.description().isEmpty());
 	}
 
 	@Test
@@ -134,7 +122,7 @@ class Array2DayConverterImplTest {
 			
 		assertTrue(day instanceof LocalDateDayImp);
 		assertEquals(LocalDate.of(1900, 1, 1) , day.value());
-		assertEquals(columns[2], day.description().orElseThrow());
+		assertTrue(day.description().isEmpty());
 		assertEquals(IdUtil.id(Long.parseLong(columns[3])), IdUtil.getId(day.dayGroup()));
 		assertEquals(columns[4], day.dayGroup().name());
 		assertEquals(Boolean.parseBoolean(columns[5]), day.dayGroup().readOnly());	

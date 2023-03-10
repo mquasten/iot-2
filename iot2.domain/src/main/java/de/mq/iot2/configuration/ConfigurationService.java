@@ -1,5 +1,7 @@
 package de.mq.iot2.configuration;
 
+
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
@@ -24,5 +26,7 @@ public interface ConfigurationService {
 	void save(final Parameter parmeter);
 
 	void export(final OutputStream os);
+
+	void importCsv(final InputStream is);
 
 }

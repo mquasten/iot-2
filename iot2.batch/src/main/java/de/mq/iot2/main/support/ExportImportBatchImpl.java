@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,11 +47,22 @@ class ExportImportBatchImpl {
 
 	@BatchMethod(value = "import-calendar", converterClass = ExportImportBatchArgumentConverterImpl.class)
 	void importCalendar(final File file) throws IOException {
-		LOGGER.info("Start export calendar, file: {}.", file.getAbsolutePath());
+		LOGGER.info("Start import calendar, file: {}.", file.getAbsolutePath());
 		final byte[] data = FileCopyUtils.copyToByteArray(file);
-		try (ByteArrayInputStream is = new ByteArrayInputStream(data)) {
+		try (InputStream is = new ByteArrayInputStream(data)) {
 			calendarService.importCsv(is);
 		} 
+		LOGGER.info("Import calendar finished.");
+	}
+	
+	@BatchMethod(value = "import-configuration", converterClass = ExportImportBatchArgumentConverterImpl.class)
+	void importConfiguration(final File file) throws IOException {
+		LOGGER.info("Start import Configuration, file: {}.", file.getAbsolutePath());
+		final byte[] data = FileCopyUtils.copyToByteArray(file);
+		try (final InputStream is = new ByteArrayInputStream(data)) {
+			configurationService.importCsv(is);
+		} 
+		LOGGER.info("Import Configuration finished.");
 	}
 
 }

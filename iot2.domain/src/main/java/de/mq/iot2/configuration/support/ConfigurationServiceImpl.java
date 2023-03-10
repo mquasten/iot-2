@@ -1,5 +1,6 @@
 package de.mq.iot2.configuration.support;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -170,5 +171,11 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		}
 
 			
+	}
+
+	@Override
+	@Transactional
+	public void importCsv(final InputStream is) {
+		
 	}
 }
