@@ -606,4 +606,32 @@ class CalendarServiceImpTest {
 					assertThrows(IllegalArgumentException.class, () -> calendarService.importCsv(is)).getMessage());
 		}
 	}
+
+	@Test
+	void removeCalendar() {
+		boolean[] daysDeleted = { false };
+		boolean[] dayGroupsDeleted = { false };
+		Mockito.doAnswer(answer -> {
+			daysDeleted[0] = true;
+			return null;
+		}).when(dayRepository).deleteAll();
+		Mockito.doAnswer(answer -> {
+			dayGroupsDeleted[0] = true;
+			assertTrue(daysDeleted[0]);
+			return null;
+		}).when(dayGroupRepository).deleteAll();
+		Mockito.doAnswer(answer -> {
+
+			assertTrue(daysDeleted[0] && dayGroupsDeleted[0]);
+			return null;
+		}).when(cycleRepository).deleteAll();
+
+		calendarService.removeCalendar();
+
+		assertTrue(daysDeleted[0]);
+		assertTrue(dayGroupsDeleted[0]);
+		Mockito.verify(dayRepository, Mockito.times(1)).deleteAll();
+		Mockito.verify(dayGroupRepository, Mockito.times(1)).deleteAll();
+		Mockito.verify(cycleRepository, Mockito.times(1)).deleteAll();
+	}
 }

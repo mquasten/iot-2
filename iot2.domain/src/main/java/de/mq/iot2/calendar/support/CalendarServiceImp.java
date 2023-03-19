@@ -349,7 +349,7 @@ class CalendarServiceImp implements CalendarService {
 
 	@Override
 	@Transactional
-	public void removecalendar() {
+	public void removeCalendar() {
 		dayRepository.deleteAll();
 		dayGroupRepository.deleteAll();
 		cycleRepository.deleteAll();

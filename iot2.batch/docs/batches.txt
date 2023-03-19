@@ -43,3 +43,17 @@ Aufruf: -c export-calendar file
 file: Dateiname ggf. mit Pfad, mandatory 
 Aufruf: -c export-configuration file 
 file: Dateiname ggf. mit Pfad, mandatory
+
+Import-Batch
+Importiert Calendar (Day, DayGroup,Cycle) und Configuration(Parameter, Configuration) als CSV-Datei.
+Aufruf: -c import-calendar file
+file: Dateiname ggf. mit Pfad, mandatory 
+Aufruf: -c import-configuration file 
+file: Dateiname ggf. mit Pfad, mandatory
+
+Delete-Batch
+Löscht Calendar (Day, DayGroup,Cycle) und Configuration(Parameter, Configuration)
+Aufruf: -c delete-calendar-and-configurations
+Keine weiteren Argumente
+Aufruf: -c  delete-configurations
+Keine weiteren Argumente

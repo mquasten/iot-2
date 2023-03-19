@@ -339,5 +339,24 @@ class ConfigurationServiceImplTest {
 					assertThrows(IllegalArgumentException.class, () -> configurationService.importCsv(is)).getMessage());
 		}
 	}
+	
+	@Test
+	void removeConfigurations() {
+		boolean[] parameterDeleted= {false};
+		Mockito.doAnswer(answer -> {
+			parameterDeleted[0]=true;
+			return null;
+		}).when(parameterRepository).deleteAll();
+		Mockito.doAnswer(answer -> {
+			assertTrue(parameterDeleted[0]);
+			return null;
+		}).when(configurationRepository).deleteAll();
+		
+		configurationService.removeConfigurations();
+		
+		assertTrue(parameterDeleted[0]);
+		Mockito.verify(parameterRepository, Mockito.times(1)).deleteAll();
+		Mockito.verify(configurationRepository, Mockito.times(1)).deleteAll();
+	}
 
 }

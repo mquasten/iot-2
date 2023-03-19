@@ -65,12 +65,19 @@ class ExportImportBatchImpl {
 		LOGGER.info("Import Configuration finished.");
 	}
 
-	@BatchMethod(value = "delete-calendar-and-configuration", converterClass = NoArgumentConverterImpl.class)
-	void deleteCalendarAndConfigurations() throws IOException {
-		LOGGER.info("Delete calendar and configuration.");
+	@BatchMethod(value = "delete-calendar-and-configurations", converterClass = NoArgumentConverterImpl.class)
+	void deleteCalendarAndConfigurations() {
+		LOGGER.info("Delete calendar and configurations.");
 		configurationService.removeConfigurations();
-		calendarService.removecalendar();
-		LOGGER.info("Delete calendar and configuration finished.");
+		calendarService.removeCalendar();
+		LOGGER.info("Delete calendar and configurations finished.");
+	}
+	
+	@BatchMethod(value = "delete-configurations", converterClass = NoArgumentConverterImpl.class)
+	void deleteConfigurations()  {
+		LOGGER.info("Delete configurations.");
+		configurationService.removeConfigurations();
+		LOGGER.info("Delete configurations finished.");
 	}
 
 }

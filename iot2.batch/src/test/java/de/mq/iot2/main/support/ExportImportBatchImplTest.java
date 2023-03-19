@@ -1,11 +1,13 @@
 package de.mq.iot2.main.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +28,7 @@ class ExportImportBatchImplTest {
 
 	private final CalendarService calendarService = mock(CalendarService.class);
 	private final ConfigurationService configurationService = mock(ConfigurationService.class);
-	private final ExportImportBatchImpl exportBatch = new ExportImportBatchImpl(calendarService, configurationService);
+	private final ExportImportBatchImpl exportImportBatch = new ExportImportBatchImpl(calendarService, configurationService);
 	private final String csvContent = "spalte1;...;spalte10";
 
 	@Test
@@ -41,7 +43,7 @@ class ExportImportBatchImplTest {
 
 		try (final MockedStatic<FileCopyUtils> util = mockStatic(FileCopyUtils.class)) {
 
-			exportBatch.exportCalendar(file);
+			exportImportBatch.exportCalendar(file);
 
 			util.verify(() -> FileCopyUtils.copy((byte[]) argThat(arg -> csvContent.equals(new String((byte[]) arg))), (File) argThat(arg -> arg.equals(file))));
 		}
@@ -59,7 +61,7 @@ class ExportImportBatchImplTest {
 
 		try (final MockedStatic<FileCopyUtils> util = mockStatic(FileCopyUtils.class)) {
 
-			exportBatch.exportConfiguration(file);
+			exportImportBatch.exportConfiguration(file);
 
 			util.verify(() -> FileCopyUtils.copy((byte[]) argThat(arg -> csvContent.equals(new String((byte[]) arg))), (File) argThat(arg -> arg.equals(file))));
 		}
@@ -76,7 +78,7 @@ class ExportImportBatchImplTest {
 		try (final MockedStatic<FileCopyUtils> util = mockStatic(FileCopyUtils.class)) {
 			util.when(() -> FileCopyUtils.copyToByteArray(file)).thenReturn(csvContent.getBytes());
 			
-			exportBatch.importCalendar(file);
+			exportImportBatch.importCalendar(file);
 			
 			util.verify(() -> FileCopyUtils.copyToByteArray(file));
 		}
@@ -104,11 +106,39 @@ class ExportImportBatchImplTest {
 		try (final MockedStatic<FileCopyUtils> util = mockStatic(FileCopyUtils.class)) {
 			util.when(() -> FileCopyUtils.copyToByteArray(file)).thenReturn(csvContent.getBytes());
 			
-			exportBatch.importConfiguration(file);
+			exportImportBatch.importConfiguration(file);
 			
 			util.verify(() -> FileCopyUtils.copyToByteArray(file));
 		}
 		verify(configurationService).importCsv(Mockito.any());
+	}
+	
+	@Test
+	void deleteCalendarAndConfiguration() {
+		
+		final boolean removeConfigurationCalled[] = {false};
+		doAnswer(answer -> {
+			assertTrue(removeConfigurationCalled[0]);
+			return null;
+		}).when(calendarService).removeCalendar();
+		doAnswer(answer -> {
+			removeConfigurationCalled[0]=true;
+			return null;
+		}).when(configurationService).removeConfigurations();
+		
+		exportImportBatch.deleteCalendarAndConfigurations();
+		
+		assertTrue(removeConfigurationCalled[0]);
+		
+		verify(calendarService, times(1)).removeCalendar();
+		verify(configurationService, times(1)).removeConfigurations();
+	}
+	
+	@Test
+	void deleteConfiguration() {
+		exportImportBatch.deleteConfigurations();
+		
+		verify(configurationService, times(1)).removeConfigurations();
 	}
 
 }
