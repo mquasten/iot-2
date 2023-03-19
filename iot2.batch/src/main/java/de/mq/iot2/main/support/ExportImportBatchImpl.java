@@ -51,18 +51,26 @@ class ExportImportBatchImpl {
 		final byte[] data = FileCopyUtils.copyToByteArray(file);
 		try (InputStream is = new ByteArrayInputStream(data)) {
 			calendarService.importCsv(is);
-		} 
+		}
 		LOGGER.info("Import calendar finished.");
 	}
-	
+
 	@BatchMethod(value = "import-configuration", converterClass = ExportImportBatchArgumentConverterImpl.class)
 	void importConfiguration(final File file) throws IOException {
-		LOGGER.info("Start import Configuration, file: {}.", file.getAbsolutePath());
+		LOGGER.info("Start import configuration, file: {}.", file.getAbsolutePath());
 		final byte[] data = FileCopyUtils.copyToByteArray(file);
 		try (final InputStream is = new ByteArrayInputStream(data)) {
 			configurationService.importCsv(is);
-		} 
+		}
 		LOGGER.info("Import Configuration finished.");
+	}
+
+	@BatchMethod(value = "delete-calendar-and-configuration", converterClass = NoArgumentConverterImpl.class)
+	void deleteCalendarAndConfigurations() throws IOException {
+		LOGGER.info("Delete calendar and configuration.");
+		configurationService.removeConfigurations();
+		calendarService.removecalendar();
+		LOGGER.info("Delete calendar and configuration finished.");
 	}
 
 }

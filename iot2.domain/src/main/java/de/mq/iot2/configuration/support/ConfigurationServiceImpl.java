@@ -58,17 +58,21 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	private final ParameterRepository parameterRepository;
 	private final CycleRepository cycleRepository;
 	private final ConversionService conversionService;
-	private  final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter; 
-	private  final Converter<Pair<String[], Pair<Map<String, Configuration>, Map<String, Cycle>>>,Parameter> arrayCsvConverter;
+	private final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter;
+	private final Converter<Pair<String[], Pair<Map<String, Configuration>, Map<String, Cycle>>>, Parameter> arrayCsvConverter;
 	private final String csvDelimiter;
-	ConfigurationServiceImpl(ConfigurationRepository configurationRepository, final ParameterRepository parameterRepository, final CycleRepository cycleRepository, final ConversionService conversionService, final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter, Converter<Pair<String[], Pair<Map<String, Configuration>, Map<String, Cycle>>>, Parameter> arrayCsvConverter ,@Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
+
+	ConfigurationServiceImpl(ConfigurationRepository configurationRepository, final ParameterRepository parameterRepository, final CycleRepository cycleRepository,
+			final ConversionService conversionService, final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter,
+			Converter<Pair<String[], Pair<Map<String, Configuration>, Map<String, Cycle>>>, Parameter> arrayCsvConverter,
+			@Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
 		this.configurationRepository = configurationRepository;
 		this.parameterRepository = parameterRepository;
 		this.cycleRepository = cycleRepository;
 		this.conversionService = conversionService;
-		this.parameterCsvConverter= parameterCsvConverter;
-		this.arrayCsvConverter=arrayCsvConverter;
-		this.csvDelimiter=csvDelimiter;
+		this.parameterCsvConverter = parameterCsvConverter;
+		this.arrayCsvConverter = arrayCsvConverter;
+		this.csvDelimiter = csvDelimiter;
 	}
 
 	@Override
@@ -153,7 +157,7 @@ class ConfigurationServiceImpl implements ConfigurationService {
 		Assert.notNull(parmeter, "Parameter is required.");
 		parameterRepository.save(parmeter);
 	}
-	
+
 	@Override
 	@Transactional
 	public void export(final OutputStream os) {
@@ -164,21 +168,21 @@ class ConfigurationServiceImpl implements ConfigurationService {
 				if (compareConfigurations != 0) {
 					return compareConfigurations;
 				}
-			
+
 				final int compareParameters = p1.key().name().compareTo(p2.key().name());
-				if ( compareParameters != 0) {
+				if (compareParameters != 0) {
 					return compareParameters;
 				}
 				return IdUtil.getId(p1).compareTo(IdUtil.getId(p2));
 
 			}).forEach(parameter -> {
 				final String configurationId = IdUtil.getId(parameter.configuration());
-				writer.println(StringUtils.arrayToDelimitedString(parameterCsvConverter.convert(Pair.of(parameter, configurationsIdsProcessed.contains(configurationId) )), csvDelimiter));
+				writer.println(
+						StringUtils.arrayToDelimitedString(parameterCsvConverter.convert(Pair.of(parameter, configurationsIdsProcessed.contains(configurationId))), csvDelimiter));
 				configurationsIdsProcessed.add(configurationId);
 			});
 		}
 
-			
 	}
 
 	@Override
@@ -186,22 +190,19 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	public void importCsv(final InputStream is) throws IOException {
 		try (final InputStreamReader streamReader = new InputStreamReader(is); final BufferedReader reader = new BufferedReader(streamReader)) {
 			final Map<String, Configuration> configurations = new HashMap<>();
-			final Map<String, Cycle> cycles = cycleRepository.findAll().stream().collect(Collectors.toMap(IdUtil::getId, Function.identity()));		
-			
+			final Map<String, Cycle> cycles = cycleRepository.findAll().stream().collect(Collectors.toMap(IdUtil::getId, Function.identity()));
+
 			for (int i = 1; reader.ready(); i++) {
 				final String pattern = String.format("[%s](?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", csvDelimiter);
 				final String line = reader.readLine();
 
-				final String[] cols = List.of(line.split(pattern, -1)).stream().map(col -> StringUtils.trimTrailingCharacter(StringUtils.trimLeadingCharacter(col.strip(), '"'), '"').strip())
-						.toArray(size -> new String[size]);
+				final String[] cols = List.of(line.split(pattern, -1)).stream()
+						.map(col -> StringUtils.trimTrailingCharacter(StringUtils.trimLeadingCharacter(col.strip(), '"'), '"').strip()).toArray(size -> new String[size]);
 
-				
-				
 				Assert.isTrue(cols.length == 7, String.format(WRONG_NUMBER_OF_COLUMNS_MESSAGE, i));
 
 				final Parameter parameter = arrayCsvConverter.convert(Pair.of(cols, Pair.of(configurations, cycles)));
-				
-				
+
 				if (!configurations.containsKey(IdUtil.getId(parameter.configuration()))) {
 					configurations.put(IdUtil.getId(parameter.configuration()), parameter.configuration());
 					configurationRepository.save(parameter.configuration());
@@ -211,6 +212,13 @@ class ConfigurationServiceImpl implements ConfigurationService {
 				i++;
 			}
 		}
+	}
+
+	@Override
+	@Transactional
+	public void removeConfigurations() {
+		parameterRepository.deleteAll();
+		configurationRepository.deleteAll();
 	}
 
 }

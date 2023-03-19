@@ -60,6 +60,8 @@ public interface CalendarService {
 
 	void importCsv(final InputStream os) throws IOException;
 
+	void removecalendar();
+
 
 
 }

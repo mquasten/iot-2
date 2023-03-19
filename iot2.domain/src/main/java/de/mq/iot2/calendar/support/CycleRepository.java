@@ -3,6 +3,8 @@ package de.mq.iot2.calendar.support;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
 
 import de.mq.iot2.calendar.Cycle;
@@ -17,5 +19,9 @@ public interface CycleRepository {
 	Cycle save(@Valid final Cycle cycle);
 
 	Optional<Cycle> findById(final String id);
+	
+	@Modifying
+	@Query("delete from Cycle")
+	void deleteAll();
 
 }

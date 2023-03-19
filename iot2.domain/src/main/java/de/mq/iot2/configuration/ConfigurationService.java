@@ -30,4 +30,6 @@ public interface ConfigurationService {
 
 	void importCsv(final InputStream is) throws IOException;
 
+	void removeConfigurations();
+
 }

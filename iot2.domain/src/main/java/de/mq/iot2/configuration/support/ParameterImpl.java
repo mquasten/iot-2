@@ -4,11 +4,11 @@ import de.mq.iot2.configuration.Configuration;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
-@Entity(name = ParameterImpl.GLOBAL_PARAMETER_ENTITY_NAME)
-@DiscriminatorValue(ParameterImpl.GLOBAL_PARAMETER_ENTITY_NAME)
+@Entity(name = ParameterImpl.ENTITY_NAME)
+@DiscriminatorValue(ParameterImpl.ENTITY_NAME)
 class ParameterImpl extends AbstractParameter {
 
-	static final String GLOBAL_PARAMETER_ENTITY_NAME = "GlobalParameter";
+	static final String ENTITY_NAME = "GlobalParameter";
 
 	@SuppressWarnings("unused")
 	private ParameterImpl() {

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
 
@@ -30,5 +31,9 @@ public interface DayRepository {
 	Day<?> save(@Valid final Day<?> day);
 
 	void delete(final Day<?> entity);
+	
+	@Modifying
+	@Query("delete from Day")
+	void deleteAll();
 
 }

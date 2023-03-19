@@ -32,4 +32,8 @@ public interface ParameterRepository {
 	@Modifying
 	@Query("delete from Parameter p where configuration= ?1")
 	void deleteByConfiguration(final Configuration configuration);
+		
+	@Modifying
+	@Query("delete from Parameter")
+	void deleteAll();
 }

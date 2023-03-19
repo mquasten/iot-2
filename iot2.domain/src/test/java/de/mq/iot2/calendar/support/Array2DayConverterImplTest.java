@@ -91,7 +91,7 @@ class Array2DayConverterImplTest {
 		final String[] columns =getLineFromFile(1);
 		columns[1]="1";
 		
-		assertEquals(String.format(Array2DayConverterImpl.INVALID_MONTH_DAY_MESSAGE, columns[1]), assertThrows(IllegalArgumentException.class, () -> converter.convert(Pair.of(columns, Pair.of(Map.of(dayGroupId, dayGroup), Map.of(cycleId, cycle))))).getMessage());
+		assertEquals(String.format(Array2DayConverterImpl.INVALID_VALUE_MESSAGE, columns[1]), assertThrows(IllegalArgumentException.class, () -> converter.convert(Pair.of(columns, Pair.of(Map.of(dayGroupId, dayGroup), Map.of(cycleId, cycle))))).getMessage());
 		
 	}
 	
@@ -130,6 +130,15 @@ class Array2DayConverterImplTest {
 		assertEquals(columns[7], day.dayGroup().cycle().name());
 		assertEquals(Integer.parseInt(columns[8]),day.dayGroup().cycle().priority());
 		assertEquals(Boolean.parseBoolean(columns[9].strip()),day.dayGroup().cycle().isDeaultCycle());
+	}
+	
+	@Test
+	void convertLocalDateDayWrongDate() throws IOException {
+		final String[] columns =getLineFromFile(4);
+		columns[1]="01.01";
+		assertEquals(String.format(Array2DayConverterImpl.INVALID_VALUE_MESSAGE, columns[1]), assertThrows(IllegalArgumentException.class, () -> converter.convert(Pair.of(columns, Pair.of(Map.of(), Map.of())))).getMessage());
+			
+		
 	}
 
 	
