@@ -1,6 +1,7 @@
 package de.mq.iot2.configuration;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -27,6 +28,6 @@ public interface ConfigurationService {
 
 	void export(final OutputStream os);
 
-	void importCsv(final InputStream is);
+	void importCsv(final InputStream is) throws IOException;
 
 }

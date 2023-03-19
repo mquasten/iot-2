@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,6 +34,7 @@ import org.springframework.util.CollectionUtils;
 
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
+import de.mq.iot2.calendar.DayGroup;
 import de.mq.iot2.calendar.support.CycleImpl;
 import de.mq.iot2.calendar.support.CycleRepository;
 import de.mq.iot2.configuration.Configuration;
@@ -54,8 +58,11 @@ class ConfigurationServiceImplTest {
 	private final ConfigurationRepository configurationRepository = Mockito.mock(ConfigurationRepository.class);
 	private final ParameterRepository parameterRepository = Mockito.mock(ParameterRepository.class);
 	@SuppressWarnings("unchecked")
-	private  final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter = Mockito.mock(Converter.class);
-	private final ConfigurationService configurationService = new ConfigurationServiceImpl(configurationRepository, parameterRepository, cycleRepository, conversionService, parameterCsvConverter, CSV_DELIMITER);
+	private final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter = Mockito.mock(Converter.class);
+	@SuppressWarnings("unchecked")
+	private final Converter<Pair<String[], Pair<Map<String, Configuration>, Map<String, Cycle>>>, Parameter> arrayCsvConverter = Mockito.mock(Converter.class);
+	private final ConfigurationService configurationService = new ConfigurationServiceImpl(configurationRepository, parameterRepository, cycleRepository, conversionService,
+			parameterCsvConverter, arrayCsvConverter, CSV_DELIMITER);
 
 	@Test
 	void createDefaultConfigurationsAndParameters() {
@@ -73,7 +80,7 @@ class ConfigurationServiceImplTest {
 
 		final Collection<Parameter> savedParameter = new ArrayList<>();
 
-		Mockito.doAnswer(answer -> { 
+		Mockito.doAnswer(answer -> {
 			final var parameter = answer.getArgument(0, Parameter.class);
 			savedParameter.add(parameter);
 			return parameter;
@@ -238,42 +245,99 @@ class ConfigurationServiceImplTest {
 	void saveNull(final Parameter parameter) {
 		assertThrows(IllegalArgumentException.class, () -> configurationService.save(parameter));
 	}
-	
+
 	@Test
 	void export() throws IOException {
 		final Configuration configurationEndOfDay = new ConfigurationImpl(1L, RuleKey.EndOfDay, "EndofDayBatch");
 		final Configuration configurationCeanup = new ConfigurationImpl(2L, RuleKey.CleanUp, "Cleanup");
-		final Cycle cycleFreizeit =  BeanUtils.instantiateClass(CycleImpl.class);
-		final Cycle cycleArbeitsZeit =  BeanUtils.instantiateClass(CycleImpl.class);
-		final Cycle cycleAbweichendeZeiten =  BeanUtils.instantiateClass(CycleImpl.class);
-		final Parameter globalParameter = new ParameterImpl(configurationEndOfDay,Key.UpTime,"07:15" );
+		final Cycle cycleFreizeit = BeanUtils.instantiateClass(CycleImpl.class);
+		final Cycle cycleArbeitsZeit = BeanUtils.instantiateClass(CycleImpl.class);
+		final Cycle cycleAbweichendeZeiten = BeanUtils.instantiateClass(CycleImpl.class);
+		final Parameter globalParameter = new ParameterImpl(configurationEndOfDay, Key.UpTime, "07:15");
 		final Parameter freizeitParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "07:00", cycleFreizeit);
 		final Parameter arbeitszeitParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "05:15", cycleArbeitsZeit);
 		final Parameter abweichendeZeitenParameter = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "06:00", cycleAbweichendeZeiten);
-		final Parameter otherGlobalParameter = new ParameterImpl(configurationEndOfDay,Key.ShadowTemperature,"25");
+		final Parameter otherGlobalParameter = new ParameterImpl(configurationEndOfDay, Key.ShadowTemperature, "25");
 		final Parameter daysBackParameter = new ParameterImpl(configurationCeanup, Key.DaysBack, "30");
 
-		Mockito.when(parameterRepository.findAll()).thenReturn(List.of(daysBackParameter, abweichendeZeitenParameter, arbeitszeitParameter, otherGlobalParameter,freizeitParameter, globalParameter));
+		Mockito.when(parameterRepository.findAll())
+				.thenReturn(List.of(daysBackParameter, abweichendeZeitenParameter, arbeitszeitParameter, otherGlobalParameter, freizeitParameter, globalParameter));
 		Mockito.doAnswer(a -> {
 			@SuppressWarnings("unchecked")
 			final Pair<Parameter, Boolean> pair = a.getArgument(0, Pair.class);
-			return new String[] { IdUtil.getId(pair.getFirst()), !pair.getSecond() ? pair.getFirst().configuration().name() : "",  "..." };
+			return new String[] { IdUtil.getId(pair.getFirst()), !pair.getSecond() ? pair.getFirst().configuration().name() : "", "..." };
 		}).when(parameterCsvConverter).convert(Mockito.any());
 		try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-			
+
 			configurationService.export(os);
-			
+
 			final Map<String, String> results = CollectionUtils.arrayToList(os.toString().split("\n")).stream().map(Object::toString)
-					.collect(Collectors.toMap(x -> x.split(String.format("[%s]", CSV_DELIMITER))[0],x -> x.split(String.format("[%s]", CSV_DELIMITER))[1]));
-			
+					.collect(Collectors.toMap(x -> x.split(String.format("[%s]", CSV_DELIMITER))[0], x -> x.split(String.format("[%s]", CSV_DELIMITER))[1]));
+
 			assertEquals(6, results.size());
 			assertEquals(configurationCeanup.name(), results.get(IdUtil.getId(daysBackParameter)));
-			final List<Parameter> endOfDayParameters = List.of(abweichendeZeitenParameter, arbeitszeitParameter, otherGlobalParameter, freizeitParameter, globalParameter).stream().sorted((p1, p2) -> p1.key().name().compareTo(p2.key().name())).collect(Collectors.toList());
-			assertEquals(configurationEndOfDay.name() ,  results.get(IdUtil.getId(endOfDayParameters.get(0))));
-			IntStream.range(1, endOfDayParameters.size()).forEach(i ->  assertTrue(results.get(IdUtil.getId(endOfDayParameters.get(i))).isEmpty()));	
+			final List<Parameter> endOfDayParameters = List.of(abweichendeZeitenParameter, arbeitszeitParameter, otherGlobalParameter, freizeitParameter, globalParameter).stream()
+					.sorted((p1, p2) -> p1.key().name().compareTo(p2.key().name())).collect(Collectors.toList());
+			assertEquals(configurationEndOfDay.name(), results.get(IdUtil.getId(endOfDayParameters.get(0))));
+			IntStream.range(1, endOfDayParameters.size()).forEach(i -> assertTrue(results.get(IdUtil.getId(endOfDayParameters.get(i))).isEmpty()));
 
 		}
-		
+
+	}
+
+	@Test
+	void importCsv() throws IOException {
+		final Configuration configurationCleanUp = new ConfigurationImpl(2, RuleKey.CleanUp, "CleanUpBatch");
+		final Configuration configurationEndOfDay = new ConfigurationImpl(1, RuleKey.EndOfDay, "EndofDayBatch");
+		final Cycle cycleFreizeit = BeanUtils.instantiateClass(CycleImpl.class);
+		IdUtil.assignId(cycleFreizeit, IdUtil.id(1L));
+		final Cycle cycleArbeitszeit = BeanUtils.instantiateClass(CycleImpl.class);
+		IdUtil.assignId(cycleArbeitszeit, IdUtil.id(2L));
+		final Cycle cycleAbweichenderTagesbeginn = BeanUtils.instantiateClass(CycleImpl.class);
+		IdUtil.assignId(cycleAbweichenderTagesbeginn, IdUtil.id(3L));
+
+		final Parameter cleanUpParameter = new ParameterImpl(configurationCleanUp, Key.DaysBack, "30");
+		final Parameter maxSunDownTimeParameter = new ParameterImpl(configurationEndOfDay, Key.MaxSunDownTime, "22:15");
+		final Parameter upTimeParameterFreizeit = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "07:00", cycleFreizeit);
+		final Parameter upTimeParameterArbeitszeit = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "05:15", cycleArbeitszeit);
+		final Parameter upTimeParameterAbweichenderTagesbeginn = new CycleParameterImpl(configurationEndOfDay, Key.UpTime, "06:30", cycleAbweichenderTagesbeginn);
+		final Parameter upTimeParameter = new ParameterImpl(configurationEndOfDay, Key.UpTime, "07:15");
+		final Map<String, Parameter> parameter = Map.of(cleanUpParameter.value(), cleanUpParameter, maxSunDownTimeParameter.value(), maxSunDownTimeParameter,
+				upTimeParameterFreizeit.value(), upTimeParameterFreizeit, upTimeParameterArbeitszeit.value(), upTimeParameterArbeitszeit,
+				upTimeParameterAbweichenderTagesbeginn.value(), upTimeParameterAbweichenderTagesbeginn, upTimeParameter.value(), upTimeParameter);
+
+		Mockito.when(cycleRepository.findAll()).thenReturn(List.of(cycleFreizeit, cycleArbeitszeit, cycleAbweichenderTagesbeginn));
+		Mockito.doAnswer(answer -> {
+			@SuppressWarnings("unchecked")
+			final Pair<String[], Pair<Map<String, DayGroup>, Map<String, Cycle>>> pair = answer.getArgument(0, Pair.class);
+			assertEquals(7, pair.getFirst().length);
+			assertEquals(3, pair.getSecond().getSecond().size());
+			return parameter.get(pair.getFirst()[2]);
+		}).when(arrayCsvConverter).convert(Mockito.any());
+
+		try (final InputStream is = getClass().getClassLoader().getResourceAsStream("configuration.csv")) {
+			configurationService.importCsv(is);
+		}
+
+		Mockito.verify(parameterRepository, Mockito.times(1)).save(cleanUpParameter);
+		Mockito.verify(parameterRepository, Mockito.times(1)).save(maxSunDownTimeParameter);
+		Mockito.verify(parameterRepository, Mockito.times(1)).save(upTimeParameterFreizeit);
+		Mockito.verify(parameterRepository, Mockito.times(1)).save(upTimeParameterArbeitszeit);
+		Mockito.verify(parameterRepository, Mockito.times(1)).save(upTimeParameterAbweichenderTagesbeginn);
+		Mockito.verify(parameterRepository, Mockito.times(1)).save(upTimeParameter);
+		Mockito.verifyNoMoreInteractions(parameterRepository);
+		Mockito.verify(configurationRepository, Mockito.times(1)).save(configurationCleanUp);
+		Mockito.verify(configurationRepository, Mockito.times(1)).save(configurationEndOfDay);
+		Mockito.verifyNoMoreInteractions(configurationRepository);
+		Mockito.verify(cycleRepository).findAll();
+	}
+
+	@Test
+	void importCsvWrongNUmberOfColumns() throws IOException {
+		try (final InputStream is = new ByteArrayInputStream(";".getBytes());) {
+			assertEquals(String.format(ConfigurationServiceImpl.WRONG_NUMBER_OF_COLUMNS_MESSAGE, 1),
+					assertThrows(IllegalArgumentException.class, () -> configurationService.importCsv(is)).getMessage());
+		}
 	}
 
 }

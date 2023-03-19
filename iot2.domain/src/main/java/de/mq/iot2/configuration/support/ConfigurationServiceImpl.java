@@ -1,11 +1,16 @@
 package de.mq.iot2.configuration.support;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -48,18 +53,21 @@ class ConfigurationServiceImpl implements ConfigurationService {
 	static final long OTHER_TIMES_CYCLE_ID = 3L;
 	static final long WORKING_DAY_CYCLE_ID = 2L;
 	static final long NON_WORKING_DAY_CYCLE_ID = 1L;
+	static final String WRONG_NUMBER_OF_COLUMNS_MESSAGE = "Wrong number of Columns in line %s.";
 	private final ConfigurationRepository configurationRepository;
 	private final ParameterRepository parameterRepository;
 	private final CycleRepository cycleRepository;
 	private final ConversionService conversionService;
 	private  final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter; 
+	private  final Converter<Pair<String[], Pair<Map<String, Configuration>, Map<String, Cycle>>>,Parameter> arrayCsvConverter;
 	private final String csvDelimiter;
-	ConfigurationServiceImpl(ConfigurationRepository configurationRepository, final ParameterRepository parameterRepository, final CycleRepository cycleRepository, final ConversionService conversionService, final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter, @Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
+	ConfigurationServiceImpl(ConfigurationRepository configurationRepository, final ParameterRepository parameterRepository, final CycleRepository cycleRepository, final ConversionService conversionService, final Converter<Pair<Parameter, Boolean>, String[]> parameterCsvConverter, Converter<Pair<String[], Pair<Map<String, Configuration>, Map<String, Cycle>>>, Parameter> arrayCsvConverter ,@Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
 		this.configurationRepository = configurationRepository;
 		this.parameterRepository = parameterRepository;
 		this.cycleRepository = cycleRepository;
 		this.conversionService = conversionService;
 		this.parameterCsvConverter= parameterCsvConverter;
+		this.arrayCsvConverter=arrayCsvConverter;
 		this.csvDelimiter=csvDelimiter;
 	}
 
@@ -175,7 +183,34 @@ class ConfigurationServiceImpl implements ConfigurationService {
 
 	@Override
 	@Transactional
-	public void importCsv(final InputStream is) {
-		
+	public void importCsv(final InputStream is) throws IOException {
+		try (final InputStreamReader streamReader = new InputStreamReader(is); final BufferedReader reader = new BufferedReader(streamReader)) {
+			final Map<String, Configuration> configurations = new HashMap<>();
+			final Map<String, Cycle> cycles = cycleRepository.findAll().stream().collect(Collectors.toMap(IdUtil::getId, Function.identity()));		
+			
+			for (int i = 1; reader.ready(); i++) {
+				final String pattern = String.format("[%s](?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", csvDelimiter);
+				final String line = reader.readLine();
+
+				final String[] cols = List.of(line.split(pattern, -1)).stream().map(col -> StringUtils.trimTrailingCharacter(StringUtils.trimLeadingCharacter(col.strip(), '"'), '"').strip())
+						.toArray(size -> new String[size]);
+
+				
+				
+				Assert.isTrue(cols.length == 7, String.format(WRONG_NUMBER_OF_COLUMNS_MESSAGE, i));
+
+				final Parameter parameter = arrayCsvConverter.convert(Pair.of(cols, Pair.of(configurations, cycles)));
+				
+				
+				if (!configurations.containsKey(IdUtil.getId(parameter.configuration()))) {
+					configurations.put(IdUtil.getId(parameter.configuration()), parameter.configuration());
+					configurationRepository.save(parameter.configuration());
+				}
+
+				parameterRepository.save(parameter);
+				i++;
+			}
+		}
 	}
+
 }

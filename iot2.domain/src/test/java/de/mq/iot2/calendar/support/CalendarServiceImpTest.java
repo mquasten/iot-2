@@ -569,8 +569,8 @@ class CalendarServiceImpTest {
 		final DayGroup urlaub = new DayGroupImpl(freizeit, 3L, "Urlaub");
 		final Day<?> dummyDayUrlaub = new LocalDateDayImp(urlaub, LocalDate.of(3, 1, 1));
 
-		final Map<String, Day<?>> days = Map.of("0", ostern, "01.05", tagDerArbeit, "6", samstag, "7", sonntag, "01.01.1900", dummyDayArbeitszeit, "02.01.1900", dummyDaySonderzeiten,
-				"03.01.1900", dummyDayUrlaub);
+		final Map<String, Day<?>> days = Map.of("0", ostern, "01.05", tagDerArbeit, "6", samstag, "7", sonntag, "01.01.1900", dummyDayArbeitszeit, "02.01.1900",
+				dummyDaySonderzeiten, "03.01.1900", dummyDayUrlaub);
 
 		Mockito.doAnswer(answer -> {
 			@SuppressWarnings("unchecked")
@@ -596,14 +596,14 @@ class CalendarServiceImpTest {
 
 		days.values().forEach(day -> Mockito.verify(dayRepository, Mockito.times(1)).save(day));
 		Mockito.verifyNoMoreInteractions(dayRepository);
-		
-		
+
 	}
-	
+
 	@Test
 	void importCsvWrongNUmberOfColumns() throws IOException {
-		try(final InputStream is = new ByteArrayInputStream(";".getBytes());) {
-		assertEquals(String.format(CalendarServiceImp.WRONG_NUMBER_OF_COLUMNS_MESSAGE, 1),assertThrows(IllegalArgumentException.class, () ->calendarService.importCsv(is)).getMessage());
+		try (final InputStream is = new ByteArrayInputStream(";".getBytes());) {
+			assertEquals(String.format(CalendarServiceImp.WRONG_NUMBER_OF_COLUMNS_MESSAGE, 1),
+					assertThrows(IllegalArgumentException.class, () -> calendarService.importCsv(is)).getMessage());
 		}
-		}
+	}
 }
