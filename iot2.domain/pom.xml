@@ -12,8 +12,8 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<properties>
-		<maven.compiler.source>19</maven.compiler.source>
-		<maven.compiler.target>19</maven.compiler.target>
+		<maven.compiler.source>20</maven.compiler.source>
+		<maven.compiler.target>20</maven.compiler.target>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<jacoco.maven.version>0.8.9-SNAPSHOT</jacoco.maven.version>
 	</properties>
