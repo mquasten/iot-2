@@ -3,6 +3,12 @@ start java -jar C:\iot/lib/h2-2.1.214.jar -tcp -tcpAllowOthers  -baseDir C:\iot/
 echo start end-of-day at: %DATE% %TIME%  >> C:\iot/log/iot.log 2>>&1
 java -jar C:\iot/lib/iot2Batch.jar -c end-of-day >> C:\iot/log/iot.log 2>>&1
 
+echo start export-calendar at: %DATE% %TIME%  >> C:\iot/log/iot.log 2>>&1
+java -jar C:\iot/lib/iot2Batch.jar -c export-calendar C:\iot/backup/calendar.csv >> C:\iot/log/iot.log 2>>&1
+
+echo start export-configuration at: %DATE% %TIME%  >> C:\iot/log/iot.log 2>>&1
+java -jar C:\iot/lib/iot2Batch.jar -c export-configuration C:\iot/backup/configuration.csv >> C:\iot/log/iot.log 2>>&1
+
 echo start cleanup at: %DATE% %TIME%  >> C:\iot/log/iot.log 2>>&1
 java -jar C:\iot/lib/iot2Batch.jar -c cleanup >> C:\iot/log/iot.log 2>>&1
 
