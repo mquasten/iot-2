@@ -16,7 +16,7 @@
 		<maven.compiler.target>20</maven.compiler.target>
 		<org.jeasy.version>4.1.0</org.jeasy.version>
 		<commons.cli.version>1.5.0</commons.cli.version>
-		<jacoco.maven.version>0.8.9-SNAPSHOT</jacoco.maven.version>
+		<jacoco.maven.version>0.8.10</jacoco.maven.version>
 		<iot2.domain.version>0.0.1-SNAPSHOT</iot2.domain.version>
 	</properties>
 	<pluginRepositories>
