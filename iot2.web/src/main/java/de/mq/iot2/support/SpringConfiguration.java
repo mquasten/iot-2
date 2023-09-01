@@ -13,14 +13,17 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
@@ -80,14 +83,33 @@ public class SpringConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
-		if (loginRequired) {
-			http.authorizeHttpRequests().requestMatchers("/css/**", "/error", "/", "/index.html").permitAll().anyRequest().authenticated().and().formLogin().loginPage(LOGIN_PAGE)
-					.successHandler(authenticationSuccessHandler).permitAll().and().logout().permitAll();
-		} else {
-			http.authorizeHttpRequests().anyRequest().permitAll();
-		}
+	public SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+
+		final MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
+		http.authorizeHttpRequests((requests) -> translateException(http, mvcMatcherBuilder, requests));
 		return http.build();
+	}
+
+	private void translateException(HttpSecurity http, final MvcRequestMatcher.Builder mvcMatcherBuilder,
+			AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests) {
+		try {
+			filterChain(http, mvcMatcherBuilder, requests);
+
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+
+		}
+	}
+
+	private void filterChain(HttpSecurity http, final MvcRequestMatcher.Builder mvcMatcherBuilder,
+			AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests) throws Exception {
+		if (loginRequired) {
+			requests.requestMatchers(mvcMatcherBuilder.pattern("/css/**"), mvcMatcherBuilder.pattern("/css/**"), mvcMatcherBuilder.pattern("/index.html")).permitAll().anyRequest()
+					.authenticated().and().formLogin().loginPage(LOGIN_PAGE).successHandler(authenticationSuccessHandler).permitAll().and().logout().permitAll();
+		    return;
+		} 
+			http.authorizeHttpRequests().anyRequest().permitAll();
+		
 	}
 
 	@Bean()

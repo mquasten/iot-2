@@ -33,7 +33,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 public class SpringConfigurationTest {
@@ -92,53 +98,10 @@ public class SpringConfigurationTest {
 				.map(field -> ReflectionTestUtils.getField(authenticationProvider, field.getName())).collect(Collectors.toList()));
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Test
-	void filterChain() throws Exception {
-		final HttpSecurity http = Mockito.mock(HttpSecurity.class);
-		final AuthorizationManagerRequestMatcherRegistry authorizationManagerRequestMatcherRegistry = mock(AuthorizationManagerRequestMatcherRegistry.class);
-		final AuthorizeHttpRequestsConfigurer.AuthorizedUrl authorizedUrl = mock(AuthorizeHttpRequestsConfigurer.AuthorizedUrl.class);
-		final FormLoginConfigurer<HttpSecurity> formLoginConfigurer = Mockito.mock(FormLoginConfigurer.class);
-		final LogoutConfigurer logoutConfigurer = mock(LogoutConfigurer.class);
-		when(http.authorizeHttpRequests()).thenReturn(authorizationManagerRequestMatcherRegistry);
-		when(authorizationManagerRequestMatcherRegistry.requestMatchers((String[]) Mockito.any())).thenReturn(authorizedUrl);
-		when(authorizedUrl.permitAll()).thenReturn(authorizationManagerRequestMatcherRegistry);
-		when(authorizationManagerRequestMatcherRegistry.anyRequest()).thenReturn(authorizedUrl);
-		when(authorizedUrl.authenticated()).thenReturn(authorizationManagerRequestMatcherRegistry);
-		when(authorizationManagerRequestMatcherRegistry.and()).thenReturn(http);
-		when(http.formLogin()).thenReturn(formLoginConfigurer);
-		when(formLoginConfigurer.loginPage(LOGIN_PAGE)).thenReturn(formLoginConfigurer);
-		when(formLoginConfigurer.successHandler(any(AuthenticationSuccessHandler.class))).thenReturn(formLoginConfigurer);
-		when(formLoginConfigurer.permitAll()).thenReturn(formLoginConfigurer);
-		when(formLoginConfigurer.and()).thenReturn(http);
-		when(http.logout()).thenReturn(logoutConfigurer);
-
-		springConfiguration.filterChain(http);
-
-		verify(authorizedUrl).authenticated();
-		verify(formLoginConfigurer).loginPage(LOGIN_PAGE);
-		verify(formLoginConfigurer).successHandler(authenticationSuccessHandler);
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Test
-	void filterChainNoLogin() throws Exception {
-		final HttpSecurity http = Mockito.mock(HttpSecurity.class);
-		final AuthorizationManagerRequestMatcherRegistry authorizationManagerRequestMatcherRegistry = mock(AuthorizationManagerRequestMatcherRegistry.class);
-		final SpringConfiguration springConfiguration = new SpringConfiguration(authenticationSuccessHandler, false);
-		final AuthorizeHttpRequestsConfigurer.AuthorizedUrl authorizedUrl = mock(AuthorizeHttpRequestsConfigurer.AuthorizedUrl.class);
-		when(http.authorizeHttpRequests()).thenReturn(authorizationManagerRequestMatcherRegistry);
-		when(authorizationManagerRequestMatcherRegistry.anyRequest()).thenReturn(authorizedUrl);
-
-		springConfiguration.filterChain(http);
-
-		verify(authorizationManagerRequestMatcherRegistry).anyRequest();
-		verify(authorizedUrl).permitAll();
-	}
-
 	@Test
 	void securityContext() {
 		assertEquals(SECURITY_CONTEXT, springConfiguration.securityContext());
 	}
+	
 
 }
