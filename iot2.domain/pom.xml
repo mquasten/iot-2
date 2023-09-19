@@ -14,7 +14,7 @@
 	<properties>
 		<!--maven.compiler.source>20</maven.compiler.source>
 		<maven.compiler.target>20</maven.compiler.target-->
-		<java.version>20</java.version>
+		<java.version>21</java.version>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<jacoco.maven.version>0.8.10</jacoco.maven.version>
 	</properties>
