@@ -42,8 +42,7 @@ class UserController {
 	final static String MESSAGE_KEY_PASSWORDS_DIFFERENT = "error.passwords.different";
 	private final boolean loginRequired;
 
-	UserController(final UserService userService, final SecurityContectRepository securityContectRepository, final ModelMapper<User, UserModel> userMapper,
-			@Value("${iot2.login.required:true}") final boolean loginRequired) {
+	UserController(final UserService userService, final SecurityContectRepository securityContectRepository, final ModelMapper<User, UserModel> userMapper, @Value("${iot2.login.required:true}") final boolean loginRequired) {
 		this.userService = userService;
 		this.securityContectRepository = securityContectRepository;
 		this.userMapper = userMapper;
@@ -52,9 +51,7 @@ class UserController {
 
 	@GetMapping(value = "/user")
 	String login(final Model model, final Locale locale, @RequestParam(name = "changed", required = false) final boolean changed) {
-		final UserModel userModel = loginRequired
-				? userMapper.toWeb(userService.user(userName()).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, userName()))))
-				: new UserModel();
+		final UserModel userModel = loginRequired ? userMapper.toWeb(userService.user(userName()).orElseThrow(() -> new EntityNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, userName())))) : new UserModel();
 		userModel.setLocale(locale.getLanguage());
 		userModel.setPasswordChanged(changed);
 		userModel.setLoginRequired(loginRequired);
@@ -66,8 +63,8 @@ class UserController {
 	}
 
 	private void addLocales(final Model model, final Locale locale) {
-		model.addAttribute(LOCALES_MODEL, List.of(new SimpleImmutableEntry<>(Locale.GERMAN.getLanguage(), Locale.GERMAN.getDisplayLanguage(locale)),
-				new SimpleImmutableEntry<>(Locale.ENGLISH.getLanguage(), Locale.ENGLISH.getDisplayLanguage(locale))));
+		model.addAttribute(LOCALES_MODEL,
+				List.of(new SimpleImmutableEntry<>(Locale.GERMAN.getLanguage(), Locale.GERMAN.getDisplayLanguage(locale)), new SimpleImmutableEntry<>(Locale.ENGLISH.getLanguage(), Locale.ENGLISH.getDisplayLanguage(locale))));
 	}
 
 	private String userName() {
@@ -105,7 +102,9 @@ class UserController {
 
 	@PostMapping(value = "/changeLanguage")
 	String changeLanguage(@ModelAttribute(USER_MODEL_AND_VIEW_NAME) final UserModel user) {
-		userService.update(user.getName(), Locale.of(user.getLocale()));
+		if (loginRequired) {
+			userService.update(user.getName(), Locale.of(user.getLocale()));
+		}
 		return String.format(USER_MODEL_AND_VIEW_NAME_REDIRECT_LOCALE_PATTERN, user.getLocale());
 	}
 

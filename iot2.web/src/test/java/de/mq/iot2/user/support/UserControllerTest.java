@@ -136,8 +136,7 @@ class UserControllerTest {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		when(userService.user(name)).thenReturn(Optional.empty());
 
-		assertEquals(String.format(USER_NOT_FOUND_MESSAGE, name),
-				assertThrows(EntityNotFoundException.class, () -> userController.login(model, Locale.ENGLISH, true)).getMessage());
+		assertEquals(String.format(USER_NOT_FOUND_MESSAGE, name), assertThrows(EntityNotFoundException.class, () -> userController.login(model, Locale.ENGLISH, true)).getMessage());
 	}
 
 	@Test
@@ -196,8 +195,8 @@ class UserControllerTest {
 		assertEquals(algorithms, model.getAttribute(UserController.ALGORITHMS_MODEL));
 
 		verify(userService, Mockito.never()).update(NAME, PASSWORD, Optional.of(ALGORITHM));
-		verify(bindingResult).addError(argThat(objectError -> objectError.getObjectName().equals(USER_MODEL_AND_VIEW_NAME) && objectError.getCodes().length == 1
-				&& objectError.getCodes()[0].equals(MESSAGE_KEY_PASSWORDS_DIFFERENT) && objectError.getDefaultMessage().equals(MESSAGE_KEY_PASSWORDS_DIFFERENT)));
+		verify(bindingResult).addError(argThat(objectError -> objectError.getObjectName().equals(USER_MODEL_AND_VIEW_NAME) && objectError.getCodes().length == 1 && objectError.getCodes()[0].equals(MESSAGE_KEY_PASSWORDS_DIFFERENT)
+				&& objectError.getDefaultMessage().equals(MESSAGE_KEY_PASSWORDS_DIFFERENT)));
 	}
 
 	@ParameterizedTest
@@ -208,6 +207,17 @@ class UserControllerTest {
 
 		assertEquals(String.format(UserController.USER_MODEL_AND_VIEW_NAME_REDIRECT_LOCALE_PATTERN, locale.getLanguage()), userController.changeLanguage(userModel));
 		verify(userService).update(NAME, locale);
+	}
+
+	@ParameterizedTest
+	@MethodSource("locales")
+	void changeLanguageLoginNotRequiered(final Locale locale) {
+		final UserController userController = new UserController(userService, securityContectRepository, userMapper, false);
+		userModel.setName(NAME);
+		userModel.setLocale(locale.getLanguage());
+
+		assertEquals(String.format(UserController.USER_MODEL_AND_VIEW_NAME_REDIRECT_LOCALE_PATTERN, locale.getLanguage()), userController.changeLanguage(userModel));
+		verify(userService, Mockito.never()).update(NAME, locale);
 	}
 
 	@Test
