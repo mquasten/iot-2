@@ -561,7 +561,7 @@
 </INDEX>
 </INDICES>
 </TABLE>
-<TABLE ID="1283" Tablename="BATCH_EXECUTION" PrevTableName="Table_07" XPos="579" YPos="814" TableType="0" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="15" >
+<TABLE ID="1283" Tablename="PROTOCOL" PrevTableName="Table_07" XPos="579" YPos="814" TableType="0" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="15" >
 <COLUMNS>
 <COLUMN ID="1289" ColName="ID" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(36)" Width="-1" Prec="-1" PrimaryKey="1" NotNull="1" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
@@ -596,7 +596,7 @@
 <INDEXCOLUMN idColumn="1289" LengthParam="0" />
 </INDEXCOLUMNS>
 </INDEX>
-<INDEX ID="1297" IndexName="BATCH_EXECUTION_NAME_TIME" IndexKind="2" FKRefDef_Obj_id="-1">
+<INDEX ID="1297" IndexName="PROTOCOL_NAME_TIME" IndexKind="2" FKRefDef_Obj_id="-1">
 <INDEXCOLUMNS>
 <INDEXCOLUMN idColumn="1332" LengthParam="0" />
 <INDEXCOLUMN idColumn="1294" LengthParam="0" />
@@ -604,7 +604,7 @@
 </INDEX>
 </INDICES>
 </TABLE>
-<TABLE ID="1298" Tablename="BATCH_PARAMETER" PrevTableName="Table_08" XPos="1050" YPos="790" TableType="0" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="17" >
+<TABLE ID="1298" Tablename="PROTOCOL_PARAMETER" PrevTableName="Table_08" XPos="1050" YPos="790" TableType="0" TablePrefix="0" nmTable="0" Temporary="0" UseStandardInserts="0" StandardInserts="\n" TableOptions="DelayKeyTblUpdates=0\nPackKeys=0\nRowChecksum=0\nRowFormat=0\nUseRaid=0\nRaidType=0\n" Comments="" Collapsed="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="17" >
 <COLUMNS>
 <COLUMN ID="1306" ColName="NAME" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(20)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
@@ -616,7 +616,7 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="1346" ColName="BATCH_PARAMETER_TYPE" PrevColName="" Pos="4" idDatatype="20" DatatypeParams="(15)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
+<COLUMN ID="1346" ColName="PROTOCOL_PARAMETER_TYPE" PrevColName="BATCH_PARAMETER_TYPE" Pos="4" idDatatype="20" DatatypeParams="(15)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="0" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
@@ -631,7 +631,7 @@
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
 </COLUMN>
-<COLUMN ID="1319" ColName="BATCH_EXECUTION_ID" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(36)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="1" DefaultValue="" Comments="">
+<COLUMN ID="1319" ColName="PROTOCOL_ID" PrevColName="" Pos="1" idDatatype="20" DatatypeParams="(36)" Width="-1" Prec="-1" PrimaryKey="0" NotNull="1" AutoInc="0" IsForeignKey="1" DefaultValue="" Comments="">
 <OPTIONSELECTED>
 <OPTIONSELECT Value="0" />
 </OPTIONSELECTED>
@@ -641,12 +641,12 @@
 <RELATION_END ID="1318" />
 </RELATIONS_END>
 <INDICES>
-<INDEX ID="1320" IndexName="FK_BATCH_PARAMETER_BATCH_EXECUTION_ID" IndexKind="1" FKRefDef_Obj_id="1318">
+<INDEX ID="1320" IndexName="FK_PROTOCOL_PARAMETER_PROTOCOL_ID" IndexKind="1" FKRefDef_Obj_id="1318">
 <INDEXCOLUMNS>
 <INDEXCOLUMN idColumn="1319" LengthParam="0" />
 </INDEXCOLUMNS>
 </INDEX>
-<INDEX ID="1344" IndexName="BATCH_PARAMETER_NAME_BATCH_EXECUTION_ID" IndexKind="2" FKRefDef_Obj_id="-1">
+<INDEX ID="1344" IndexName="PROTOCOL_PARAMETER_NAME_PROTOCOL_ID" IndexKind="2" FKRefDef_Obj_id="-1">
 <INDEXCOLUMNS>
 <INDEXCOLUMN idColumn="1306" LengthParam="0" />
 <INDEXCOLUMN idColumn="1319" LengthParam="0" />
@@ -660,7 +660,7 @@
 <RELATION ID="1125" RelationName="Timer2DayGroup" Kind="2" SrcTable="1096" DestTable="1000" FKFields="ID=CYCLE_ID\n" FKFieldsComments="\n" relDirection="4" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1140" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="6" />
 <RELATION ID="1163" RelationName="Configuration2Parameter" Kind="2" SrcTable="1141" DestTable="1147" FKFields="ID=CONFIGURATION_ID\n" FKFieldsComments="\n" relDirection="2" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1165" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="9" />
 <RELATION ID="1169" RelationName="Cycle2CycleParameter" Kind="2" SrcTable="1096" DestTable="1147" FKFields="ID=CYCLE_ID\n" FKFieldsComments="\n" relDirection="4" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1171" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="10" />
-<RELATION ID="1318" RelationName="BatchExecution2BatchParameter" Kind="2" SrcTable="1283" DestTable="1298" FKFields="ID=BATCH_EXECUTION_ID\n" FKFieldsComments="\n" relDirection="2" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1320" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="19" />
+<RELATION ID="1318" RelationName="Protocol2ProtocolParameter" Kind="2" SrcTable="1283" DestTable="1298" FKFields="ID=PROTOCOL_ID\n" FKFieldsComments="\n" relDirection="2" MidOffset="0" OptionalStart="0" OptionalEnd="0" CaptionOffsetX="0" CaptionOffsetY="0" StartIntervalOffsetX="0" StartIntervalOffsetY="0" EndIntervalOffsetX="0" EndIntervalOffsetY="0" CreateRefDef="1" Invisible="0" RefDef="Matching=0\nOnDelete=3\nOnUpdate=3\n" Comments="" FKRefDefIndex_Obj_id="1320" Splitted="0" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="19" />
 </RELATIONS>
 <NOTES>
 <NOTE ID="1193" NoteName="Note_01" XPos="64" YPos="380" NoteText="SingleTable\n" IsLinkedObject="0" IDLinkedModel="-1" Obj_id_Linked="-1" OrderPos="13" />
