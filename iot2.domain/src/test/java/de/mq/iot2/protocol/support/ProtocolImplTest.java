@@ -4,6 +4,7 @@ import static de.mq.iot2.protocol.support.ProtocolImpl.MESSAGE_EXECUTION_TIME_RE
 import static de.mq.iot2.protocol.support.ProtocolImpl.MESSAGE_NAME_IS_REQUIRED;
 import static de.mq.iot2.protocol.support.ProtocolImpl.MESSAGE_STATUS_REQUIRED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -94,6 +95,54 @@ class ProtocolImplTest {
 		protocol.assignLogMessage(logMessage);
 
 		assertEquals(Optional.of(logMessage), protocol.logMessage());
+	}
+	
+	@Test
+	void hash() {
+		final Protocol protocol = new ProtocolImpl(name);
+		assertEquals(protocol.name().hashCode() + protocol.executionTime().hashCode(), protocol.hashCode());
+	}
+	
+	@Test
+	void hashCodeEmtyFields() {
+		final Protocol protocol = BeanUtils.instantiateClass(ProtocolImpl.class);
+		assertEquals(System.identityHashCode(protocol), protocol.hashCode());
+		setName(protocol, name);
+		assertEquals(System.identityHashCode(protocol), protocol.hashCode());
+	}
+	
+	@Test
+	void equals() throws InterruptedException {
+		final Protocol protocol = new ProtocolImpl(name);
+		Thread.sleep(10);
+		final Protocol other = new ProtocolImpl(name);
+		
+		
+		assertFalse(protocol.equals(other));
+		
+		setTime(other, protocol.executionTime());
+		assertTrue(protocol.equals(other));
+		
+		setName(other, RandomTestUtil.randomString());
+		assertFalse(protocol.equals(other));
+		
+		final Protocol otherProtocol = BeanUtils.instantiateClass(ProtocolImpl.class);
+	
+		assertFalse(protocol.equals(otherProtocol));
+		assertFalse(otherProtocol.equals(protocol));
+		assertFalse(otherProtocol.equals(BeanUtils.instantiateClass(ProtocolImpl.class)));
+		assertTrue(otherProtocol.equals(otherProtocol));
+		assertFalse(protocol.equals(new String()));
+		
+		
+	}
+
+	private void setTime(final Protocol protocol, LocalDateTime localDateTime) {
+		ReflectionTestUtils.setField(protocol, "executionTime", localDateTime);
+	}
+	
+	private void setName(final Protocol protocol, String name) {
+		ReflectionTestUtils.setField(protocol, "name", name);
 	}
 
 }

@@ -5,7 +5,6 @@ import java.time.ZoneId;
 import java.util.Optional;
 
 import org.springframework.util.Assert;
-
 import de.mq.iot2.protocol.Protocol;
 import de.mq.iot2.support.IdUtil;
 import jakarta.persistence.Column;
@@ -110,4 +109,33 @@ class ProtocolImpl implements Protocol {
 	public void assignLogMessage(final String logMessage) {
 		this.logMessage = logMessage;
 	}
+	
+	private boolean missingKeyFields(final ProtocolImpl protocol) {
+		return (protocol.name == null) || (protocol.executionTime == null);
+	}
+	
+	@Override
+	public int hashCode() {
+		if (missingKeyFields(this)) {
+			return super.hashCode();
+		}
+		return  name.hashCode() + executionTime.hashCode();
+	}
+	
+	@Override
+	public boolean equals(final Object object) {
+
+		if (!(object instanceof ProtocolImpl)) {
+			return super.equals(object);
+
+		}
+		final var other = (ProtocolImpl) object;
+
+		if (missingKeyFields(this) || (missingKeyFields(other))) {
+			return super.equals(object);
+		}
+
+		return  other.name.equals(name) && other.executionTime.equals(executionTime);
+	}
+
 }
