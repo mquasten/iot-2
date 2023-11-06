@@ -96,13 +96,13 @@ class ProtocolImplTest {
 
 		assertEquals(Optional.of(logMessage), protocol.logMessage());
 	}
-	
+
 	@Test
 	void hash() {
 		final Protocol protocol = new ProtocolImpl(name);
 		assertEquals(protocol.name().hashCode() + protocol.executionTime().hashCode(), protocol.hashCode());
 	}
-	
+
 	@Test
 	void hashCodeEmtyFields() {
 		final Protocol protocol = BeanUtils.instantiateClass(ProtocolImpl.class);
@@ -110,38 +110,36 @@ class ProtocolImplTest {
 		setName(protocol, name);
 		assertEquals(System.identityHashCode(protocol), protocol.hashCode());
 	}
-	
+
 	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	void equals() throws InterruptedException {
 		final Protocol protocol = new ProtocolImpl(name);
 		Thread.sleep(10);
 		final Protocol other = new ProtocolImpl(name);
-		
-		
+
 		assertFalse(protocol.equals(other));
-		
+
 		setTime(other, protocol.executionTime());
 		assertTrue(protocol.equals(other));
-		
+
 		setName(other, RandomTestUtil.randomString());
 		assertFalse(protocol.equals(other));
-		
+
 		final Protocol otherProtocol = BeanUtils.instantiateClass(ProtocolImpl.class);
-	
+
 		assertFalse(protocol.equals(otherProtocol));
 		assertFalse(otherProtocol.equals(protocol));
 		assertFalse(otherProtocol.equals(BeanUtils.instantiateClass(ProtocolImpl.class)));
 		assertTrue(otherProtocol.equals(otherProtocol));
 		assertFalse(protocol.equals(new String()));
-		
-		
+
 	}
 
 	private void setTime(final Protocol protocol, LocalDateTime localDateTime) {
 		ReflectionTestUtils.setField(protocol, "executionTime", localDateTime);
 	}
-	
+
 	private void setName(final Protocol protocol, String name) {
 		ReflectionTestUtils.setField(protocol, "name", name);
 	}

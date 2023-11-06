@@ -25,7 +25,6 @@ class ProtocolImpl implements Protocol {
 	static final String MESSAGE_STATUS_REQUIRED = "Status required.";
 
 	static final String MESSAGE_NAME_IS_REQUIRED = "Name is required.";
-	
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
@@ -110,19 +109,19 @@ class ProtocolImpl implements Protocol {
 	public void assignLogMessage(final String logMessage) {
 		this.logMessage = logMessage;
 	}
-	
+
 	private boolean missingKeyFields(final ProtocolImpl protocol) {
 		return (protocol.name == null) || (protocol.executionTime == null);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		if (missingKeyFields(this)) {
 			return super.hashCode();
 		}
-		return  name.hashCode() + executionTime.hashCode();
+		return name.hashCode() + executionTime.hashCode();
 	}
-	
+
 	@Override
 	public boolean equals(final Object object) {
 
@@ -136,7 +135,7 @@ class ProtocolImpl implements Protocol {
 			return super.equals(object);
 		}
 
-		return  other.name.equals(name) && other.executionTime.equals(executionTime);
+		return other.name.equals(name) && other.executionTime.equals(executionTime);
 	}
 
 }

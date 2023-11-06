@@ -73,7 +73,7 @@ class ProtocolParameterImplTest {
 	void valueNull() {
 		assertEquals(MESSAGE_VALUE_IS_REQUIRED, assertThrows(IllegalArgumentException.class, () -> emptyProtocolParameter.value()).getMessage());
 	}
-	
+
 	@Test
 	void constructorGuards() {
 		assertEquals(MESSAGE_PROTOCOL_IS_REQUIRED, assertThrows(IllegalArgumentException.class, () -> new ProtocolParameterImpl(null, name, ProtocolParameterType.Input, value)).getMessage());
@@ -81,61 +81,59 @@ class ProtocolParameterImplTest {
 		assertEquals(MESSAGE_TYPE_IST_REQUIRED, assertThrows(IllegalArgumentException.class, () -> new ProtocolParameterImpl(protocol, name, null, value)).getMessage());
 		assertEquals(MESSAGE_VALUE_IS_REQUIRED, assertThrows(IllegalArgumentException.class, () -> new ProtocolParameterImpl(protocol, name, ProtocolParameterType.Result, null)).getMessage());
 	}
-	
+
 	@Test
 	void hash() {
-		assertEquals(name.hashCode()+ protocol.hashCode(), protocolParameter.hashCode());
-		
+		assertEquals(name.hashCode() + protocol.hashCode(), protocolParameter.hashCode());
+
 		assertEquals(System.identityHashCode(emptyProtocolParameter), emptyProtocolParameter.hashCode());
-		
+
 		final ProtocolParameter invalid = BeanUtils.instantiateClass(ProtocolParameterImpl.class);
-		assertEquals(System.identityHashCode(invalid),invalid.hashCode());
-		
+		assertEquals(System.identityHashCode(invalid), invalid.hashCode());
+
 		setName(invalid, name);
-		assertEquals(System.identityHashCode(invalid),invalid.hashCode());
-		
+		assertEquals(System.identityHashCode(invalid), invalid.hashCode());
+
 		setName(invalid, null);
 		setProtocoll(invalid, protocol);
-		assertEquals(System.identityHashCode(invalid),invalid.hashCode());
-		
-		
+		assertEquals(System.identityHashCode(invalid), invalid.hashCode());
+
 	}
-	
+
 	private void setName(final ProtocolParameter protocolParameter, String name) {
 		ReflectionTestUtils.setField(protocolParameter, "name", name);
 	}
+
 	private void setProtocoll(final ProtocolParameter protocolParameter, Protocol protocol) {
 		ReflectionTestUtils.setField(protocolParameter, "protocol", protocol);
 	}
-	
+
 	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	void equals() throws InterruptedException {
 		final ProtocolParameter protocolParameter = newProtocolParameter();
-		
+
 		final ProtocolParameter other = newProtocolParameter();
-		
-		
+
 		assertTrue(protocolParameter.equals(other));
-		
+
 		setProtocoll(other, new ProtocolImpl(RandomTestUtil.randomString()));
 		assertFalse(protocolParameter.equals(other));
-		
-		setProtocoll(other,protocol);
+
+		setProtocoll(other, protocol);
 		setName(other, RandomTestUtil.randomString());
 		assertFalse(protocolParameter.equals(other));
-		
-		setProtocoll(other,new ProtocolImpl(RandomTestUtil.randomString()));
+
+		setProtocoll(other, new ProtocolImpl(RandomTestUtil.randomString()));
 		assertFalse(protocolParameter.equals(other));
-		
+
 		final ProtocolParameter otherProtocolParameter = BeanUtils.instantiateClass(ProtocolParameterImpl.class);
 		assertFalse(protocolParameter.equals(otherProtocolParameter));
 		assertFalse(otherProtocolParameter.equals(protocolParameter));
 		assertFalse(otherProtocolParameter.equals(BeanUtils.instantiateClass(ProtocolParameterImpl.class)));
 		assertTrue(otherProtocolParameter.equals(otherProtocolParameter));
 		assertFalse(protocolParameter.equals(new String()));
-		
-		
+
 	}
 
 }
