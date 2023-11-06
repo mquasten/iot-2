@@ -111,6 +111,7 @@ class ProtocolImplTest {
 		assertEquals(System.identityHashCode(protocol), protocol.hashCode());
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	void equals() throws InterruptedException {
 		final Protocol protocol = new ProtocolImpl(name);

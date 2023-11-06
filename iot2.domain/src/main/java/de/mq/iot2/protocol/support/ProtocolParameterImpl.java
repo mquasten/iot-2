@@ -28,7 +28,7 @@ import jakarta.validation.constraints.Size;
 @DiscriminatorValue(ProtocolParameterImpl.ENTITY_NAME)
 @IdClass(ProtocolParameterPrimaryKeyImpl.class) 
 class ProtocolParameterImpl implements ProtocolParameter {
-
+	
 	static final String MESSAGE_TYPE_IST_REQUIRED = "ProtocolParameterType ist required.";
 	static final String MESSAGE_VALUE_IS_REQUIRED = "Value is required.";
 	static final String MESSAGE_PROTOCOL_IS_REQUIRED = "Protocol is required.";
@@ -62,8 +62,7 @@ class ProtocolParameterImpl implements ProtocolParameter {
 	@Valid
 	private Protocol protocol;
 	
-	@SuppressWarnings("unused")
-	private ProtocolParameterImpl() {
+	ProtocolParameterImpl() {
 		
 	}
 	
@@ -116,4 +115,34 @@ class ProtocolParameterImpl implements ProtocolParameter {
 		protocolRequiredGuard(protocol);
 		return protocol;
 	}
+	
+	private boolean missingKeyFields(final ProtocolParameterImpl protocolParameter) {
+		return (protocolParameter.name == null) || (protocolParameter.protocol == null);
+	}
+	
+	@Override
+	public int hashCode() {
+		if (missingKeyFields(this)) {
+			return super.hashCode();
+		}
+		return  name.hashCode() + protocol.hashCode();
+	}
+	
+	@Override
+	public boolean equals(final Object object) {
+
+		if (!(object instanceof ProtocolParameter)) {
+			return super.equals(object);
+
+		}
+		final var other = (ProtocolParameterImpl) object;
+
+		if (missingKeyFields(this) || (missingKeyFields(other))) {
+			return super.equals(object);
+		}
+		System.out.println( other.name+ ":"+ name +"|" +  other.protocol+ ":"+ protocol );
+
+		return  other.name.equals(name) && other.protocol.equals(protocol);
+	}
+
 }
