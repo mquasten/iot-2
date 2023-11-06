@@ -25,6 +25,7 @@ class ProtocolImpl implements Protocol {
 	static final String MESSAGE_STATUS_REQUIRED = "Status required.";
 
 	static final String MESSAGE_NAME_IS_REQUIRED = "Name is required.";
+	
 
 	@Id
 	@Column(name = "ID", length = 36, nullable = false)
