@@ -36,13 +36,13 @@ class ProtocolParameterImpl implements ProtocolParameter {
 	static final String MESSAGE_NAME_IS_REQUIRED = "Name is required.";
 
 	@Id
-	@Column(name = "NAME", length = 15, nullable = false)
-	@Size(max = 20)
+	@Column(name = "NAME", length = 25, nullable = false)
+	@Size(max = 26)
 	@NotBlank
 	private String name;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "kind", length = 15, nullable = false)
+	@Column(name = "kind", length = 20, nullable = false)
 	@NotNull
 	private ProtocolParameterType type;
 
@@ -52,7 +52,7 @@ class ProtocolParameterImpl implements ProtocolParameter {
 	private String value;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "STATE", length = 15, nullable = true)
+	@Column(name = "STATE", length = 20, nullable = true)
 	private Status status;
 
 	@Id
@@ -141,7 +141,6 @@ class ProtocolParameterImpl implements ProtocolParameter {
 		if (missingKeyFields(this) || (missingKeyFields(other))) {
 			return super.equals(object);
 		}
-		System.out.println(other.name + ":" + name + "|" + other.protocol + ":" + protocol);
 
 		return other.name.equals(name) && other.protocol.equals(protocol);
 	}

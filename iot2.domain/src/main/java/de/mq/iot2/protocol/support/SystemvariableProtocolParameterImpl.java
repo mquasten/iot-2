@@ -1,13 +1,13 @@
 package de.mq.iot2.protocol.support;
 
 import static de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType.Result;
-import static de.mq.iot2.protocol.SystemvariableProtocolProtocolParameter.SystemvariableStatus.Calculated;
-import static de.mq.iot2.protocol.SystemvariableProtocolProtocolParameter.SystemvariableStatus.Updated;
+import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Calculated;
+import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Updated;
 
 import org.springframework.util.Assert;
 
 import de.mq.iot2.protocol.Protocol;
-import de.mq.iot2.protocol.SystemvariableProtocolProtocolParameter;
+import de.mq.iot2.protocol.SystemvariableProtocolParameter;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorValue;
@@ -23,7 +23,11 @@ import jakarta.validation.constraints.NotNull;
 @DiscriminatorColumn(name = "PROTOCOL_PARAMETER_TYPE", length = 15)
 @DiscriminatorValue(SystemvariableProtocolParameterImpl.ENTITY_NAME)
 
-class SystemvariableProtocolParameterImpl extends ProtocolParameterImpl implements SystemvariableProtocolProtocolParameter {
+class SystemvariableProtocolParameterImpl extends ProtocolParameterImpl implements SystemvariableProtocolParameter {
+	static final String MESSAGE_INVALID_STATUS = "Status should be 'Calculated'.";
+
+	static final String MESSAGE_STATUS_REQUIRED = "Status is required.";
+
 	static final String ENTITY_NAME = "SystemvariableProtocolParameter";
 
 	@Enumerated(EnumType.STRING)
@@ -41,12 +45,13 @@ class SystemvariableProtocolParameterImpl extends ProtocolParameterImpl implemen
 
 	@Override
 	public void assignUpdated() {
-		Assert.isTrue(this.status == Calculated, "Status should be 'Calculated'.");
+		Assert.isTrue(this.status == Calculated, MESSAGE_INVALID_STATUS);
 		this.status = Updated;
 	}
 
 	@Override
 	public SystemvariableStatus status() {
+		Assert.notNull(status, MESSAGE_STATUS_REQUIRED);
 		return this.status;
 	}
 

@@ -17,6 +17,9 @@ import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
+import de.mq.iot2.protocol.Protocol;
+import de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType;
+import de.mq.iot2.protocol.ProtocolService;
 import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.rules.RuleService;
 import de.mq.iot2.sysvars.SystemVariable;
@@ -25,6 +28,7 @@ import de.mq.iot2.weather.WeatherService;
 
 @Service
 public class EndOfDayBatchImpl {
+	private static final String END_OF_DAY_BATCH_NAME = "end-of-day";
 	private static Logger LOGGER = LoggerFactory.getLogger(EndOfDayBatchImpl.class);
 	private final CalendarService calendarService;
 
@@ -35,25 +39,28 @@ public class EndOfDayBatchImpl {
 	private final SystemVariableService systemVariableService;
 
 	private final WeatherService weatherService;
+	
+
+	private final ProtocolService protocolService;
 
 	EndOfDayBatchImpl(final CalendarService calendarService, final ConfigurationService configurationService, final RuleService ruleService,
-			final SystemVariableService systemVariableService, final WeatherService weatherService) {
+			final SystemVariableService systemVariableService, final WeatherService weatherService, final ProtocolService protocolService) {
 		this.calendarService = calendarService;
 		this.configurationService = configurationService;
 		this.ruleService = ruleService;
 		this.systemVariableService = systemVariableService;
 		this.weatherService = weatherService;
+		this.protocolService=protocolService;
 	}
 
-	@BatchMethod(value = "end-of-day", converterClass = EndOfDayBatchArgumentConverterImpl.class)
+	@BatchMethod(value = END_OF_DAY_BATCH_NAME, converterClass = EndOfDayBatchArgumentConverterImpl.class)
 	final void execute(final LocalDate date) {
-
 		execute(date, Optional.empty());
 
 	}
 
 	private void execute(final LocalDate date, Optional<LocalTime> uptateTime) {
-
+		final Protocol protocol = protocolService.create(END_OF_DAY_BATCH_NAME);
 		final Cycle cycle = calendarService.cycle(date);
 
 		final var parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);
@@ -71,6 +78,8 @@ public class EndOfDayBatchImpl {
 		final var arguments = Map.of(EndOfDayArguments.Date, date, EndOfDayArguments.SunUpTime, sunUpTime, EndOfDayArguments.SunDownTime, sunDownTime, EndOfDayArguments.Cycle,
 				cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature, EndOfDayArguments.UpdateTime, uptateTime);
 
+		protocolService.assignParameter(protocol, ProtocolParameterType.RulesEngineArgument, arguments);
+		
 		LOGGER.debug("Start RulesEngine parameters {} arguments {}.", parameters, arguments);
 		final var results = ruleService.process(parameters, arguments);
 

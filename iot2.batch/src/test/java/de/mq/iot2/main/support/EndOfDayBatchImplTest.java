@@ -18,6 +18,7 @@ import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
+import de.mq.iot2.protocol.ProtocolService;
 import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.rules.RuleService;
 import de.mq.iot2.sysvars.SystemVariable;
@@ -31,7 +32,8 @@ class EndOfDayBatchImplTest {
 	private final RuleService ruleService = Mockito.mock(RuleService.class);
 	private final SystemVariableService systemVariableService = Mockito.mock(SystemVariableService.class);
 	private final WeatherService weatherService = Mockito.mock(WeatherService.class);
-	private final EndOfDayBatchImpl endOfDayBatch = new EndOfDayBatchImpl(calendarService, configurationService, ruleService, systemVariableService, weatherService);
+	private final ProtocolService protocolService = Mockito.mock(ProtocolService.class);
+	private final EndOfDayBatchImpl endOfDayBatch = new EndOfDayBatchImpl(calendarService, configurationService, ruleService, systemVariableService, weatherService, protocolService);
 
 	private final LocalDate date = LocalDate.now().plusDays(1);
 
