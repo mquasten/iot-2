@@ -21,7 +21,7 @@ import jakarta.validation.constraints.NotNull;
 @Entity(name = SystemvariableProtocolParameterImpl.ENTITY_NAME)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "PROTOCOL_PARAMETER_TYPE", length = 15)
-@DiscriminatorValue(SystemvariableProtocolParameterImpl.ENTITY_NAME)
+@DiscriminatorValue("Systemvariable")
 
 class SystemvariableProtocolParameterImpl extends ProtocolParameterImpl implements SystemvariableProtocolParameter {
 	static final String MESSAGE_INVALID_STATUS = "Status should be 'Calculated'.";

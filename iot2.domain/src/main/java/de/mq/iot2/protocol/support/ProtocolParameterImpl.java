@@ -25,7 +25,7 @@ import jakarta.validation.constraints.Size;
 @Entity(name = ProtocolParameterImpl.ENTITY_NAME)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "PROTOCOL_PARAMETER_TYPE", length = 15)
-@DiscriminatorValue(ProtocolParameterImpl.ENTITY_NAME)
+@DiscriminatorValue("Parameter")
 @IdClass(ProtocolParameterPrimaryKeyImpl.class)
 class ProtocolParameterImpl implements ProtocolParameter {
 
@@ -37,7 +37,7 @@ class ProtocolParameterImpl implements ProtocolParameter {
 
 	@Id
 	@Column(name = "NAME", length = 25, nullable = false)
-	@Size(max = 26)
+	@Size(max = 25)
 	@NotBlank
 	private String name;
 
@@ -52,7 +52,7 @@ class ProtocolParameterImpl implements ProtocolParameter {
 	private String value;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "STATE", length = 20, nullable = true)
+	@Column(name = "STATE", length = 15, nullable = true)
 	private Status status;
 
 	@Id

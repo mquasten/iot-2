@@ -78,6 +78,7 @@ public class EndOfDayBatchImpl {
 		final var arguments = Map.of(EndOfDayArguments.Date, date, EndOfDayArguments.SunUpTime, sunUpTime, EndOfDayArguments.SunDownTime, sunDownTime, EndOfDayArguments.Cycle,
 				cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature, EndOfDayArguments.UpdateTime, uptateTime);
 
+		protocolService.assignParameter(protocol, ProtocolParameterType.Configuration, parameters);
 		protocolService.assignParameter(protocol, ProtocolParameterType.RulesEngineArgument, arguments);
 		
 		LOGGER.debug("Start RulesEngine parameters {} arguments {}.", parameters, arguments);
