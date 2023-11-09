@@ -18,14 +18,14 @@ class ProtocolServiceImpl implements ProtocolService {
 	static final String MESSAGE_CONVERTER_MISSING = "Class %s can not be converted to string.";
 	static final String MESSAGE_VALUE_RREQUIRED = "Value is Rrequired.";
 	static final String MESSAGE_KEY_RREQUIRED = "Key is Rrequired.";
-	final ProtocolRepository protocolRepository;
-	final ProtocolParameterRepository protocolParameterRepository;
-	final ConversionService conversionService;
+	private final ProtocolRepository protocolRepository;
+	private final ProtocolParameterRepository protocolParameterRepository;
+	private final ConversionService conversionService;
 
-	ProtocolServiceImpl(final ProtocolRepository protocolRepository,final ProtocolParameterRepository protocolParameterRepository, final ConversionService conversionService) {
+	ProtocolServiceImpl(final ProtocolRepository protocolRepository, final ProtocolParameterRepository protocolParameterRepository, final ConversionService conversionService) {
 		this.protocolRepository = protocolRepository;
-		this.conversionService=conversionService;
-		this.protocolParameterRepository=protocolParameterRepository;
+		this.conversionService = conversionService;
+		this.protocolParameterRepository = protocolParameterRepository;
 	}
 
 	@Override
@@ -35,10 +35,11 @@ class ProtocolServiceImpl implements ProtocolService {
 		return protocolRepository.save(protocol);
 
 	}
+
 	@Override
 	@Transactional
-	public void assignParameter(final Protocol protocol, final ProtocolParameterType type,final Map<? extends Enum<?>, Object>  parameters) {
-		parameters.entrySet().stream().map( entry -> convert(protocol, type, entry)).forEach( protocolParameter -> protocolParameterRepository.save(protocolParameter));
+	public void assignParameter(final Protocol protocol, final ProtocolParameterType type, final Map<? extends Enum<?>, Object> parameters) {
+		parameters.entrySet().stream().map(entry -> convert(protocol, type, entry)).forEach(protocolParameter -> protocolParameterRepository.save(protocolParameter));
 	}
 
 	private ProtocolParameterImpl convert(final Protocol protocol, final ProtocolParameterType type, Entry<? extends Enum<?>, Object> entry) {
