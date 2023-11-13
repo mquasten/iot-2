@@ -45,5 +45,7 @@ class SystemvariableProtocolParameterImplTest {
 		assertEquals(MESSAGE_STATUS_REQUIRED, assertThrows(IllegalArgumentException.class, () -> systemvariableProtocolParameter.status()).getMessage());
 		assertEquals(MESSAGE_INVALID_STATUS, assertThrows(IllegalArgumentException.class, () -> systemvariableProtocolParameter.assignUpdated()).getMessage());
 	}
+	
+	
 
 }

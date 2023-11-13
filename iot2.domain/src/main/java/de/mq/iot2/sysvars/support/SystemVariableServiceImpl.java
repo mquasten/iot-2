@@ -23,7 +23,7 @@ class SystemVariableServiceImpl implements SystemVariableService {
 	}
 
 	@Override
-	public void update(Collection<SystemVariable> systemVariables) {
+	public Collection<SystemVariable> update(Collection<SystemVariable> systemVariables) {
 		Assert.notNull(systemVariables, "SystemVariables shouldn't be null.");
 		final var existingSystemVariables = systemVariableRepository.readSystemVariables().stream().collect(Collectors.toMap(SystemVariable::getName, Function.identity()));
 		LOGGER.debug("{} Systemvariables read from ccu2 '{}'.", existingSystemVariables.size(), existingSystemVariables.keySet());
@@ -32,7 +32,7 @@ class SystemVariableServiceImpl implements SystemVariableService {
 			systemVariableNameAndValueRequiredGuard(systemVariable);
 			if (!existingSystemVariables.containsKey(systemVariable.getName())) {
 				LOGGER.warn("SystemVariable {} doesn't exist at ccu2.");
-				continue;
+				continue; 
 			}
 
 			final SystemVariable existingSystemVariable = existingSystemVariables.get(systemVariable.getName());
@@ -49,6 +49,7 @@ class SystemVariableServiceImpl implements SystemVariableService {
 		LOGGER.debug("{} SystemVariables need update.", systemVariables4Update.size());
 
 		systemVariables4Update.forEach(systemVariableRepository::updateSystemVariable);
+		return systemVariables4Update;
 
 	}
 

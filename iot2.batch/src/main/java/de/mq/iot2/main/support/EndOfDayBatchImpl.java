@@ -83,14 +83,20 @@ public class EndOfDayBatchImpl {
 		
 		LOGGER.debug("Start RulesEngine parameters {} arguments {}.", parameters, arguments);
 		final var results = ruleService.process(parameters, arguments);
-
+		
 		Assert.notNull(results.containsKey(EndOfDayArguments.SystemVariables.name()), "Systemvariables required.");
 
 		@SuppressWarnings("unchecked")
 		final Collection<SystemVariable> systemVariables = (Collection<SystemVariable>) results.get(EndOfDayArguments.SystemVariables.name());
+		protocolService.assignParameter(protocol, systemVariables);
 		Assert.notEmpty(systemVariables, "Systemvariables required.");
 		LOGGER.debug("{} Systemvariables calculated.", systemVariables.size());
-		systemVariableService.update(systemVariables);
+		
+		
+		final var updatedSystemVariables =systemVariableService.update(systemVariables);
+		
+		protocolService.updateSystemVariables(protocol, updatedSystemVariables);
+		
 	}
 
 	@BatchMethod(value = "end-of-day-update", converterClass = EndOfDayUpdateBatchArgumentConverterImpl.class)

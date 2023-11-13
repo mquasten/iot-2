@@ -16,8 +16,10 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +33,10 @@ import de.mq.iot2.protocol.Protocol;
 import de.mq.iot2.protocol.ProtocolParameter;
 import de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType;
 import de.mq.iot2.protocol.ProtocolService;
+import de.mq.iot2.protocol.SystemvariableProtocolParameter;
+import de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus;
 import de.mq.iot2.support.RandomTestUtil;
+import de.mq.iot2.sysvars.SystemVariable;
 
 class ProtocolServiceImplTest {
 	private static final String EMPTY_OPTIONAL_STRING = "<Empty>";
@@ -166,6 +171,28 @@ class ProtocolServiceImplTest {
 
 		return value.toString();
 
+	}
+	
+	
+	@Test
+	void assignSystemvariableParameter() {
+		
+		final Collection<SystemVariable> systemVariables = List.of(new SystemVariable(RandomTestUtil.randomString(), RandomTestUtil.randomString()), new SystemVariable(RandomTestUtil.randomString(), RandomTestUtil.randomString()));
+		protocolService.assignParameter(protocol, systemVariables);
+		
+		assertEquals(2, savedParameters.size());
+		
+		final Map<String, String> expected = systemVariables.stream().collect(Collectors.toMap(SystemVariable::getName, SystemVariable::getValue));
+		
+		savedParameters.forEach(parameter -> checkSystemParameter(expected, parameter));
+		
+	}
+
+	private void checkSystemParameter(final Map<String, String> expected, final ProtocolParameter parameter) {
+		assertTrue(expected.keySet().contains(parameter.name()));
+		assertEquals(expected.get(parameter.name()), parameter.value());
+		assertEquals(SystemvariableStatus.Calculated, ((SystemvariableProtocolParameter) parameter).status());
+		assertEquals(protocol, parameter.protocol());
 	}
 
 }

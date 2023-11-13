@@ -31,7 +31,7 @@ class SystemvariableProtocolParameterImpl extends ProtocolParameterImpl implemen
 	static final String ENTITY_NAME = "SystemvariableProtocolParameter";
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "state", length = 15, nullable = false)
+	@Column(name = "state", length = 15, nullable = true)
 	@NotNull
 	private SystemvariableStatus status;
 

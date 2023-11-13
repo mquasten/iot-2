@@ -3,7 +3,6 @@ package de.mq.iot2.protocol.support;
 import org.springframework.util.Assert;
 
 import de.mq.iot2.protocol.Protocol;
-import de.mq.iot2.protocol.Protocol.Status;
 import de.mq.iot2.protocol.ProtocolParameter;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -51,9 +50,6 @@ class ProtocolParameterImpl implements ProtocolParameter {
 	@NotBlank
 	private String value;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "STATE", length = 15, nullable = true)
-	private Status status;
 
 	@Id
 	@ManyToOne(targetEntity = ProtocolImpl.class)
