@@ -1,6 +1,10 @@
 package de.mq.iot2.protocol.support;
 
+import static de.mq.iot2.protocol.Protocol.Status.Error;
 import static de.mq.iot2.protocol.Protocol.Status.Started;
+import static de.mq.iot2.protocol.Protocol.Status.Success;
+import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Calculated;
+import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Updated;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -9,6 +13,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,7 +40,7 @@ import de.mq.iot2.protocol.ProtocolParameter;
 import de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType;
 import de.mq.iot2.protocol.ProtocolService;
 import de.mq.iot2.protocol.SystemvariableProtocolParameter;
-import de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus;
+import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.RandomTestUtil;
 import de.mq.iot2.sysvars.SystemVariable;
 
@@ -45,7 +51,7 @@ class ProtocolServiceImplTest {
 	private final ConversionService conversionService = mock(ConversionService.class);
 	private final ProtocolService protocolService = new ProtocolServiceImpl(protocolRepository, protocolParameterRepository, conversionService);
 
-	private final Protocol protocol = mock(Protocol.class);
+	private final Protocol protocol =  new ProtocolImpl(RandomTestUtil.randomString());
 	private static final LocalDate MAXWEELS_BIRTHDATE = LocalDate.of(1831, 6, 18);
 	final Collection<ProtocolParameter> savedParameters = new ArrayList<>();
 
@@ -54,6 +60,7 @@ class ProtocolServiceImplTest {
 		when(conversionService.canConvert(Mockito.any(Class.class), Mockito.any(Class.class))).thenReturn(true);
 		doAnswer(answer -> convert(answer.getArgument(0))).when(conversionService).convert(Mockito.any(), Mockito.any());
 		doAnswer(answer -> addParameter(savedParameters, answer.getArgument(0, ProtocolParameter.class))).when(protocolParameterRepository).save(Mockito.any(ProtocolParameter.class));
+	
 	}
 
 	@Test
@@ -68,11 +75,32 @@ class ProtocolServiceImplTest {
 		assertTrue(Duration.between(protocol.executionTime(), LocalDateTime.now()).getSeconds() < 1);
 
 		verify(protocolRepository).save(protocol);
-
+	}
+	
+	@Test
+	void success() {
+		final var message = RandomTestUtil.randomString();
+		protocolService.success(protocol, message);
+		
+		assertEquals(Optional.of(message) ,protocol.logMessage());
+		assertEquals(Success, protocol.status());
+		verify(protocolRepository).save(protocol);
+	}
+	
+	@Test
+	void error() {
+		final var throwable = new IllegalStateException(RandomTestUtil.randomString());
+		protocolService.error(protocol, throwable);
+		final var stringwriter = new StringWriter();
+		throwable.printStackTrace(new PrintWriter(stringwriter));
+		
+		assertEquals(Optional.of(stringwriter.toString()) ,protocol.logMessage());
+		assertEquals(Error, protocol.status());
+		verify(protocolRepository).save(protocol);
 	}
 
 	@Test
-	void assignParameterConviguration() {
+	void assignParameterConfiguration() {
 		final Map<? extends Enum<?>, Object> parameters = Map.of(Key.MaxSunDownTime, LocalTime.of(17, 0), Key.SunUpDownType, TwilightType.Mathematical, Key.ShadowTemperature, Double.valueOf(8.08), Key.DaysBack, Integer.valueOf(30));
 
 		protocolService.assignParameter(protocol, ProtocolParameterType.Configuration, parameters);
@@ -191,10 +219,24 @@ class ProtocolServiceImplTest {
 	private void checkSystemParameter(final Map<String, String> expected, final ProtocolParameter parameter) {
 		assertTrue(expected.keySet().contains(parameter.name()));
 		assertEquals(expected.get(parameter.name()), parameter.value());
-		assertEquals(SystemvariableStatus.Calculated, ((SystemvariableProtocolParameter) parameter).status());
+		assertEquals(Calculated, ((SystemvariableProtocolParameter) parameter).status());
 		assertEquals(protocol, parameter.protocol());
 	}
 
+	
+	@Test
+	void updateSystemVariables() {
+		final SystemVariable lastBatchUpdate = new SystemVariable("LastBatchUpdate", LocalTime.now().toString());
+		final SystemVariable month = new SystemVariable("Month", LocalDate.now().getMonth().toString());
+		final SystemvariableProtocolParameter lastBatchUpdateParameter = new SystemvariableProtocolParameterImpl(protocol, lastBatchUpdate.getName(), lastBatchUpdate.getValue());
+		
+		when(protocolParameterRepository.findByProtocolIdNameNameIn(IdUtil.getId(protocol), List.of(lastBatchUpdate.getName(), month.getName() ))).thenReturn(List.of(lastBatchUpdateParameter));
+		
+		protocolService.updateSystemVariables(protocol, List.of(lastBatchUpdate,month));
+		
+		assertEquals(Updated,lastBatchUpdateParameter.status());
+		verify(protocolParameterRepository).save(lastBatchUpdateParameter);
+	}
 }
 
 enum TestEndOfDayArguments {

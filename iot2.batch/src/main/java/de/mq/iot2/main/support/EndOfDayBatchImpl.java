@@ -97,6 +97,9 @@ public class EndOfDayBatchImpl {
 		
 		protocolService.updateSystemVariables(protocol, updatedSystemVariables);
 		
+		protocolService.success(protocol);
+		
+		
 	}
 
 	@BatchMethod(value = "end-of-day-update", converterClass = EndOfDayUpdateBatchArgumentConverterImpl.class)

@@ -1,5 +1,7 @@
 package de.mq.iot2.protocol.support;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,30 @@ class ProtocolServiceImpl implements ProtocolService {
 		return protocolRepository.save(protocol);
 
 	}
+	
+	@Override
+	@Transactional
+	public void success(final Protocol protocol, final String message) {
+		protocol.assignSuccessState();
+		protocol.assignLogMessage(message);
+		protocolRepository.save(protocol);
+
+	}
+	
+	
+	public void success(final Protocol protocol) {
+		success(protocol, null);
+
+	}
+	@Override
+	@Transactional
+	public void error(final Protocol protocol, final Throwable throwable)  {
+	    final StringWriter writer = new StringWriter();  
+	    throwable.printStackTrace(new PrintWriter(writer));
+	    protocol.assignLogMessage(writer.toString());		
+		protocol.assignErrorState();
+		protocolRepository.save(protocol);
+	}
 
 	@Override
 	@Transactional
@@ -73,7 +99,6 @@ class ProtocolServiceImpl implements ProtocolService {
 		final String protocolId = IdUtil.getId(protocol);
 		final List<String> updated = systemVariables.stream().map(SystemVariable::getName).collect(Collectors.toList());
 		protocolParameterRepository.findByProtocolIdNameNameIn(protocolId, updated).forEach(parameter -> assignUpdated(parameter));
-		
 	}
 
 	private void  assignUpdated(final SystemvariableProtocolParameter parameter) {

@@ -20,6 +20,12 @@ public interface ProtocolService {
 
 	void updateSystemVariables(final Protocol protocol, final  Collection<SystemVariable> systemVariables);
 
+	void success(final Protocol protocol);
+
+	void error(final Protocol protocol, final Throwable throwable);
+
+	void success(final Protocol protocol, final String message);
+
 
 
 
