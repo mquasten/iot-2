@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.BeanUtils;
 
 import de.mq.iot2.protocol.Protocol;
@@ -44,6 +47,15 @@ class SystemvariableProtocolParameterImplTest {
 		final SystemvariableProtocolParameter systemvariableProtocolParameter = BeanUtils.instantiateClass(SystemvariableProtocolParameterImpl.class);
 		assertEquals(MESSAGE_STATUS_REQUIRED, assertThrows(IllegalArgumentException.class, () -> systemvariableProtocolParameter.status()).getMessage());
 		assertEquals(MESSAGE_INVALID_STATUS, assertThrows(IllegalArgumentException.class, () -> systemvariableProtocolParameter.assignUpdated()).getMessage());
+	}
+	
+	@ParameterizedTest
+	@NullSource
+	@ValueSource(strings = {"", " "})
+	void createWithEmptyValue(final String value) {
+		final SystemvariableProtocolParameter systemvariableProtocolParameter = new SystemvariableProtocolParameterImpl(protocol, name, value);
+		
+		assertEquals(SystemvariableProtocolParameterImpl.EMPTY_VALUE_STRING, systemvariableProtocolParameter.value());
 	}
 	
 	

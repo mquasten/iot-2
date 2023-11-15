@@ -3,6 +3,7 @@ package de.mq.iot2.protocol.support;
 import static de.mq.iot2.protocol.Protocol.Status.Error;
 import static de.mq.iot2.protocol.Protocol.Status.Started;
 import static de.mq.iot2.protocol.Protocol.Status.Success;
+import static de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType.Result;
 import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Calculated;
 import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Updated;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.core.convert.ConversionService;
+
 
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
@@ -83,6 +85,15 @@ class ProtocolServiceImplTest {
 		protocolService.success(protocol, message);
 		
 		assertEquals(Optional.of(message) ,protocol.logMessage());
+		assertEquals(Success, protocol.status());
+		verify(protocolRepository).save(protocol);
+	}
+	
+	@Test
+	void successWithoutMessage() {
+		protocolService.success(protocol);
+		
+		assertEquals(Optional.empty() ,protocol.logMessage());
 		assertEquals(Success, protocol.status());
 		verify(protocolRepository).save(protocol);
 	}
@@ -236,6 +247,19 @@ class ProtocolServiceImplTest {
 		
 		assertEquals(Updated,lastBatchUpdateParameter.status());
 		verify(protocolParameterRepository).save(lastBatchUpdateParameter);
+	}
+	
+	@Test
+	void assignParameter() {
+		final var name = RandomTestUtil.randomString();
+		final var value = RandomTestUtil.randomLong();
+		protocolService.assignParameter(protocol, Result, name, value);
+		
+		assertEquals(1, savedParameters.size());
+		final ProtocolParameter protocolParameter = savedParameters.iterator().next();
+		assertEquals(name, protocolParameter.name());
+		assertEquals(String.valueOf(value), protocolParameter.value());
+		assertEquals(Result, protocolParameter.type());
 	}
 }
 

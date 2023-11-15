@@ -28,6 +28,7 @@ import de.mq.iot2.weather.WeatherService;
 
 @Service
 public class EndOfDayBatchImpl {
+	private static final String END_OF_DAY_UPDATE_BATCH_NAME = "end-of-day-update";
 	private static final String END_OF_DAY_BATCH_NAME = "end-of-day";
 	private static Logger LOGGER = LoggerFactory.getLogger(EndOfDayBatchImpl.class);
 	private final CalendarService calendarService;
@@ -55,12 +56,22 @@ public class EndOfDayBatchImpl {
 
 	@BatchMethod(value = END_OF_DAY_BATCH_NAME, converterClass = EndOfDayBatchArgumentConverterImpl.class)
 	final void execute(final LocalDate date) {
-		execute(date, Optional.empty());
+		final Protocol protocol = protocolService.create(END_OF_DAY_BATCH_NAME);
+		executeWithCatch(protocol, date, Optional.empty());
 
 	}
 
-	private void execute(final LocalDate date, Optional<LocalTime> uptateTime) {
-		final Protocol protocol = protocolService.create(END_OF_DAY_BATCH_NAME);
+	private void executeWithCatch(final Protocol protocol,  final LocalDate date, final Optional<LocalTime> uptateTime) {
+		try {
+			execute(protocol, date, uptateTime);
+		} catch ( RuntimeException exception) {
+			protocolService.error(protocol, exception);
+			throw exception;
+		}
+	}
+	
+	private void execute(final Protocol protocol,  final LocalDate date, final Optional<LocalTime> uptateTime) {
+		
 		final Cycle cycle = calendarService.cycle(date);
 
 		final var parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);
@@ -102,10 +113,10 @@ public class EndOfDayBatchImpl {
 		
 	}
 
-	@BatchMethod(value = "end-of-day-update", converterClass = EndOfDayUpdateBatchArgumentConverterImpl.class)
+	@BatchMethod(value = END_OF_DAY_UPDATE_BATCH_NAME, converterClass = EndOfDayUpdateBatchArgumentConverterImpl.class)
 	final void executeUpdate(final LocalTime time) {
-
-		execute(LocalDate.now(), Optional.of(time));
+		final Protocol protocol = protocolService.create(END_OF_DAY_UPDATE_BATCH_NAME);
+		executeWithCatch(protocol, LocalDate.now(), Optional.of(time));
 
 	}
 

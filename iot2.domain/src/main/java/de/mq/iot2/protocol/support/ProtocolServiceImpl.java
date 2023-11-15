@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+
 import de.mq.iot2.protocol.Protocol;
 import de.mq.iot2.protocol.ProtocolParameter;
 import de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType;
@@ -84,13 +85,22 @@ class ProtocolServiceImpl implements ProtocolService {
 	
 	@Override
 	@Transactional
+	public void assignParameter(final Protocol protocol, final ProtocolParameterType type, final String name, final Object value) {
+		Assert.notNull(name, MESSAGE_KEY_RREQUIRED);
+		Assert.notNull(value, MESSAGE_VALUE_RREQUIRED);
+		final ProtocolParameter protocolParameter=  new ProtocolParameterImpl(protocol, name, type, conversionService.convert(value, String.class));
+		protocolParameterRepository.save(protocolParameter);
+	}
+	
+	@Override
+	@Transactional
 	public void assignParameter(final Protocol protocol, final Collection<SystemVariable> systemVariables) {
 		systemVariables.stream(). map(systemVariable -> convert(protocol, systemVariable)).forEach(protocolParameter -> protocolParameterRepository.save(protocolParameter));
 		
 	}
 	
 	private ProtocolParameter convert(final Protocol protocol, final SystemVariable systemVariable) {
-		return new SystemvariableProtocolParameterImpl(protocol, systemVariable.getName(), systemVariable.getValue());
+		return new SystemvariableProtocolParameterImpl(protocol, systemVariable.getName(),  systemVariable.getValue());
 	}
 	
 	@Override

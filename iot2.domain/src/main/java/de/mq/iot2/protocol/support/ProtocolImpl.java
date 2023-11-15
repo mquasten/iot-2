@@ -32,7 +32,7 @@ class ProtocolImpl implements Protocol {
 	private String id;
 
 	@Column(name = "NAME", length = 15, nullable = false)
-	@Size(max = 15)
+	@Size(max = 20)
 	@NotBlank
 	private String name;
 

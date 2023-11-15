@@ -4,7 +4,9 @@ import static de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType.Result
 import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Calculated;
 import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Updated;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
+
 
 import de.mq.iot2.protocol.Protocol;
 import de.mq.iot2.protocol.SystemvariableProtocolParameter;
@@ -29,6 +31,7 @@ class SystemvariableProtocolParameterImpl extends ProtocolParameterImpl implemen
 	static final String MESSAGE_STATUS_REQUIRED = "Status is required.";
 
 	static final String ENTITY_NAME = "SystemvariableProtocolParameter";
+	final static String EMPTY_VALUE_STRING = "<Empty>";
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "state", length = 15, nullable = true)
@@ -39,7 +42,7 @@ class SystemvariableProtocolParameterImpl extends ProtocolParameterImpl implemen
 	}
 
 	SystemvariableProtocolParameterImpl(final Protocol protocol, final String name, final String value) {
-		super(protocol, name, Result, value);
+		super(protocol, name, Result,StringUtils.defaultIfBlank(StringUtils.defaultIfEmpty(value, EMPTY_VALUE_STRING), EMPTY_VALUE_STRING));
 		this.status = Calculated;
 	}
 
