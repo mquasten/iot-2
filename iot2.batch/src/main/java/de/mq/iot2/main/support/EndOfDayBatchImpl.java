@@ -28,8 +28,8 @@ import de.mq.iot2.weather.WeatherService;
 
 @Service
 public class EndOfDayBatchImpl {
-	private static final String END_OF_DAY_UPDATE_BATCH_NAME = "end-of-day-update";
-	private static final String END_OF_DAY_BATCH_NAME = "end-of-day";
+	static final String END_OF_DAY_UPDATE_BATCH_NAME = "end-of-day-update";
+	static final String END_OF_DAY_BATCH_NAME = "end-of-day";
 	private static Logger LOGGER = LoggerFactory.getLogger(EndOfDayBatchImpl.class);
 	private final CalendarService calendarService;
 
@@ -56,7 +56,7 @@ public class EndOfDayBatchImpl {
 
 	@BatchMethod(value = END_OF_DAY_BATCH_NAME, converterClass = EndOfDayBatchArgumentConverterImpl.class)
 	final void execute(final LocalDate date) {
-		final Protocol protocol = protocolService.create(END_OF_DAY_BATCH_NAME);
+		final Protocol protocol = protocolService.protocol(END_OF_DAY_BATCH_NAME);
 		executeWithCatch(protocol, date, Optional.empty());
 
 	}
@@ -71,12 +71,11 @@ public class EndOfDayBatchImpl {
 	}
 	
 	private void execute(final Protocol protocol,  final LocalDate date, final Optional<LocalTime> uptateTime) {
+		protocolService.save(protocol);
 		
 		final Cycle cycle = calendarService.cycle(date);
 
 		final var parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);
-
-		// final TimeType timeType = calendarService.timeType(date);
 
 		final var twilightType = parameters.containsKey(Key.SunUpDownType) ? (TwilightType) parameters.get(Key.SunUpDownType) : TwilightType.Mathematical;
 
@@ -103,19 +102,15 @@ public class EndOfDayBatchImpl {
 		Assert.notEmpty(systemVariables, "Systemvariables required.");
 		LOGGER.debug("{} Systemvariables calculated.", systemVariables.size());
 		
-		
 		final var updatedSystemVariables =systemVariableService.update(systemVariables);
 		
 		protocolService.updateSystemVariables(protocol, updatedSystemVariables);
-		
 		protocolService.success(protocol);
-		
-		
 	}
 
 	@BatchMethod(value = END_OF_DAY_UPDATE_BATCH_NAME, converterClass = EndOfDayUpdateBatchArgumentConverterImpl.class)
 	final void executeUpdate(final LocalTime time) {
-		final Protocol protocol = protocolService.create(END_OF_DAY_UPDATE_BATCH_NAME);
+		final Protocol protocol = protocolService.protocol(END_OF_DAY_UPDATE_BATCH_NAME);
 		executeWithCatch(protocol, LocalDate.now(), Optional.of(time));
 
 	}

@@ -66,16 +66,22 @@ class ProtocolServiceImplTest {
 	}
 
 	@Test
-	void create() throws InterruptedException {
+	void protocol() throws InterruptedException {
 		final var name = RandomTestUtil.randomString();
 		doAnswer(answer -> answer.getArgument(0, Protocol.class)).when(protocolRepository).save(any(Protocol.class));
 
-		final Protocol protocol = protocolService.create(name);
+		final Protocol protocol = protocolService.protocol(name);
 
 		assertEquals(name, protocol.name());
 		assertEquals(Started, protocol.status());
 		assertTrue(Duration.between(protocol.executionTime(), LocalDateTime.now()).getSeconds() < 1);
 
+	}
+	
+	@Test
+	void save() {
+		protocolService.save(protocol);
+		
 		verify(protocolRepository).save(protocol);
 	}
 	

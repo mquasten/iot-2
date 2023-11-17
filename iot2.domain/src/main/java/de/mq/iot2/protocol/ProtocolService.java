@@ -12,8 +12,9 @@ import de.mq.iot2.sysvars.SystemVariable;
 
 public interface ProtocolService {
 
-	Protocol create(final String name);
-
+	Protocol protocol(final String name);
+	
+	void save(final Protocol protocol);
 	void assignParameter(final Protocol protocol, final ProtocolParameterType rulesengineargument, final Map<? extends Enum<?>, Object> arguments );
 
 	void assignParameter(final Protocol protocol, final Collection<SystemVariable> systemVariables);
@@ -27,6 +28,8 @@ public interface ProtocolService {
 	void success(final Protocol protocol, final String message);
 
 	void assignParameter(final Protocol protocol, final ProtocolParameterType type, final String name, final Object value);
+	
+
 
 
 

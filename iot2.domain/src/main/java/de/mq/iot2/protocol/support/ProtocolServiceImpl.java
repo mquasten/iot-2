@@ -39,10 +39,15 @@ class ProtocolServiceImpl implements ProtocolService {
 	}
 
 	@Override
+	public Protocol protocol(final String name) {
+		return new ProtocolImpl(name);
+	}
+	
+	@Override
 	@Transactional
-	public Protocol create(final String name) {
-		final Protocol protocol = new ProtocolImpl(name);
-		return protocolRepository.save(protocol);
+	@CheckConfiguration
+	public void save(final Protocol protocol) {
+		protocolRepository.save(protocol);
 
 	}
 	
