@@ -48,11 +48,11 @@ class ProtocolServiceImpl implements ProtocolService {
 	@CheckConfiguration
 	public void save(final Protocol protocol) {
 		protocolRepository.save(protocol);
-
 	}
 	
 	@Override
 	@Transactional
+	@CheckConfiguration
 	public void success(final Protocol protocol, final String message) {
 		protocol.assignSuccessState();
 		protocol.assignLogMessage(message);
@@ -60,13 +60,15 @@ class ProtocolServiceImpl implements ProtocolService {
 
 	}
 	
-	
+
+	@CheckConfiguration
 	public void success(final Protocol protocol) {
 		success(protocol, null);
 
 	}
 	@Override
 	@Transactional
+	@CheckConfiguration
 	public void error(final Protocol protocol, final Throwable throwable)  {
 	    final StringWriter writer = new StringWriter();  
 	    throwable.printStackTrace(new PrintWriter(writer));
@@ -77,6 +79,7 @@ class ProtocolServiceImpl implements ProtocolService {
 
 	@Override
 	@Transactional
+	@CheckConfiguration
 	public void assignParameter(final Protocol protocol, final ProtocolParameterType type, final Map<? extends Enum<?>, Object> parameters) {
 		parameters.entrySet().stream().map(entry -> convert(protocol, type, entry)).forEach(protocolParameter -> protocolParameterRepository.save(protocolParameter));
 	}
@@ -90,6 +93,7 @@ class ProtocolServiceImpl implements ProtocolService {
 	
 	@Override
 	@Transactional
+	@CheckConfiguration
 	public void assignParameter(final Protocol protocol, final ProtocolParameterType type, final String name, final Object value) {
 		Assert.notNull(name, MESSAGE_KEY_RREQUIRED);
 		Assert.notNull(value, MESSAGE_VALUE_RREQUIRED);
@@ -99,6 +103,7 @@ class ProtocolServiceImpl implements ProtocolService {
 	
 	@Override
 	@Transactional
+	@CheckConfiguration
 	public void assignParameter(final Protocol protocol, final Collection<SystemVariable> systemVariables) {
 		systemVariables.stream(). map(systemVariable -> convert(protocol, systemVariable)).forEach(protocolParameter -> protocolParameterRepository.save(protocolParameter));
 		
@@ -110,6 +115,7 @@ class ProtocolServiceImpl implements ProtocolService {
 	
 	@Override
 	@Transactional
+	@CheckConfiguration
 	public void updateSystemVariables(final Protocol protocol, final Collection<SystemVariable> systemVariables) {
 		final String protocolId = IdUtil.getId(protocol);
 		final List<String> updated = systemVariables.stream().map(SystemVariable::getName).collect(Collectors.toList());
