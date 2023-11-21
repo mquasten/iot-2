@@ -169,7 +169,7 @@ class UserControllerTest {
 	@MethodSource("locales")
 	void changePasswordValidationError(final Locale locale) {
 		
-		when(bindingResult.hasErrors()).thenReturn(true);
+		Mockito.when(bindingResult.hasErrors()).thenReturn(true);
 		when(userService.algorithms()).thenReturn(algorithms);
 		
 		assertEquals(USER_MODEL_AND_VIEW_NAME, userController.changePassword(userModel, bindingResult, model, locale));
@@ -222,7 +222,7 @@ class UserControllerTest {
 
 	@Test
 	void logout() {
-		when(securityContectRepository.securityContext()).thenReturn(securityContext);
+		Mockito.when(securityContectRepository.securityContext()).thenReturn(securityContext);
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		final HttpServletRequest request= mock(HttpServletRequest.class);
 		final HttpSession session = mock(HttpSession.class);

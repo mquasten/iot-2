@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.BeanUtils;
 
 import de.mq.iot2.calendar.Cycle;
@@ -84,7 +85,7 @@ class ParameterMapperTest {
 
 	@Test
 	void toDomainById() {
-		when(parameterRepository.findById(PARAMETER_ID)).thenReturn(Optional.of(parameter));
+		Mockito.when(parameterRepository.findById(PARAMETER_ID)).thenReturn(Optional.of(parameter));
 
 		assertEquals(parameter, parameterMapper.toDomain(PARAMETER_ID));
 	}

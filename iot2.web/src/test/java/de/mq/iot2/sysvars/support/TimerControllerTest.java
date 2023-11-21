@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -228,7 +229,7 @@ class TimerControllerTest {
 
 	@Test
 	void timerBindingErrors() {
-		when(bindingResults.hasErrors()).thenReturn(true);
+		Mockito.when(bindingResults.hasErrors()).thenReturn(true);
 		assertEquals(TIMER_MODEL_AND_VIEW_NAME,timerController.timer(new TimerModel(), bindingResults));
 	}
 

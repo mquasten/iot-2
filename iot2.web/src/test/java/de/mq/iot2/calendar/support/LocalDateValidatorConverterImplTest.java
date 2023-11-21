@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import jakarta.validation.ConstraintValidator;
@@ -35,7 +36,7 @@ class LocalDateValidatorConverterImplTest {
 	void mockConstraintValidatorContextForProperty() {
 
 		
-		when(constraintValidatorContext.buildConstraintViolationWithTemplate(LocalDateValidatorConverterImpl.MESSAGE_KEY_INVALID_DATE)).thenReturn(constraintViolationBuilder);
+		Mockito.when(constraintValidatorContext.buildConstraintViolationWithTemplate(LocalDateValidatorConverterImpl.MESSAGE_KEY_INVALID_DATE)).thenReturn(constraintViolationBuilder);
 		when(constraintViolationBuilder.addPropertyNode(LocalDateValidatorConverterImpl.FROM_PROPERY)).thenReturn(fromContext);
 		when(constraintViolationBuilder.addPropertyNode(LocalDateValidatorConverterImpl.TO_PROPERTY)).thenReturn(toContext);
 		when(constraintValidatorContext.buildConstraintViolationWithTemplate(LocalDateValidatorConverterImpl.MESSAGE_KEY_MANDATORY)).thenReturn(constraintViolationBuilder);

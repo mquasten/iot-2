@@ -10,7 +10,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -21,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 
 import de.mq.iot2.support.RandomTestUtil;
 import de.mq.iot2.user.User;
@@ -39,7 +39,7 @@ class UserServiceImplTest {
 
 	@Test
 	void user() {
-		when(userRepository.findByName(NAME)).thenReturn(Optional.of(user));
+		Mockito.when(userRepository.findByName(NAME)).thenReturn(Optional.of(user));
 		assertEquals(Optional.of(user), userService.user(NAME));
 	}
 
@@ -53,7 +53,7 @@ class UserServiceImplTest {
 
 	@Test
 	void update() {
-		when(userRepository.findByName(NAME)).thenReturn(Optional.of(user));
+		Mockito.when(userRepository.findByName(NAME)).thenReturn(Optional.of(user));
 		
 		userService.update(NAME, PASSWORD, Optional.of("MD5"));
 		
@@ -63,7 +63,7 @@ class UserServiceImplTest {
 
 	@Test
 	void updateWithoutAlgorithm() {
-		when(userRepository.findByName(NAME)).thenReturn(Optional.of(user));
+		Mockito.when(userRepository.findByName(NAME)).thenReturn(Optional.of(user));
 		
 		userService.update(NAME, PASSWORD, Optional.empty());
 		
@@ -73,7 +73,7 @@ class UserServiceImplTest {
 
 	@Test
 	void updateNew() {
-		when(userRepository.findByName(NAME)).thenReturn(Optional.empty());
+		Mockito.when(userRepository.findByName(NAME)).thenReturn(Optional.empty());
 		
 		userService.update(NAME, PASSWORD,Optional.of(ALGORITHM));
 		
@@ -95,7 +95,7 @@ class UserServiceImplTest {
 
 	@Test
 	void updateLanguage() {
-		when(userRepository.findByName(NAME)).thenReturn(Optional.of(user));
+		Mockito.when(userRepository.findByName(NAME)).thenReturn(Optional.of(user));
 		
 		userService.update(NAME, Locale.GERMAN);
 		
@@ -111,13 +111,13 @@ class UserServiceImplTest {
 
 	@Test
 	void updateLanguageUserNotFound() {
-		when(userRepository.findByName(NAME)).thenReturn(Optional.empty());
+		Mockito.when(userRepository.findByName(NAME)).thenReturn(Optional.empty());
 		assertEquals(String.format(USER_NOT_FOUND_MESSAGE, NAME),assertThrows(EntityNotFoundException.class, () -> userService.update(NAME, Locale.GERMAN)).getMessage());
 	}
 
 	@Test
 	void delete() {
-		when(userRepository.findByName(NAME)).thenReturn(Optional.of(user));
+		Mockito.when(userRepository.findByName(NAME)).thenReturn(Optional.of(user));
 		
 		assertTrue(userService.delete(NAME));
 		
@@ -126,7 +126,7 @@ class UserServiceImplTest {
 
 	@Test
 	void deleteUserNotFound() {
-		when(userRepository.findByName(NAME)).thenReturn(Optional.empty());
+		Mockito.when(userRepository.findByName(NAME)).thenReturn(Optional.empty());
 		
 		assertFalse(userService.delete(NAME));
 		

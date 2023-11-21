@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,14 +28,14 @@ class UserDetailsServiceImplTest {
 
 	@Test
 	void loadUserByUsername() {
-		when(userService.user(NAME)).thenReturn(Optional.of(user));
+		Mockito.when(userService.user(NAME)).thenReturn(Optional.of(user));
 		when(userConterter.toWeb(user)).thenReturn(userDetails);
 		assertEquals(userDetails, userDetailsService.loadUserByUsername(NAME));
 	}
 
 	@Test
 	void loadUserByUsernameNotFound() {
-		when(userService.user(NAME)).thenReturn(Optional.empty());
+		Mockito.when(userService.user(NAME)).thenReturn(Optional.empty());
 		assertEquals(String.format(USER_NOT_FOUND_MESSAGE, NAME),assertThrows(UsernameNotFoundException.class, () -> userDetailsService.loadUserByUsername(NAME)).getMessage());
 	}
 }

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import de.mq.iot2.support.ModelMapper;
@@ -22,7 +23,7 @@ class UserMapperTest {
 
 	@Test
 	 void toWeb() {
-		 when(user.name()).thenReturn(NAME);
+		 Mockito.when(user.name()).thenReturn(NAME);
 		 when(user.encodedPasswordAndAlgorithm()).thenReturn(PASSWORD_AND_ALGORITHM);
 		 
 		 final UserDetails userDetails =  userMapper.toWeb(user);

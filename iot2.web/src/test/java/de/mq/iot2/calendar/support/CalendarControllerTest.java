@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.mockito.Mockito;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -150,7 +150,7 @@ class CalendarControllerTest {
 
 	@Test
 	void searchValidationErrors() {
-		when(bindingResults.hasErrors()).thenReturn(true);
+		Mockito.when(bindingResults.hasErrors()).thenReturn(true);
 		
 		assertEquals(CALENDAR_VIEW_NAME , calendarController.search(dayGroupModel01, bindingResults));
 	}

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -129,7 +130,7 @@ class ConfigurationControllerTest {
 
 	@Test
 	void searchBindingErrors() {
-		when(bindingResults.hasErrors()).thenReturn(true);
+		Mockito.when(bindingResults.hasErrors()).thenReturn(true);
 		assertEquals(CONFIGURATION_MODEL_AND_VIEW_NAME, configurationController.search(endOfDayConfigurationModel, bindingResults));
 	}
 
