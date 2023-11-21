@@ -1,7 +1,7 @@
--- sqlplus iot2/iot2@//localhost:1521/XEPDB1
+-- sqlplus iot2/iot2@//localhost:1521/XE
 
 -- tabelle muss man noch umbenennen LOGIN_USER_IOT
-CREATE TABLE LOGIN_USER (
+CREATE TABLE LOGIN_USER_IOT (
   ID VARCHAR(36)   NOT NULL ,
   NAME VARCHAR(20)   NOT NULL ,
   PASSWORD_HASH VARCHAR(128)   NOT NULL ,

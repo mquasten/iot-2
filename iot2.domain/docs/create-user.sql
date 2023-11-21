@@ -1,6 +1,6 @@
 -- create user oracle
--- sqlplus system/oracle@//localhost:1521/XEPDB1
--- sqlplus sys/oracle@//localhost:1521/XEPDB1 as sysdba
+-- sqlplus system/oracle@//localhost:1521/XE
+-- sqlplus sys/oracle@//localhost:1521/XE as sysdba
 
 alter session set "_ORACLE_SCRIPT"=true;  
 

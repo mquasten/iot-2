@@ -29,7 +29,7 @@ class ProtocolServiceAspectImpl {
 	
 	
 	@Around("within(de.mq.iot2.protocol.support.ProtocolServiceImpl) && @annotation(CheckConfiguration)")
-	public Object employeeAroundAdvice(ProceedingJoinPoint proceedingJoinPoint) throws Throwable{
+	public Object protocolServiceAroundAdvice(final ProceedingJoinPoint proceedingJoinPoint) throws Throwable{
 		 final Protocol parameter = (Protocol) DataAccessUtils.requiredSingleResult(List.of(proceedingJoinPoint.getArgs()).stream().filter(arg -> Protocol.class.isInstance(arg)).collect(Collectors.toList()));
 		
 		 if(batches.contains(parameter.name())) {
