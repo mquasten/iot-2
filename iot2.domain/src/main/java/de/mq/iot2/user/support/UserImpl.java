@@ -19,7 +19,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Entity(name = "User")
-@Table(name = "LOGIN_USER")
+@Table(name = "LOGIN_USER_IOT")
 class UserImpl implements User {
 	static final String LANGUAGE_INVALID_MESSAGE = "Language %s is invalid.";
 
