@@ -14,11 +14,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
+
 @SpringBootApplication
 @EnableJpaRepositories("de.mq.iot2")
 @EntityScan(basePackages = "de.mq.iot2")
 @ComponentScan(basePackages = SimpleReflectionCommandLineRunner.COMPONENT_SCAN_BASE_PACKAGE)
 @EnableTransactionManagement()
+@EnableEncryptableProperties
 public class SimpleReflectionCommandLineRunner implements CommandLineRunner {
 
 	public static final String COMPONENT_SCAN_BASE_PACKAGE = "de.mq.iot2";

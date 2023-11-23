@@ -57,3 +57,10 @@ Aufruf: -c delete-calendar-and-configurations
 Keine weiteren Argumente
 Aufruf: -c  delete-configurations
 Keine weiteren Argumente
+
+
+Profile aktivieren:
+ -Dspring.profiles.active=oracle 
+ 
+ Properties verschlüsseln:
+ mvn jasypt:encrypt-value -Djasypt.encryptor.password=6FdwNEP6CBZWz1nJldHZRrilasBLdf1SfRuX2z4Sl9u4WVnedL -Djasypt.plugin.value="password" 
