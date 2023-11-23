@@ -16,7 +16,11 @@ Aufruf: -c end-of-day-update <time>
 
 CleanUp
 Löscht LocalDateDays, die älter als die konfigurierte Anzahl von Tagen sind (Parameter: DaysBack, Configuration: CleanUp);
-Aufruf: -c cleanup
+Aufruf: -c cleanup-calendar
+Keine weiteren Argumente. 
+
+Löscht Protocol Einträge, die älter als die konfigurierte Anzahl von Tagen sind (Parameter: ProtocolBack, Configuration: CleanUp);
+Aufruf: -c cleanup-protocol
 Keine weiteren Argumente. 
 
 DayGroupBatch
