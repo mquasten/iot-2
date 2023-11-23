@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
 
+import de.mq.iot2.protocol.Protocol;
 import de.mq.iot2.protocol.ProtocolParameter;
 import de.mq.iot2.protocol.SystemvariableProtocolParameter;
 import jakarta.validation.Valid;
@@ -17,5 +18,11 @@ interface ProtocolParameterRepository {
 	
 	@Query("select p  from SystemvariableProtocolParameter p where p.protocol.id= ?1 and p.name in ?2")
 	Collection<SystemvariableProtocolParameter> findByProtocolIdNameNameIn(final String protocolId, final List<String> names);
+	
+	void delete(final ProtocolParameter protocolParameter);
+	
+	Collection<ProtocolParameter> findByProtocol(final Protocol protocol);
+	
+
 
 }

@@ -16,8 +16,10 @@ import de.mq.iot2.protocol.ProtocolService;
 
 @Service
 class CleanUpBatchImpl {
-	static final String CLEANUP_BATCH_NAME = "cleanup";
+	static final String CLEANUP_CALENDAR_BATCH_NAME = "cleanup-calendar";
+	static final String CLEANUP_PROTOCOL_BATCH_NAME = "cleanup-protocol";
 	static final String RESULT_DAYS_DELETED = "DaysDeleted";
+	static final String RESULT_PROTOCOLS_DELETED = "ProtocolsDeleted";
 	static final String NOTHING_REMOVED = "Configuration for cleanup is missing. Nothing will be deleted.";
 	private static Logger LOGGER = LoggerFactory.getLogger(CleanUpBatchImpl.class);
 	private final CalendarService calendarService;
@@ -30,9 +32,9 @@ class CleanUpBatchImpl {
 		this.protocolService=protocolService;
 	}
 
-	@BatchMethod(value = CLEANUP_BATCH_NAME, converterClass = NoArgumentConverterImpl.class)
+	@BatchMethod(value = CLEANUP_CALENDAR_BATCH_NAME, converterClass = NoArgumentConverterImpl.class)
 	final void cleanUpLocalDateDays() {
-		final Protocol protocol = protocolService.protocol(CLEANUP_BATCH_NAME);
+		final Protocol protocol = protocolService.protocol(CLEANUP_CALENDAR_BATCH_NAME);
 		try {
 			cleanUpLocalDateDays(protocol);
 		} catch (final RuntimeException exception) {
@@ -57,6 +59,39 @@ class CleanUpBatchImpl {
 		protocolService.assignParameter(protocol, ProtocolParameterType.Result, RESULT_DAYS_DELETED, numberOfDaysDeleted);
 		protocolService.success(protocol);
 	}
+	
+	
+	@BatchMethod(value = CLEANUP_PROTOCOL_BATCH_NAME, converterClass = NoArgumentConverterImpl.class)
+	final void cleanUpProtocol() {
+		final Protocol protocol = protocolService.protocol(CLEANUP_PROTOCOL_BATCH_NAME);
+		try {
+			cleanUpProtocol(protocol);
+		} catch (final RuntimeException exception) {
+			protocolService.error(protocol, exception);
+			throw exception;
+		}
+	}
+	
+	private void cleanUpProtocol(final Protocol protocol) {
+		protocolService.save(protocol);
+		final Optional<Integer> daysBack = configurationService.parameter(RuleKey.CleanUp, Key.ProtocolBack, Integer.class);
+		protocolService.assignParameter(protocol, ProtocolParameterType.Configuration, Key.ProtocolBack.name(), daysBack);
+		if (daysBack.isEmpty()) {
+			LOGGER.warn(NOTHING_REMOVED);
+			protocolService.success(protocol, NOTHING_REMOVED );
+			return;
+		}		
+		
+		LOGGER.info("Delete protocols elder or equals {} days back.", daysBack.get());
+		final var numberOfProtocolsDeleted = protocolService.deleteProtocols(daysBack.get());
+		LOGGER.info("{} protocols deleted.", numberOfProtocolsDeleted);
+		protocolService.assignParameter(protocol, ProtocolParameterType.Result, RESULT_PROTOCOLS_DELETED, numberOfProtocolsDeleted);
+		protocolService.success(protocol);
+	}
+	
+	
+	
+	
 	
 	
 }

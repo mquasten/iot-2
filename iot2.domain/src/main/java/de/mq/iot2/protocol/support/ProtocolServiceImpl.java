@@ -2,6 +2,9 @@ package de.mq.iot2.protocol.support;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +31,7 @@ class ProtocolServiceImpl implements ProtocolService {
 	static final String MESSAGE_CONVERTER_MISSING = "Class %s can not be converted to string.";
 	static final String MESSAGE_VALUE_RREQUIRED = "Value is Rrequired.";
 	static final String MESSAGE_KEY_RREQUIRED = "Key is Required.";
+	static final String DAYS_BACK_INVALID_MESSAGE = "DaysBack should be > 0.";
 	private final ProtocolRepository protocolRepository;
 	private final ProtocolParameterRepository protocolParameterRepository;
 	private final ConversionService conversionService;
@@ -125,6 +129,22 @@ class ProtocolServiceImpl implements ProtocolService {
 	private void  assignUpdated(final SystemvariableProtocolParameter parameter) {
 		parameter.assignUpdated();
 		protocolParameterRepository.save(parameter);
+	}
+	
+	@Override
+	@Transactional
+	public int deleteProtocols(final int daysBack) {
+		Assert.isTrue(daysBack > 0, DAYS_BACK_INVALID_MESSAGE);
+		final var deleteDate = LocalDateTime.of( LocalDate.now(), LocalTime.of(0, 0)).minusDays(daysBack);
+		
+		final Collection<Protocol> toBeDeleted = protocolRepository.findByExecutionTimeBefore(deleteDate);
+		toBeDeleted.forEach(this::deleteProtocol);
+		return toBeDeleted.size();
+	}
+	
+	private void deleteProtocol(final Protocol protocol) {
+		protocolParameterRepository.findByProtocol(protocol).forEach( protocolParameterRepository::delete);
+		protocolRepository.delete(protocol);
 	}
 
 }

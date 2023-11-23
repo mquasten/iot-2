@@ -2,7 +2,7 @@ package de.mq.iot2.main.support;
 
 import static de.mq.iot2.configuration.Configuration.RuleKey.CleanUp;
 import static de.mq.iot2.configuration.Parameter.Key.DaysBack;
-import static de.mq.iot2.main.support.CleanUpBatchImpl.CLEANUP_BATCH_NAME;
+import static de.mq.iot2.main.support.CleanUpBatchImpl.CLEANUP_CALENDAR_BATCH_NAME;
 import static de.mq.iot2.main.support.CleanUpBatchImpl.NOTHING_REMOVED;
 import static de.mq.iot2.main.support.CleanUpBatchImpl.RESULT_DAYS_DELETED;
 import static de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType.Configuration;
@@ -37,7 +37,7 @@ class CleanUpBatchImplTest {
 	void cleanUpLocalDateDays() {
 		final int daysBack = 30;
 		final int daysDeleted=5;
-		when(protocolService.protocol(CleanUpBatchImpl.CLEANUP_BATCH_NAME)).thenReturn(protocol);
+		when(protocolService.protocol(CleanUpBatchImpl.CLEANUP_CALENDAR_BATCH_NAME)).thenReturn(protocol);
 		when(configurationService.parameter(RuleKey.CleanUp, DaysBack, Integer.class)).thenReturn(Optional.of(daysBack));
 		when(calendarService.deleteLocalDateDays(daysBack)).thenReturn(daysDeleted);
 		
@@ -53,7 +53,7 @@ class CleanUpBatchImplTest {
 	@Test
 	void cleanUpLocalDateDaysDaysBackEmpty() {
 		Mockito.when(configurationService.parameter(CleanUp, DaysBack, Integer.class)).thenReturn(Optional.empty());
-		when(protocolService.protocol(CLEANUP_BATCH_NAME)).thenReturn(protocol);
+		when(protocolService.protocol(CLEANUP_CALENDAR_BATCH_NAME)).thenReturn(protocol);
 		
 		cleanUpBatch.cleanUpLocalDateDays();
 
@@ -67,7 +67,7 @@ class CleanUpBatchImplTest {
 	@Test
 	void cleanUpLocalDateDaysException() {
 		final int daysBack = 30;
-		when(protocolService.protocol(CLEANUP_BATCH_NAME)).thenReturn(protocol);
+		when(protocolService.protocol(CLEANUP_CALENDAR_BATCH_NAME)).thenReturn(protocol);
 		when(configurationService.parameter(CleanUp, DaysBack, Integer.class)).thenReturn(Optional.of(daysBack));
 		final Throwable exception = new IllegalStateException();
 		when(calendarService.deleteLocalDateDays(anyInt())).thenThrow(exception);

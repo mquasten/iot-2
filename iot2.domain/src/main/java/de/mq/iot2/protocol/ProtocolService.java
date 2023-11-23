@@ -28,6 +28,8 @@ public interface ProtocolService {
 	void success(final Protocol protocol, final String message);
 
 	void assignParameter(final Protocol protocol, final ProtocolParameterType type, final String name, final Object value);
+
+	int deleteProtocols(final int daysBack);
 	
 
 
