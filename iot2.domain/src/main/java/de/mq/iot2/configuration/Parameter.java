@@ -9,7 +9,7 @@ public interface Parameter {
 	public enum Key {
 
 		UpTime(LocalTime.class), MinSunDownTime(LocalTime.class), MaxSunDownTime(LocalTime.class), MinSunUpTime(LocalTime.class), MaxSunUpTime(LocalTime.class),
-		SunUpDownType(TwilightType.class), ShadowTemperature(Double.class), ShadowTime(LocalTime.class), DaysBack(Integer.class);
+		SunUpDownType(TwilightType.class), ShadowTemperature(Double.class), ShadowTime(LocalTime.class), DaysBack(Integer.class), ProtocolBack(Integer.class);
 
 		private final Class<?> type;
 

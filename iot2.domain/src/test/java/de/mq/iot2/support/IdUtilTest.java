@@ -3,7 +3,6 @@ package de.mq.iot2.support;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 
 import jakarta.persistence.Id;

@@ -7,11 +7,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
+
 @SpringBootApplication
 @EnableJpaRepositories("de.mq.iot2")
 @EntityScan(basePackages = "de.mq.iot2")
 @ComponentScan(basePackages = "de.mq.iot2")
 @EnableTransactionManagement()
+@EnableEncryptableProperties()
 public abstract class Main {
 
 	public static void main(String[] args) {
