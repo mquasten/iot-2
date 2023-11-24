@@ -21,7 +21,7 @@ Keine weiteren Argumente.
 
 Löscht Protocol Einträge, die älter als die konfigurierte Anzahl von Tagen sind (Parameter: ProtocolBack, Configuration: CleanUp);
 Aufruf: -c cleanup-protocol
-Keine weiteren Argumente. 
+Keine weiteren Argumente.
 
 DayGroupBatch
 Fügt LocalDateDay zu einer DayGroup hinzu oder löscht sie (nur solche, die nicht readonly sind). Die daten werden nur dann hinzugefügt, wenn sie nicht bereits in einer anderen DayGroup verwendet werden.
