@@ -98,5 +98,15 @@ class ParameterValidatorImplTest {
 
 		assertFalse(constraintValidator.isValid(parameterModel, context));
 	}
+	
+	@Test
+	void isValidRangeValidatiorProtocolBack() {
+		final ParameterModel parameterModel = new ParameterModel();
+		parameterModel.setName(Key.ProtocolBack.name());
+		parameterModel.setValue("30");
+
+		assertTrue(constraintValidator.isValid(parameterModel, context));
+	}
+	
 
 }

@@ -24,8 +24,12 @@ class ParameterValidatorImpl implements ConstraintValidator<ValidParameter, Para
 
 	ParameterValidatorImpl(final ConversionService conversionService) {
 		this.conversionService = conversionService;
-		additionalValidations = Map.of(Key.DaysBack, value -> inRange(conversionService.convert(value, Integer.class), 1, 999), Key.ShadowTemperature,
+		additionalValidations = Map.of(Key.DaysBack, value -> daysForCleanup(conversionService, value),Key.ProtocolBack, value -> daysForCleanup(conversionService, value) , Key.ShadowTemperature,
 				value -> inRange(conversionService.convert(value, Double.class), 10d, 40d));
+	}
+
+	private boolean daysForCleanup(final ConversionService conversionService, String value) {
+		return inRange(conversionService.convert(value, Integer.class), 1, 999);
 	}
 
 	private boolean inRange(final Number value, final Number min, final Number max) {
