@@ -31,7 +31,7 @@ class ProtocolServiceImpl implements ProtocolService {
 	static final String MESSAGE_CONVERTER_MISSING = "Class %s can not be converted to string.";
 	static final String MESSAGE_VALUE_RREQUIRED = "Value is Rrequired.";
 	static final String MESSAGE_KEY_RREQUIRED = "Key is Required.";
-	static final String DAYS_BACK_INVALID_MESSAGE = "DaysBack should be > 0.";
+	static final String MESSAGE_DAYS_BACK_INVALID = "DaysBack should be > 0.";
 	private final ProtocolRepository protocolRepository;
 	private final ProtocolParameterRepository protocolParameterRepository;
 	private final ConversionService conversionService;
@@ -134,7 +134,7 @@ class ProtocolServiceImpl implements ProtocolService {
 	@Override
 	@Transactional
 	public int deleteProtocols(final int daysBack) {
-		Assert.isTrue(daysBack > 0, DAYS_BACK_INVALID_MESSAGE);
+		Assert.isTrue(daysBack > 0, MESSAGE_DAYS_BACK_INVALID);
 		final var deleteDate = LocalDateTime.of( LocalDate.now(), LocalTime.of(0, 0)).minusDays(daysBack);
 		
 		final Collection<Protocol> toBeDeleted = protocolRepository.findByExecutionTimeBefore(deleteDate);

@@ -31,16 +31,17 @@ class CeanupProtocolServiceImp implements CeanupProtocolService {
 	@Override
 	public void execute(final Protocol protocol) {
 		protocolService.save(protocol);
-		final Optional<Integer> daysBack = configurationService.parameter(RuleKey.CleanUp, Key.ProtocolBack, Integer.class);
-		protocolService.assignParameter(protocol, ProtocolParameterType.Configuration, Key.ProtocolBack.name(), daysBack);
-		if (daysBack.isEmpty()) {
+		final Optional<Integer> protocolBack = configurationService.parameter(RuleKey.CleanUp, Key.ProtocolBack, Integer.class);
+
+		protocolService.assignParameter(protocol, ProtocolParameterType.Configuration, Key.ProtocolBack.name(), protocolBack);
+		if (protocolBack.isEmpty()) {
 			LOGGER.warn(NOTHING_REMOVED);
 			protocolService.success(protocol, NOTHING_REMOVED);
 			return;
 		}
 
-		LOGGER.info("Delete protocols elder or equals {} days back.", daysBack.get());
-		final var numberOfProtocolsDeleted = protocolService.deleteProtocols(daysBack.get());
+		LOGGER.info("Delete protocols elder or equals {} days back.", protocolBack.get());
+		final var numberOfProtocolsDeleted = protocolService.deleteProtocols(protocolBack.get());
 		LOGGER.info("{} protocols deleted.", numberOfProtocolsDeleted);
 		protocolService.assignParameter(protocol, ProtocolParameterType.Result, RESULT_PROTOCOLS_DELETED, numberOfProtocolsDeleted);
 

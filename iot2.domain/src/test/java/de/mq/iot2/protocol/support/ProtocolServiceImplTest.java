@@ -6,9 +6,12 @@ import static de.mq.iot2.protocol.Protocol.Status.Success;
 import static de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType.Result;
 import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Calculated;
 import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Updated;
+import static de.mq.iot2.protocol.support.ProtocolServiceImpl.MESSAGE_DAYS_BACK_INVALID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -30,6 +33,8 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.core.convert.ConversionService;
 
@@ -266,6 +271,33 @@ class ProtocolServiceImplTest {
 		assertEquals(name, protocolParameter.name());
 		assertEquals(String.valueOf(value), protocolParameter.value());
 		assertEquals(Result, protocolParameter.type());
+	}
+	
+	@Test
+	void deleteProtocols() {
+		final var daysBack = 30;
+		final var  expectedDeletionDateTime =   LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).minusDays(daysBack);
+		final Protocol protocol01 = mock(Protocol.class);
+		final Protocol protocol02 = mock(Protocol.class);
+		final ProtocolParameter protocolParameter01 = mock(ProtocolParameter.class);
+		final ProtocolParameter protocolParameter02 = mock(ProtocolParameter.class);
+		
+		when(protocolRepository.findByExecutionTimeBefore(argThat(dateTime ->  expectedDeletionDateTime.equals(dateTime) ) )).thenReturn(List.of(protocol01, protocol02));
+		when(protocolParameterRepository.findByProtocol(protocol01)).thenReturn(List.of(protocolParameter01));
+		when(protocolParameterRepository.findByProtocol(protocol02)).thenReturn(List.of(protocolParameter02));
+		
+		protocolService.deleteProtocols(daysBack);
+		
+		verify(protocolRepository).delete(protocol01);
+		verify(protocolRepository).delete(protocol02);
+		verify(protocolParameterRepository).delete(protocolParameter01);
+		verify(protocolParameterRepository).delete(protocolParameter02);
+	}
+	
+	@ParameterizedTest
+	@ValueSource(ints = {0,-1})
+	void deleteProtocolsInvalidNumberOfDays(final int value) {
+		assertEquals(MESSAGE_DAYS_BACK_INVALID, assertThrows(IllegalArgumentException.class, () -> protocolService.deleteProtocols(0)).getMessage());
 	}
 }
 

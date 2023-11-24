@@ -2,6 +2,11 @@ package de.mq.iot2.protocol.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.junit.jupiter.api.Test;
@@ -36,10 +41,10 @@ class ProtocolServiceAspectImplTest {
 	@Test
 	void protocolServiceAroundAdviceNoProtocolParameter() throws Throwable {
 		Mockito.when(proceedingJoinPoint.proceed()).thenReturn(result);
-		Mockito.when(proceedingJoinPoint.getArgs()).thenReturn(new Object[] {});
+		when(proceedingJoinPoint.getArgs()).thenReturn(new Object[] {});
 
 		assertEquals(result, protocolServiceAspect.protocolServiceAroundAdvice(proceedingJoinPoint));
-		Mockito.verify(proceedingJoinPoint).proceed();
+		verify(proceedingJoinPoint).proceed();
 	}
 
 	@Test
@@ -51,7 +56,39 @@ class ProtocolServiceAspectImplTest {
 
 		assertNull(protocolServiceAspect.protocolServiceAroundAdvice(proceedingJoinPoint));
 
-		Mockito.verify(proceedingJoinPoint, Mockito.never()).proceed();
+		verify(proceedingJoinPoint, Mockito.never()).proceed();
+	}
+
+	@Test
+	void serviceAroundAdviceException() throws Throwable {
+		Mockito.when(proceedingJoinPoint.getArgs()).thenReturn(new Object[] { "", protocol });
+		final var exception = new IllegalStateException();
+		when(proceedingJoinPoint.proceed()).thenThrow(exception);
+
+		assertEquals(exception, assertThrows(IllegalStateException.class, () -> protocolServiceAspect.serviceAroundAdvice(proceedingJoinPoint)));
+		verify(protocolService).error(protocol, exception);
+	}
+
+	@Test
+	void serviceAroundAdviceOk() throws Throwable {
+		Mockito.when(proceedingJoinPoint.getArgs()).thenReturn(new Object[] { "", protocol });
+		final var exception = new IllegalStateException();
+		final Object result = mock(Object.class);
+
+		when(proceedingJoinPoint.proceed()).thenReturn(result);
+
+		assertEquals(result, protocolServiceAspect.serviceAroundAdvice(proceedingJoinPoint));
+		verify(protocolService, never()).error(protocol, exception);
+	}
+
+	@Test
+	void serviceAroundAdviceNoProtocolArgument() throws Throwable {
+		Mockito.when(proceedingJoinPoint.getArgs()).thenReturn(new Object[] {});
+		final var exception = new IllegalStateException();
+		when(proceedingJoinPoint.proceed()).thenThrow(exception);
+
+		assertEquals(exception, assertThrows(IllegalStateException.class, () -> protocolServiceAspect.serviceAroundAdvice(proceedingJoinPoint)));
+		verify(protocolService, Mockito.never()).error(protocol, exception);
 	}
 
 }

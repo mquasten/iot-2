@@ -22,7 +22,6 @@ class ProtocolServiceAspectImpl {
 	private static Logger LOGGER = LoggerFactory.getLogger(ProtocolServiceAspectImpl.class);
 
 	private final Collection<String> batches;
-
 	private final ProtocolService protocolService;
 
 	ProtocolServiceAspectImpl(final ProtocolService protocolService, @Value("${iot2.protocol.batches:}") final String batches) {
@@ -49,7 +48,7 @@ class ProtocolServiceAspectImpl {
 	}
 
 	private Optional<Protocol> protocol(final ProceedingJoinPoint proceedingJoinPoint) {
-		return List.of(proceedingJoinPoint.getArgs()).stream().filter(arg -> Protocol.class.isInstance(arg)).map(x -> (Protocol) x).findFirst();
+		return List.of(proceedingJoinPoint.getArgs()).stream().filter(arg -> Protocol.class.isInstance(arg)).map(arg -> (Protocol) arg).findFirst();
 	}
 
 	@Around("within(de.mq.iot2.calendar.support.EndOfDayServiceImpl)||within(de.mq.iot2.calendar.support.CleanupCalendarServiceImpl)||within(de.mq.iot2.protocol.support.CeanupProtocolServiceImp)")
