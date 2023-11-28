@@ -18,6 +18,9 @@
 			<li th:if="${page!='calendar'}"><a href="/calendar"  th:text="#{calendar.headline}" ></a></li>
 			<li th:if="${page=='calendar'}" th:text="#{calendar.headline}"></li>
 			
+			<li th:if="${page!='protocol'}"><a href="/protocol"  th:text="#{protocol.headline}" ></a></li>
+			<li th:if="${page=='protocol'}" th:text="#{protocol.headline}"></li>
+			
 			<li th:if="${page!='variable'}"><a href="/variable"  th:text="#{variable.headline}" ></a></li>
 			<li th:if="${page=='variable'}" th:text="#{variable.headline}"></li>
 			

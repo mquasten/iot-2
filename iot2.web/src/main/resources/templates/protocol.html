@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: header}" />
+
+<body>
+	<div th:replace="~{fragments :: navidation('protocol')}" ></div>
+	<div align="center">
+		<h1 th:text="#{protocol.headline}"></h1>
+	
+		<form action="#" th:action="@{/searchProtocol}" method="post"
+			th:object="${protocol}">
+			<table>
+				<tr>
+
+					<td><select th:field="*{name}">
+							<option th:each="batch : ${batches}"
+								th:value="${batch}" th:utext="${batch}">
+							</option>
+					</select>
+					</td>
+					<td th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:errorclass="error"></td>
+				    
+					<td>
+					
+						<button type="submit" name="submit" th:text="#{protocol.search}"></button>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2"></td>
+				</tr>
+
+			</table>
+		</form>
+
+		<div th:if="${protocol.name != null}">
+			<h3 th:text="#{protocol.protocoltable.headline} + '&nbsp;'+ ${protocol.name}"></h3>
+			<table class="result-table">
+				<thead>
+					<tr>
+						<th th:text="#{protocol.protocoltable.name}"></th>
+						<th th:text="#{protocol.protocoltable.time}"></th>
+						<th th:text="#{protocol.protocoltable.status}"></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="protocol: ${protocol.protocols}">
+						<td th:text="${protocol.name}"></td>
+						<td th:text="${protocol.executionTime}"></td>
+						<td th:text="${protocol.status}"></td>
+						<td><form th:action="@{/showProtocolParameter}"
+								th:object="${parameter}" method="post">
+								<input type="hidden" name="id" th:value="${protocol.id}" /> <input
+									type="hidden" name="protocolId"
+									th:value="${protocol.id}" />
+								<button type="submit" th:text="#{protocol.protocoltable.edit}"></button>
+							</form></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+</html>
