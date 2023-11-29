@@ -48,12 +48,11 @@
 						<td th:text="${protocol.name}"></td>
 						<td th:text="${protocol.executionTime}"></td>
 						<td th:text="${protocol.status}"></td>
-						<td><form th:action="@{/showProtocolParameter}"
-								th:object="${parameter}" method="post">
-								<input type="hidden" name="id" th:value="${protocol.id}" /> <input
-									type="hidden" name="protocolId"
-									th:value="${protocol.id}" />
-								<button type="submit" th:text="#{protocol.protocoltable.edit}"></button>
+						<td><form th:action="@{/showProtocol}"
+								th:object="${protocolxx}" method="post">
+								<input type="hidden" name="id" th:value="${protocol.id}" />
+								<button type="submit" th:text="#{protocol.protocoltable.details}" name="parameter"></button>
+								<button  th:if="${protocol.logMessageAware}" type="submit" th:text="#{protocol.protocoltable.log}" name="log"></button>
 							</form></td>
 					</tr>
 				</tbody>

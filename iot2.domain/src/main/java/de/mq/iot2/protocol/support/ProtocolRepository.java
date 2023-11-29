@@ -17,4 +17,10 @@ interface ProtocolRepository {
 	
 	@Query("select distinct name from Protocol order by name")
 	Collection<String> findDistinctNames() ;
+	
+	Collection<Protocol>findByNameOrderByExecutionTime(final String name );
+	
+	
+	
+	
 }

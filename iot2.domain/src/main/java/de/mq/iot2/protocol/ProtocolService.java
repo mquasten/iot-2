@@ -32,6 +32,8 @@ public interface ProtocolService {
 	int deleteProtocols(final int daysBack);
 
 	Collection<String> protocolNames();
+
+	Collection<Protocol> protocols(final String name);
 	
 
 

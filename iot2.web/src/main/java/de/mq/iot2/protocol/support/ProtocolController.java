@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.mq.iot2.protocol.Protocol;
 import de.mq.iot2.protocol.ProtocolService;
+import de.mq.iot2.support.ModelMapper;
 import jakarta.validation.Valid;
 
 @Controller
@@ -24,9 +26,12 @@ class ProtocolController {
 
 	private final ProtocolService protocolService;
 	
+	private final ModelMapper<Protocol,ProtocolModel> protoMapper;
 	
-	ProtocolController(final ProtocolService protocolService) {
+	
+	ProtocolController(final ProtocolService protocolService, final ModelMapper<Protocol,ProtocolModel> protoMapper) {
 		this.protocolService = protocolService;
+		this.protoMapper=protoMapper;
 	}
 
 	@GetMapping(value = "/protocol")
@@ -34,6 +39,7 @@ class ProtocolController {
 		model.addAttribute(BATCHES_ATTRIBUTE_NAME, protocolService.protocolNames());
 		ProtocolModel protocol = new ProtocolModel();
 		protocol.setName(batchName);
+		protocol.setProtocols(protoMapper.toWeb(protocolService.protocols(batchName)));
 		model.addAttribute(PROTOCOL_MODEL_AND_VIEW_NAME, protocol);
 		
 		
@@ -46,5 +52,13 @@ class ProtocolController {
 		
 		return String.format(REDIRECT_PROTOCOL_PATTERN,  protocolModel.getName());
 	}
+	
+	@PostMapping(value = "/showProtocol")
+	String showParameter(@ModelAttribute(PROTOCOL_MODEL_AND_VIEW_NAME) final ProtocolModel protocolModel, final Model model) {
+	
+		System.out.println(protocolModel.getId());
+		return PROTOCOL_MODEL_AND_VIEW_NAME;
+	}
+
 
 }

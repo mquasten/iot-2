@@ -152,5 +152,10 @@ class ProtocolServiceImpl implements ProtocolService {
 	public Collection<String> protocolNames() {
 		return protocolRepository.findDistinctNames();
 	}
+	@Override
+	@Transactional
+	public Collection<Protocol> protocols(final String name) {
+		return protocolRepository.findByNameOrderByExecutionTime(name);
+	}
 
 }
