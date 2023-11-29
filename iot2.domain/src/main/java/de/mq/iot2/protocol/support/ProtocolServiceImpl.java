@@ -146,5 +146,11 @@ class ProtocolServiceImpl implements ProtocolService {
 		protocolParameterRepository.findByProtocol(protocol).forEach( protocolParameterRepository::delete);
 		protocolRepository.delete(protocol);
 	}
+	
+	@Override
+	@Transactional
+	public Collection<String> protocolNames() {
+		return protocolRepository.findDistinctNames();
+	}
 
 }

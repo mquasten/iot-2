@@ -30,6 +30,8 @@ public interface ProtocolService {
 	void assignParameter(final Protocol protocol, final ProtocolParameterType type, final String name, final Object value);
 
 	int deleteProtocols(final int daysBack);
+
+	Collection<String> protocolNames();
 	
 
 
