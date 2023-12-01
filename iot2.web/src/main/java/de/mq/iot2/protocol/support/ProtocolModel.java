@@ -1,6 +1,5 @@
 package de.mq.iot2.protocol.support;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -10,16 +9,44 @@ import de.mq.iot2.protocol.Protocol.Status;
 
 public class ProtocolModel {
 	
+	private static final String TRUNCATED_POSTFIX = "...";
+
+	private static final int SHORT_LOG_MESSAGE_LENGTH = 50;
+
+
 	private String id;
 
 	private String name;
 	
+	private String executionTime;
+
+
+	private Status status; 
 	
 
-
 	private String logMessage;
+	
+	public String getExecutionTime() {
+		return executionTime;
+	}
+
+	public void setExecutionTime(String executionTime) {
+		this.executionTime = executionTime;
+	}
+
 
 	public String getLogMessage() {
+		return logMessage;
+	}
+	
+	public String getLogMessageShort() {
+		if(logMessage==null) {
+			return logMessage;
+		}
+		
+		if (logMessage.length() > SHORT_LOG_MESSAGE_LENGTH) {
+			return logMessage.subSequence(0, SHORT_LOG_MESSAGE_LENGTH) + TRUNCATED_POSTFIX;
+		}
 		return logMessage;
 	}
 
@@ -32,9 +59,7 @@ public class ProtocolModel {
 	}
 
 
-	private LocalDateTime executionTime;
-	
-	private Status status; 
+
 	
 	public String getId() {
 		return id;
@@ -53,13 +78,7 @@ public class ProtocolModel {
 		this.status = status;
 	}
 
-	public LocalDateTime getExecutionTime() {
-		return executionTime;
-	}
 
-	public void setExecutionTime(LocalDateTime executionTime) {
-		this.executionTime = executionTime;
-	}
 
 	private Collection<ProtocolModel> protocols = List.of();
 

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: header}" />
+<body>
+	<div align="center">
+		<h1 th:text="#{logmessage.headline}"></h1>
+		<form action="#" th:action="@{/cancelProtocol}" method="post"
+			th:object="${protocol}">
+			<table>
+
+				<tr>
+					<td><label th:text="#{logmessage.name}"></label></td>
+					<td><input type="text" th:field="*{name}" size="30" readonly>
+					<td th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
+						th:errorclass="error"></td>
+				</tr>
+				<tr>
+					<td><label th:text="#{logmessage.executionTime}"></label></td>
+					<td><input type="text" th:field="*{executionTime}" size="30" readonly>
+					<td th:if="${#fields.hasErrors('executionTime')}" th:errors="*{executionTime}"
+						th:errorclass="error"></td>
+				</tr>
+				
+				<tr>
+					<td><label th:text="#{logmessage.status}"></label></td>
+					<td><input type="text" th:field="*{status}" size="30" readonly>
+					<td th:if="${#fields.hasErrors('status')}" th:errors="*{status}"
+						th:errorclass="error"></td>
+				</tr>
+
+				<tr>
+					<td><label th:text="#{logmessage.logmessage}"></label></td>
+					
+					 <td> <textarea rows="10" cols="100" th:field="*{logMessage}" readonly ></textarea> </td>
+					
+					<td th:if="${#fields.hasErrors('logMessage')}" th:errors="*{logMessage}"
+						th:errorclass="error"></td>
+				</tr>
+				
+
+				<tr>
+					<th colspan="3">
+						<button type="submit" th:text="#{logmessage.cancel}"></button>
+				
+					</th>
+				</tr>
+			</table>
+		</form>
+	</div>
+</body>
+</html>

@@ -37,12 +37,10 @@ class ProtocolController {
 	@GetMapping(value = "/protocol")
 	String protocol(final Model model, @RequestParam(name = "batchName", required = false) final String batchName) {
 		model.addAttribute(BATCHES_ATTRIBUTE_NAME, protocolService.protocolNames());
-		ProtocolModel protocol = new ProtocolModel();
+		final ProtocolModel protocol = new ProtocolModel();
 		protocol.setName(batchName);
 		protocol.setProtocols(protoMapper.toWeb(protocolService.protocols(batchName)));
 		model.addAttribute(PROTOCOL_MODEL_AND_VIEW_NAME, protocol);
-		
-		
 		
 		return PROTOCOL_MODEL_AND_VIEW_NAME;
 	}
@@ -55,9 +53,15 @@ class ProtocolController {
 	
 	@PostMapping(value = "/showProtocol")
 	String showParameter(@ModelAttribute(PROTOCOL_MODEL_AND_VIEW_NAME) final ProtocolModel protocolModel, final Model model) {
+		protocolService.protocolById(protocolModel.getId());
+		
+		model.addAttribute(PROTOCOL_MODEL_AND_VIEW_NAME, protoMapper.toWeb(protocolService.protocolById(protocolModel.getId())));
+		return "logmessage";
+	}
 	
-		System.out.println(protocolModel.getId());
-		return PROTOCOL_MODEL_AND_VIEW_NAME;
+	@PostMapping(value = "/cancelProtocol")
+	String chancelProtocol(@ModelAttribute(PROTOCOL_MODEL_AND_VIEW_NAME) final ProtocolModel protocolModel, final Model model) {
+		return String.format(REDIRECT_PROTOCOL_PATTERN,  protocolModel.getName());
 	}
 
 

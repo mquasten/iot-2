@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.springframework.core.convert.ConversionService;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -28,6 +29,7 @@ import de.mq.iot2.sysvars.SystemVariable;
 @Service
 class ProtocolServiceImpl implements ProtocolService {
 
+	private static final String MESSAGE_ID_REQUIRED = "Id required.";
 	static final String MESSAGE_CONVERTER_MISSING = "Class %s can not be converted to string.";
 	static final String MESSAGE_VALUE_RREQUIRED = "Value is Rrequired.";
 	static final String MESSAGE_KEY_RREQUIRED = "Key is Required.";
@@ -156,6 +158,13 @@ class ProtocolServiceImpl implements ProtocolService {
 	@Transactional
 	public Collection<Protocol> protocols(final String name) {
 		return protocolRepository.findByNameOrderByExecutionTime(name);
+	}
+	
+	@Override
+	@Transactional
+	public Protocol protocolById(final String id) {
+		Assert.hasText(id, MESSAGE_ID_REQUIRED);
+		return protocolRepository.findById(id).orElseThrow(() -> new EmptyResultDataAccessException(String.format("Protocol not found Id:%s", id), 1));
 	}
 
 }

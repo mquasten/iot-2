@@ -34,6 +34,8 @@ public interface ProtocolService {
 	Collection<String> protocolNames();
 
 	Collection<Protocol> protocols(final String name);
+
+	Protocol protocolById(final String id);
 	
 
 

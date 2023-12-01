@@ -2,6 +2,7 @@ package de.mq.iot2.protocol.support;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
@@ -19,6 +20,8 @@ interface ProtocolRepository {
 	Collection<String> findDistinctNames() ;
 	
 	Collection<Protocol>findByNameOrderByExecutionTime(final String name );
+	
+	Optional<Protocol> findById(final String id );
 	
 	
 	
