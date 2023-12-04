@@ -7,6 +7,7 @@ import static de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType.Result
 import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Calculated;
 import static de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus.Updated;
 import static de.mq.iot2.protocol.support.ProtocolServiceImpl.MESSAGE_DAYS_BACK_INVALID;
+import static de.mq.iot2.protocol.support.ProtocolServiceImpl.MESSAGE_PROTOCOL_NOT_FOUND_FOR_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,15 +30,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.core.convert.ConversionService;
-
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
@@ -298,6 +301,52 @@ class ProtocolServiceImplTest {
 	@ValueSource(ints = {0,-1})
 	void deleteProtocolsInvalidNumberOfDays(final int value) {
 		assertEquals(MESSAGE_DAYS_BACK_INVALID, assertThrows(IllegalArgumentException.class, () -> protocolService.deleteProtocols(0)).getMessage());
+	}
+	
+	@Test
+	void protocolNames() {
+		final Collection<String> protocolNames = List.of("end-of-day", "cleanup-calendar", "cleanup-protocol");
+		when(protocolRepository.findDistinctNames()).thenReturn(protocolNames);
+		assertEquals(protocolNames, protocolService.protocolNames());
+		
+		verify(protocolRepository).findDistinctNames();
+	}
+	
+	
+	@Test
+	void protocols() {
+		final var protocolName = RandomTestUtil.randomString();
+		final Collection<Protocol> protocols = List.of(Mockito.mock(Protocol.class), Mockito.mock(Protocol.class));
+		when(protocolRepository.findByNameOrderByExecutionTime(protocolName)).thenReturn(protocols);
+		
+		assertEquals(protocols, protocolService.protocols(protocolName));
+		
+		verify(protocolRepository).findByNameOrderByExecutionTime(protocolName);
+	}
+	
+	@Test
+	void protocolById() {
+		final var id = RandomTestUtil.randomString();
+		final Protocol protocol = Mockito.mock(Protocol.class);
+		when(protocolRepository.findById(id)).thenReturn(Optional.of(protocol));
+		
+		assertEquals(protocol, protocolService.protocolById(id));
+		
+		verify(protocolRepository).findById(id);
+	}
+	
+	@Test
+	void protocolByIdNotFound() {
+		final var id = UUID.randomUUID().toString();
+
+		assertEquals(String.format(MESSAGE_PROTOCOL_NOT_FOUND_FOR_ID , id), assertThrows(EmptyResultDataAccessException.class, () -> protocolService.protocolById(id)).getMessage());
+	}
+	
+	@ParameterizedTest
+	@ValueSource(strings = {""," " , "\t"})
+	@NullSource
+	void protocolByIdIdEmpty(final String id) {
+		assertEquals(ProtocolServiceImpl.MESSAGE_ID_REQUIRED, assertThrows(IllegalArgumentException.class, () -> protocolService.protocolById(id)).getMessage());
 	}
 }
 

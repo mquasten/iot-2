@@ -29,7 +29,8 @@ import de.mq.iot2.sysvars.SystemVariable;
 @Service
 class ProtocolServiceImpl implements ProtocolService {
 
-	private static final String MESSAGE_ID_REQUIRED = "Id required.";
+	static final String MESSAGE_PROTOCOL_NOT_FOUND_FOR_ID = "Protocol not found Id: %s";
+	static final String MESSAGE_ID_REQUIRED = "Id required.";
 	static final String MESSAGE_CONVERTER_MISSING = "Class %s can not be converted to string.";
 	static final String MESSAGE_VALUE_RREQUIRED = "Value is Rrequired.";
 	static final String MESSAGE_KEY_RREQUIRED = "Key is Required.";
@@ -164,7 +165,7 @@ class ProtocolServiceImpl implements ProtocolService {
 	@Transactional
 	public Protocol protocolById(final String id) {
 		Assert.hasText(id, MESSAGE_ID_REQUIRED);
-		return protocolRepository.findById(id).orElseThrow(() -> new EmptyResultDataAccessException(String.format("Protocol not found Id:%s", id), 1));
+		return protocolRepository.findById(id).orElseThrow(() -> new EmptyResultDataAccessException(String.format(MESSAGE_PROTOCOL_NOT_FOUND_FOR_ID, id), 1));
 	}
 
 }
