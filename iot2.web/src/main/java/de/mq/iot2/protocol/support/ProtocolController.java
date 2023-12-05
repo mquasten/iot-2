@@ -2,6 +2,7 @@ package de.mq.iot2.protocol.support;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -18,8 +19,8 @@ class ProtocolController {
 	
 	private static final String PROTOCOL_PARAMETER_VIEW = "protocolParameter";
 	private static final String LOGMESSAGE_VIEW = "logmessage";
-	private static final String BATCHES_ATTRIBUTE_NAME = "batches";
-	private static final String PROTOCOL_MODEL_AND_VIEW_NAME = "protocol";
+	static final String BATCHES_ATTRIBUTE_NAME = "batches";
+	static final String PROTOCOL_MODEL_AND_VIEW_NAME = "protocol";
 	private static final String BATCH_NAME_PARAMETER_NAME = "batchName";
 	static final String REDIRECT_PROTOCOL_PATTERN = "redirect:" + PROTOCOL_MODEL_AND_VIEW_NAME + "?" + BATCH_NAME_PARAMETER_NAME + "=%s";
 	
@@ -31,17 +32,20 @@ class ProtocolController {
 	private final ModelMapper<Protocol,ProtocolModel> protoMapper;
 	
 	
-	ProtocolController(final ProtocolService protocolService, final ModelMapper<Protocol,ProtocolModel> protoMapper) {
+	ProtocolController(final ProtocolService protocolService, final ModelMapper<Protocol,ProtocolModel> protocolMapper) {
 		this.protocolService = protocolService;
-		this.protoMapper=protoMapper;
+		this.protoMapper=protocolMapper;
 	}
 
 	@GetMapping(value = "/protocol")
 	String protocol(final Model model, @RequestParam(name = "batchName", required = false) final String batchName) {
 		model.addAttribute(BATCHES_ATTRIBUTE_NAME, protocolService.protocolNames());
 		final ProtocolModel protocol = new ProtocolModel();
-		protocol.setName(batchName);
-		protocol.setProtocols(protoMapper.toWeb(protocolService.protocols(batchName)));
+		
+		if( StringUtils.hasText(batchName)) {
+			protocol.setName(batchName);
+			protocol.setProtocols(protoMapper.toWeb(protocolService.protocols(batchName)));
+		}
 		model.addAttribute(PROTOCOL_MODEL_AND_VIEW_NAME, protocol);
 		
 		return PROTOCOL_MODEL_AND_VIEW_NAME;

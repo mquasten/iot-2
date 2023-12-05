@@ -14,9 +14,9 @@ import de.mq.iot2.support.ModelMapper;
 @Component
 class ProtocolMapper implements ModelMapper<Protocol, ProtocolModel> {
 
-	private static final String DATE_TIME_FORMAT_GERMAN = "dd.MM.yyyy HH:mm:ss";
+	static final String DATE_TIME_FORMAT_GERMAN = "dd.MM.yyyy HH:mm:ss";
 
-	private static final String DATE_TIME_FORMAT_ENGLISH = "MM/dd/yyyy HH:mm:ss";
+	static final String DATE_TIME_FORMAT_ENGLISH = "MM/dd/yyyy HH:mm:ss";
 
 	private final LocaleContextRepository localeContextRepository;
 

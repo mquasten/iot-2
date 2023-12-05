@@ -9,7 +9,7 @@ import de.mq.iot2.protocol.Protocol.Status;
 
 public class ProtocolModel {
 	
-	private static final String TRUNCATED_POSTFIX = "...";
+	static final String TRUNCATED_POSTFIX = "...";
 
 	private static final int SHORT_LOG_MESSAGE_LENGTH = 50;
 
@@ -26,11 +26,13 @@ public class ProtocolModel {
 
 	private String logMessage;
 	
+	private Collection<ProtocolModel> protocols = List.of();
+	
 	public String getExecutionTime() {
 		return executionTime;
 	}
 
-	public void setExecutionTime(String executionTime) {
+	public void setExecutionTime(final String executionTime) {
 		this.executionTime = executionTime;
 	}
 
@@ -50,7 +52,7 @@ public class ProtocolModel {
 		return logMessage;
 	}
 
-	public void setLogMessage(String logMessage) {
+	public void setLogMessage(final String logMessage) {
 		this.logMessage = logMessage;
 	}
 
@@ -74,19 +76,17 @@ public class ProtocolModel {
 		return status;
 	}
 
-	public void setStatus(Status status) {
+	public void setStatus(final Status status) {
 		this.status = status;
 	}
 
 
 
-	private Collection<ProtocolModel> protocols = List.of();
-
 	public Collection<ProtocolModel> getProtocols() {
 		return protocols;
 	}
 
-	public void setProtocols(Collection<ProtocolModel> protocols) {
+	public void setProtocols(final Collection<ProtocolModel> protocols) {
 		this.protocols = protocols;
 	}
 
@@ -94,7 +94,7 @@ public class ProtocolModel {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
