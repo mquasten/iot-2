@@ -167,5 +167,11 @@ class ProtocolServiceImpl implements ProtocolService {
 		Assert.hasText(id, MESSAGE_ID_REQUIRED);
 		return protocolRepository.findById(id).orElseThrow(() -> new EmptyResultDataAccessException(String.format(MESSAGE_PROTOCOL_NOT_FOUND_FOR_ID, id), 1));
 	}
+	
+	@Override
+	@Transactional
+	public Collection<ProtocolParameter> protocolParameters(final String protocolId) {
+		return protocolParameterRepository.findByProtocol(protocolById(protocolId));
+	}
 
 }

@@ -18,7 +18,7 @@ import jakarta.validation.Valid;
 class ProtocolController {
 	
 	private static final String PROTOCOL_PARAMETER_VIEW = "protocolParameter";
-	private static final String LOGMESSAGE_VIEW = "logmessage";
+	static final String LOGMESSAGE_VIEW = "logmessage";
 	static final String BATCHES_ATTRIBUTE_NAME = "batches";
 	static final String PROTOCOL_MODEL_AND_VIEW_NAME = "protocol";
 	private static final String BATCH_NAME_PARAMETER_NAME = "batchName";
@@ -29,12 +29,12 @@ class ProtocolController {
 
 	private final ProtocolService protocolService;
 	
-	private final ModelMapper<Protocol,ProtocolModel> protoMapper;
+	private final ModelMapper<Protocol,ProtocolModel> protocolMapper;
 	
 	
 	ProtocolController(final ProtocolService protocolService, final ModelMapper<Protocol,ProtocolModel> protocolMapper) {
 		this.protocolService = protocolService;
-		this.protoMapper=protocolMapper;
+		this.protocolMapper=protocolMapper;
 	}
 
 	@GetMapping(value = "/protocol")
@@ -44,7 +44,7 @@ class ProtocolController {
 		
 		if( StringUtils.hasText(batchName)) {
 			protocol.setName(batchName);
-			protocol.setProtocols(protoMapper.toWeb(protocolService.protocols(batchName)));
+			protocol.setProtocols(protocolMapper.toWeb(protocolService.protocols(batchName)));
 		}
 		model.addAttribute(PROTOCOL_MODEL_AND_VIEW_NAME, protocol);
 		
@@ -59,21 +59,25 @@ class ProtocolController {
 	
 	@PostMapping(value = "/showProtocol", params="log")
 	String showLog(@ModelAttribute(PROTOCOL_MODEL_AND_VIEW_NAME) final ProtocolModel protocolModel, final Model model) {
-		model.addAttribute(PROTOCOL_MODEL_AND_VIEW_NAME, protoMapper.toWeb(protocolService.protocolById(protocolModel.getId())));
+		model.addAttribute(PROTOCOL_MODEL_AND_VIEW_NAME, protocolMapper.toWeb(protocolService.protocolById(protocolModel.getId())));
 		return LOGMESSAGE_VIEW;
 	}
+	
+	@PostMapping(value = "/cancelProtocol")
+	String chancelProtocol(@ModelAttribute(PROTOCOL_MODEL_AND_VIEW_NAME) final ProtocolModel protocolModel, final Model model) {
+		return String.format(REDIRECT_PROTOCOL_PATTERN,  protocolModel.getName());
+	}
+	
 	
 	@PostMapping(value = "/showProtocol", params="parameter")
 	String showParameter(@ModelAttribute(PROTOCOL_MODEL_AND_VIEW_NAME) final ProtocolModel protocolModel, final Model model) {
 	
 		System.out.println("Protocol-Parameter");
 		
+		System.out.println(protocolModel.getId());
+		
+		
 		return PROTOCOL_PARAMETER_VIEW;
-	}
-	
-	@PostMapping(value = "/cancelProtocol")
-	String chancelProtocol(@ModelAttribute(PROTOCOL_MODEL_AND_VIEW_NAME) final ProtocolModel protocolModel, final Model model) {
-		return String.format(REDIRECT_PROTOCOL_PATTERN,  protocolModel.getName());
 	}
 
 

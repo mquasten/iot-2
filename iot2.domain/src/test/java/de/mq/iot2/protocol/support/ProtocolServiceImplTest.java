@@ -63,7 +63,7 @@ class ProtocolServiceImplTest {
 
 	private final Protocol protocol =  new ProtocolImpl(RandomTestUtil.randomString());
 	private static final LocalDate MAXWEELS_BIRTHDATE = LocalDate.of(1831, 6, 18);
-	final Collection<ProtocolParameter> savedParameters = new ArrayList<>();
+	private final Collection<ProtocolParameter> savedParameters = new ArrayList<>();
 
 	@BeforeEach
 	void beforeEach() {
@@ -347,6 +347,19 @@ class ProtocolServiceImplTest {
 	@NullSource
 	void protocolByIdIdEmpty(final String id) {
 		assertEquals(ProtocolServiceImpl.MESSAGE_ID_REQUIRED, assertThrows(IllegalArgumentException.class, () -> protocolService.protocolById(id)).getMessage());
+	}
+	
+	@Test
+	void protocolParameters() {
+		final var id = UUID.randomUUID().toString();
+		when(protocolRepository.findById(id)).thenReturn(Optional.of(protocol));
+		final Collection<ProtocolParameter> protocolParameters = List.of(mock(ProtocolParameter.class), mock(ProtocolParameter.class));
+		when(protocolParameterRepository.findByProtocol(protocol)).thenReturn(protocolParameters);
+		
+		assertEquals(protocolParameters,protocolService.protocolParameters(id));
+		
+		verify(protocolRepository).findById(id);
+		verify(protocolParameterRepository).findByProtocol(protocol);
 	}
 }
 

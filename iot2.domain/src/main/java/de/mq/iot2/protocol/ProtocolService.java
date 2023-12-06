@@ -36,6 +36,8 @@ public interface ProtocolService {
 	Collection<Protocol> protocols(final String name);
 
 	Protocol protocolById(final String id);
+
+	Collection<ProtocolParameter> protocolParameters(final String protocolId);
 	
 
 
