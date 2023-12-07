@@ -3,7 +3,46 @@
 <head th:replace="~{fragments :: header}" />
 <body>
 	<div align="center">
-		<h1 th:text="Protokol-Parameter"></h1>
+		
+		<h1 th:if="${protocolParameter.size() > 0}" th:text="#{protocolparameter.headline} + ':&nbsp;'+ ${protocolParameter[0].protocolName}"></h1>
+			<table th:if="${protocolParameter.size() > 0}" class="result-table">
+				<thead>
+					<tr>
+						<th th:text="#{protocolparameter.protocolparametertable.type}"></th>
+						<th th:text="#{protocolparameter.protocolparametertable.name}"></th>
+						<th th:text="#{protocolparameter.protocolparametertable.value}"></th>
+						<th th:text="#{protocolparameter.protocolparametertable.status}"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="parameter: ${protocolParameter}">
+						<td th:text="${parameter.type}"></td>
+						<td th:text="${parameter.name}"></td>
+						<td th:text="${parameter.value}"></td>
+						<td th:text="${parameter.status}"></td>
+					</tr>
+				</tbody>
+			</table>
+			
+		<form action="#" th:action="@{/cancelProtocol}" method="post"
+			th:object="${protocol}">
+				<table>
+					<tr>
+						<td>
+						<input  th:if="${protocolParameter.size() > 0}" type="hidden" name="name" th:value="${protocolParameter[0].protocolName}" />
+							
+							<button type="submit" th:text="#{logmessage.cancel}"></button>
+						</td>
+					</tr>
+				</table>
+
+			</form>
+		
+		
+		
+		
+		
+		
 		
 	</div>
 </body>

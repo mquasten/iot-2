@@ -1,10 +1,13 @@
 package de.mq.iot2.protocol.support;
 
+import org.springframework.stereotype.Component;
+
 import de.mq.iot2.protocol.ProtocolParameter;
 import de.mq.iot2.protocol.SystemvariableProtocolParameter;
 import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.ModelMapper;
 
+@Component
 class ProtocolParameterMapper implements ModelMapper<ProtocolParameter, ProtocolParameterModel> {
 
 	@Override

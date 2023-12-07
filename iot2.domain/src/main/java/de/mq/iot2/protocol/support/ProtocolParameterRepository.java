@@ -21,7 +21,7 @@ interface ProtocolParameterRepository {
 	
 	void delete(final ProtocolParameter protocolParameter);
 	
-	Collection<ProtocolParameter> findByProtocol(final Protocol protocol);
+	Collection<ProtocolParameter> findByProtocolOrderByTypeAscNameAsc(final Protocol protocol);
 	
 
 

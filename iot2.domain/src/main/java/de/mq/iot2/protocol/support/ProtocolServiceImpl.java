@@ -146,7 +146,7 @@ class ProtocolServiceImpl implements ProtocolService {
 	}
 	
 	private void deleteProtocol(final Protocol protocol) {
-		protocolParameterRepository.findByProtocol(protocol).forEach( protocolParameterRepository::delete);
+		protocolParameterRepository.findByProtocolOrderByTypeAscNameAsc(protocol).forEach( protocolParameterRepository::delete);
 		protocolRepository.delete(protocol);
 	}
 	
@@ -171,7 +171,7 @@ class ProtocolServiceImpl implements ProtocolService {
 	@Override
 	@Transactional
 	public Collection<ProtocolParameter> protocolParameters(final String protocolId) {
-		return protocolParameterRepository.findByProtocol(protocolById(protocolId));
+		return protocolParameterRepository.findByProtocolOrderByTypeAscNameAsc(protocolById(protocolId));
 	}
 
 }

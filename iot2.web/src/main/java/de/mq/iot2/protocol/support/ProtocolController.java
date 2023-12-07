@@ -17,7 +17,7 @@ import jakarta.validation.Valid;
 @Controller
 class ProtocolController {
 	
-	private static final String PROTOCOL_PARAMETER_VIEW = "protocolParameter";
+	private static final String PROTOCOL_PARAMETER_MODEL_AND_VIEW = "protocolParameter";
 	static final String LOGMESSAGE_VIEW = "logmessage";
 	static final String BATCHES_ATTRIBUTE_NAME = "batches";
 	static final String PROTOCOL_MODEL_AND_VIEW_NAME = "protocol";
@@ -31,10 +31,13 @@ class ProtocolController {
 	
 	private final ModelMapper<Protocol,ProtocolModel> protocolMapper;
 	
+	private final ProtocolParameterMapper protocolParameterMapper;
 	
-	ProtocolController(final ProtocolService protocolService, final ModelMapper<Protocol,ProtocolModel> protocolMapper) {
+	
+	ProtocolController(final ProtocolService protocolService, final ModelMapper<Protocol,ProtocolModel> protocolMapper, final ProtocolParameterMapper protocolParameterMapper) {
 		this.protocolService = protocolService;
 		this.protocolMapper=protocolMapper;
+		this.protocolParameterMapper=protocolParameterMapper;
 	}
 
 	@GetMapping(value = "/protocol")
@@ -75,9 +78,9 @@ class ProtocolController {
 		System.out.println("Protocol-Parameter");
 		
 		System.out.println(protocolModel.getId());
-		
-		
-		return PROTOCOL_PARAMETER_VIEW;
+
+		model.addAttribute(PROTOCOL_PARAMETER_MODEL_AND_VIEW,protocolParameterMapper.toWeb( protocolService.protocolParameters(protocolModel.getId())));
+		return PROTOCOL_PARAMETER_MODEL_AND_VIEW;
 	}
 
 
