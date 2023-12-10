@@ -25,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
 import de.mq.iot2.protocol.Protocol;
+import de.mq.iot2.protocol.ProtocolParameter;
 import de.mq.iot2.protocol.ProtocolService;
 import de.mq.iot2.support.ModelMapper;
 
@@ -35,8 +36,9 @@ class ProtocolControllerTest {
 	private static final List<String> BATCHES = List.of(END_OF_DAY_BATCH, "end-of-day-update", "cleanup-calendar", "cleanup-protocol");
 	private final ProtocolService protocolService = mock(ProtocolService.class);
 	private final ModelMapper<Protocol, ProtocolModel> protocolMapper = mock(ProtocolMapper.class);
+	private final ProtocolParameterMapper protocolParameterMapper = mock(ProtocolParameterMapper.class);
 
-	private final ProtocolController protocolController = new ProtocolController(protocolService, protocolMapper);
+	private final ProtocolController protocolController = new ProtocolController(protocolService, protocolMapper, protocolParameterMapper);
 
 	private final Model model = new ExtendedModelMap();
 
@@ -104,5 +106,28 @@ class ProtocolControllerTest {
 		when(protocolModel.getName()).thenReturn(END_OF_DAY_BATCH);
 
 		assertEquals(String.format(ProtocolController.REDIRECT_PROTOCOL_PATTERN, END_OF_DAY_BATCH), protocolController.chancelProtocol(protocolModel, model));
+	}
+	
+	@Test
+	void  showParameter() {
+		final ProtocolModel protocolModel = mock(ProtocolModel.class);
+		final ProtocolModel protocolWeb = mock(ProtocolModel.class);
+		final Protocol protocol = mock(Protocol.class);
+		final Collection<ProtocolParameter> protocolParameters = List.of();
+		final Collection<ProtocolParameterModel> protocolParameterModels = List.of(mock(ProtocolParameterModel.class));
+		when(protocolModel.getId()).thenReturn(ID);
+		when(protocolService.protocolById(ID)).thenReturn(protocol);
+		when(protocolService.protocolParameters(ID)).thenReturn(protocolParameters);
+		when(protocolMapper.toWeb(protocol)).thenReturn(protocolWeb);
+		when(protocolParameterMapper.toWeb(protocolParameters)).thenReturn(protocolParameterModels);
+
+		assertEquals(ProtocolController.PROTOCOL_PARAMETER_MODEL_AND_VIEW, protocolController.showParameter(protocolModel, model));
+
+		assertEquals(protocolWeb, model.getAttribute(ProtocolController.PROTOCOL_MODEL_AND_VIEW_NAME));
+		verify(protocolService).protocolById(ID);
+		verify(protocolMapper).toWeb(protocol);
+		assertEquals(protocolParameterModels, model.getAttribute(ProtocolController.PROTOCOL_PARAMETER_MODEL_AND_VIEW));
+		verify(protocolService).protocolParameters(ID);
+		verify(protocolParameterMapper).toWeb(protocolParameters);
 	}
 }

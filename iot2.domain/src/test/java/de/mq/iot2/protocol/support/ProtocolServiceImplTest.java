@@ -286,8 +286,8 @@ class ProtocolServiceImplTest {
 		final ProtocolParameter protocolParameter02 = mock(ProtocolParameter.class);
 		
 		when(protocolRepository.findByExecutionTimeBefore(argThat(dateTime ->  expectedDeletionDateTime.equals(dateTime) ) )).thenReturn(List.of(protocol01, protocol02));
-		when(protocolParameterRepository.findByProtocol(protocol01)).thenReturn(List.of(protocolParameter01));
-		when(protocolParameterRepository.findByProtocol(protocol02)).thenReturn(List.of(protocolParameter02));
+		when(protocolParameterRepository.findByProtocolOrderByTypeAscNameAsc(protocol01)).thenReturn(List.of(protocolParameter01));
+		when(protocolParameterRepository.findByProtocolOrderByTypeAscNameAsc(protocol02)).thenReturn(List.of(protocolParameter02));
 		
 		protocolService.deleteProtocols(daysBack);
 		
@@ -354,12 +354,12 @@ class ProtocolServiceImplTest {
 		final var id = UUID.randomUUID().toString();
 		when(protocolRepository.findById(id)).thenReturn(Optional.of(protocol));
 		final Collection<ProtocolParameter> protocolParameters = List.of(mock(ProtocolParameter.class), mock(ProtocolParameter.class));
-		when(protocolParameterRepository.findByProtocol(protocol)).thenReturn(protocolParameters);
+		when(protocolParameterRepository.findByProtocolOrderByTypeAscNameAsc(protocol)).thenReturn(protocolParameters);
 		
 		assertEquals(protocolParameters,protocolService.protocolParameters(id));
 		
 		verify(protocolRepository).findById(id);
-		verify(protocolParameterRepository).findByProtocol(protocol);
+		verify(protocolParameterRepository).findByProtocolOrderByTypeAscNameAsc(protocol);
 	}
 }
 

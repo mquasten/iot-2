@@ -30,9 +30,6 @@ class ProtocolParameterMapperTest {
 		final SystemvariableProtocolParameter systemvariableProtocolParameter = new SystemvariableProtocolParameterImpl(protocol, PARAMETER_NAME, PARAMETER_VALUE);
 
 		final ProtocolParameterModel result = protocolParameterMapper.toWeb(systemvariableProtocolParameter);
-
-		assertEquals(PROTOCOL_ID, result.getProtocolId());
-		assertEquals(PROTOCOL_NAME, result.getProtocolName());
 		assertEquals(PARAMETER_NAME, result.getName());
 		assertEquals(systemvariableProtocolParameter.type(), result.getType());
 		assertEquals(systemvariableProtocolParameter.status(), result.getStatus());
@@ -47,9 +44,6 @@ class ProtocolParameterMapperTest {
 		final ProtocolParameter protocolParameter = new ProtocolParameterImpl(protocol, PARAMETER_NAME, ProtocolParameterType.IntermediateResult, PARAMETER_VALUE);
 
 		final ProtocolParameterModel result = protocolParameterMapper.toWeb(protocolParameter);
-
-		assertEquals(PROTOCOL_ID, result.getProtocolId());
-		assertEquals(PROTOCOL_NAME, result.getProtocolName());
 		assertEquals(PARAMETER_NAME, result.getName());
 		assertEquals(ProtocolParameterType.IntermediateResult, result.getType());
 		assertNull(result.getStatus());

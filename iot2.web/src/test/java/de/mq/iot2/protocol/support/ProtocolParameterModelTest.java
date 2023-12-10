@@ -15,26 +15,9 @@ class ProtocolParameterModelTest {
 
 	private final ProtocolParameterModel protocolParameterModel = new ProtocolParameterModel();
 
-	@Test
-	void protocolId() {
-		assertNull(protocolParameterModel.getProtocolId());
-
-		final var protocolId = random();
-		protocolParameterModel.setProtocolId(protocolId);
-		assertEquals(protocolId, protocolParameterModel.getProtocolId());
-	}
 
 	private String random() {
 		return RandomStringUtils.random(50);
-	}
-
-	@Test
-	void protocolName() {
-		assertNull(protocolParameterModel.getProtocolName());
-
-		final var protocolName = random();
-		protocolParameterModel.setProtocolName(protocolName);
-		assertEquals(protocolName, protocolParameterModel.getProtocolName());
 	}
 
 	@Test

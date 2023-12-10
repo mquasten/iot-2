@@ -50,7 +50,7 @@
 						<td th:text="${protocol.executionTime}"></td>
 						<td th:text="${protocol.status}"></td>
 							<td th:text="${protocol.logMessageShort}"></td>
-						<td><form th:action="@{/showProtocol}"
+						<td><form th:action="@{/showProtocolDetails}"
 								th:object="${protocol}" method="post">
 								<input type="hidden" name="id" th:value="${protocol.id}" />
 								<button type="submit" th:text="#{protocol.protocoltable.details}" name="parameter"></button>

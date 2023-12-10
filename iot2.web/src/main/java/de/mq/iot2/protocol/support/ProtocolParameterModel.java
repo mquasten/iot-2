@@ -5,9 +5,6 @@ import de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus;
 
 class ProtocolParameterModel {
 
-	private String protocolId;
-
-	private String protocolName;
 
 	private String name;
 
@@ -17,13 +14,7 @@ class ProtocolParameterModel {
 
 	private SystemvariableStatus status;
 
-	public String getProtocolId() {
-		return protocolId;
-	}
 
-	public void setProtocolId(final String protocolId) {
-		this.protocolId = protocolId;
-	}
 
 	public String getName() {
 		return name;
@@ -55,14 +46,6 @@ class ProtocolParameterModel {
 
 	public void setStatus(final SystemvariableStatus status) {
 		this.status = status;
-	}
-
-	public String getProtocolName() {
-		return protocolName;
-	}
-
-	public void setProtocolName(String protocolName) {
-		this.protocolName = protocolName;
 	}
 
 	public boolean isSystemvariableParameter() {

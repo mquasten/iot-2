@@ -17,7 +17,7 @@ import jakarta.validation.Valid;
 @Controller
 class ProtocolController {
 	
-	private static final String PROTOCOL_PARAMETER_MODEL_AND_VIEW = "protocolParameter";
+	static final String PROTOCOL_PARAMETER_MODEL_AND_VIEW = "protocolParameter";
 	static final String LOGMESSAGE_VIEW = "logmessage";
 	static final String BATCHES_ATTRIBUTE_NAME = "batches";
 	static final String PROTOCOL_MODEL_AND_VIEW_NAME = "protocol";
@@ -60,7 +60,7 @@ class ProtocolController {
 		return String.format(REDIRECT_PROTOCOL_PATTERN,  protocolModel.getName());
 	}
 	
-	@PostMapping(value = "/showProtocol", params="log")
+	@PostMapping(value = "/showProtocolDetails", params="log")
 	String showLog(@ModelAttribute(PROTOCOL_MODEL_AND_VIEW_NAME) final ProtocolModel protocolModel, final Model model) {
 		model.addAttribute(PROTOCOL_MODEL_AND_VIEW_NAME, protocolMapper.toWeb(protocolService.protocolById(protocolModel.getId())));
 		return LOGMESSAGE_VIEW;
@@ -72,13 +72,9 @@ class ProtocolController {
 	}
 	
 	
-	@PostMapping(value = "/showProtocol", params="parameter")
+	@PostMapping(value = "/showProtocolDetails", params="parameter")
 	String showParameter(@ModelAttribute(PROTOCOL_MODEL_AND_VIEW_NAME) final ProtocolModel protocolModel, final Model model) {
-	
-		System.out.println("Protocol-Parameter");
-		
-		System.out.println(protocolModel.getId());
-
+		model.addAttribute(PROTOCOL_MODEL_AND_VIEW_NAME, protocolMapper.toWeb(protocolService.protocolById(protocolModel.getId())));
 		model.addAttribute(PROTOCOL_PARAMETER_MODEL_AND_VIEW,protocolParameterMapper.toWeb( protocolService.protocolParameters(protocolModel.getId())));
 		return PROTOCOL_PARAMETER_MODEL_AND_VIEW;
 	}
