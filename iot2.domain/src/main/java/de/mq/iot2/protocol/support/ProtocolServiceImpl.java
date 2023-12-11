@@ -47,27 +47,27 @@ class ProtocolServiceImpl implements ProtocolService {
 
 	private final String csvDelimiter;
 
-
-	ProtocolServiceImpl(final ProtocolRepository protocolRepository, final ProtocolParameterRepository protocolParameterRepository, final ConversionService conversionService, final Converter<Pair<ProtocolParameter, Boolean>, String[]> parameterCsvConverter, @Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
+	ProtocolServiceImpl(final ProtocolRepository protocolRepository, final ProtocolParameterRepository protocolParameterRepository, final ConversionService conversionService,
+			final Converter<Pair<ProtocolParameter, Boolean>, String[]> parameterCsvConverter, @Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
 		this.protocolRepository = protocolRepository;
 		this.conversionService = conversionService;
 		this.protocolParameterRepository = protocolParameterRepository;
-		this.parameterCsvConverter=parameterCsvConverter;
-		this.csvDelimiter=csvDelimiter;
+		this.parameterCsvConverter = parameterCsvConverter;
+		this.csvDelimiter = csvDelimiter;
 	}
 
 	@Override
 	public Protocol protocol(final String name) {
 		return new ProtocolImpl(name);
 	}
-	
+
 	@Override
 	@Transactional
 	@CheckConfiguration
 	public void save(final Protocol protocol) {
 		protocolRepository.save(protocol);
 	}
-	
+
 	@Override
 	@Transactional
 	@CheckConfiguration
@@ -77,20 +77,20 @@ class ProtocolServiceImpl implements ProtocolService {
 		protocolRepository.save(protocol);
 
 	}
-	
 
 	@CheckConfiguration
 	public void success(final Protocol protocol) {
 		success(protocol, null);
 
 	}
+
 	@Override
 	@Transactional
 	@CheckConfiguration
-	public void error(final Protocol protocol, final Throwable throwable)  {
-	    final StringWriter writer = new StringWriter();  
-	    throwable.printStackTrace(new PrintWriter(writer));
-	    protocol.assignLogMessage(writer.toString());		
+	public void error(final Protocol protocol, final Throwable throwable) {
+		final StringWriter writer = new StringWriter();
+		throwable.printStackTrace(new PrintWriter(writer));
+		protocol.assignLogMessage(writer.toString());
 		protocol.assignErrorState();
 		protocolRepository.save(protocol);
 	}
@@ -108,29 +108,29 @@ class ProtocolServiceImpl implements ProtocolService {
 		Assert.isTrue(conversionService.canConvert(entry.getValue().getClass(), String.class), String.format(MESSAGE_CONVERTER_MISSING, entry.getValue().getClass().getSimpleName()));
 		return new ProtocolParameterImpl(protocol, conversionService.convert(entry.getKey(), String.class), type, conversionService.convert(entry.getValue(), String.class));
 	}
-	
+
 	@Override
 	@Transactional
 	@CheckConfiguration
 	public void assignParameter(final Protocol protocol, final ProtocolParameterType type, final String name, final Object value) {
 		Assert.notNull(name, MESSAGE_KEY_RREQUIRED);
 		Assert.notNull(value, MESSAGE_VALUE_RREQUIRED);
-		final ProtocolParameter protocolParameter=  new ProtocolParameterImpl(protocol, name, type, conversionService.convert(value, String.class));
+		final ProtocolParameter protocolParameter = new ProtocolParameterImpl(protocol, name, type, conversionService.convert(value, String.class));
 		protocolParameterRepository.save(protocolParameter);
 	}
-	
+
 	@Override
 	@Transactional
 	@CheckConfiguration
 	public void assignParameter(final Protocol protocol, final Collection<SystemVariable> systemVariables) {
-		systemVariables.stream(). map(systemVariable -> convert(protocol, systemVariable)).forEach(protocolParameter -> protocolParameterRepository.save(protocolParameter));
-		
+		systemVariables.stream().map(systemVariable -> convert(protocol, systemVariable)).forEach(protocolParameter -> protocolParameterRepository.save(protocolParameter));
+
 	}
-	
+
 	private ProtocolParameter convert(final Protocol protocol, final SystemVariable systemVariable) {
-		return new SystemvariableProtocolParameterImpl(protocol, systemVariable.getName(),  systemVariable.getValue());
+		return new SystemvariableProtocolParameterImpl(protocol, systemVariable.getName(), systemVariable.getValue());
 	}
-	
+
 	@Override
 	@Transactional
 	@CheckConfiguration
@@ -140,73 +140,72 @@ class ProtocolServiceImpl implements ProtocolService {
 		protocolParameterRepository.findByProtocolIdNameNameIn(protocolId, updated).forEach(parameter -> assignUpdated(parameter));
 	}
 
-	private void  assignUpdated(final SystemvariableProtocolParameter parameter) {
+	private void assignUpdated(final SystemvariableProtocolParameter parameter) {
 		parameter.assignUpdated();
 		protocolParameterRepository.save(parameter);
 	}
-	
+
 	@Override
 	@Transactional
 	public int deleteProtocols(final int daysBack) {
 		Assert.isTrue(daysBack > 0, MESSAGE_DAYS_BACK_INVALID);
-		final var deleteDate = LocalDateTime.of( LocalDate.now(), LocalTime.of(0, 0)).minusDays(daysBack);
-		
+		final var deleteDate = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0)).minusDays(daysBack);
+
 		final Collection<Protocol> toBeDeleted = protocolRepository.findByExecutionTimeBefore(deleteDate);
 		toBeDeleted.forEach(this::deleteProtocol);
 		return toBeDeleted.size();
 	}
-	
+
 	private void deleteProtocol(final Protocol protocol) {
-		protocolParameterRepository.findByProtocolOrderByTypeAscNameAsc(protocol).forEach( protocolParameterRepository::delete);
+		protocolParameterRepository.findByProtocolOrderByTypeAscNameAsc(protocol).forEach(protocolParameterRepository::delete);
 		protocolRepository.delete(protocol);
 	}
-	
+
 	@Override
 	@Transactional
 	public Collection<String> protocolNames() {
 		return protocolRepository.findDistinctNames();
 	}
+
 	@Override
 	@Transactional
 	public Collection<Protocol> protocols(final String name) {
 		return protocolRepository.findByNameOrderByExecutionTime(name);
 	}
-	
+
 	@Override
 	@Transactional
 	public Protocol protocolById(final String id) {
 		Assert.hasText(id, MESSAGE_ID_REQUIRED);
 		return protocolRepository.findById(id).orElseThrow(() -> new EmptyResultDataAccessException(String.format(MESSAGE_PROTOCOL_NOT_FOUND_FOR_ID, id), 1));
 	}
-	
+
 	@Override
 	@Transactional
 	public Collection<ProtocolParameter> protocolParameters(final String protocolId) {
 		return protocolParameterRepository.findByProtocolOrderByTypeAscNameAsc(protocolById(protocolId));
 	}
-	
+
 	@Override
 	@Transactional
 	public void export(final OutputStream os) {
 		try (final PrintWriter writer = new PrintWriter(os)) {
 			final Collection<String> protocolIdsProcessed = new HashSet<>();
-			protocolParameterRepository.findAll().stream().sorted((p1, p2) -> {		
-				final int compareProtocolNames = p1.protocol().name().compareTo(p2.protocol().name());
-				if (compareProtocolNames != 0) {
-					return compareProtocolNames;
+			protocolParameterRepository.findAll().stream().sorted((p1, p2) -> {
+				final int compareProtocolIds = IdUtil.getId(p1.protocol()).compareTo(IdUtil.getId(p2.protocol()));
+				if (compareProtocolIds != 0) {
+					return compareProtocolIds;
 				}
-				
-				return IdUtil.getId(p1.protocol()).compareTo(IdUtil.getId(p2.protocol()));
+
+				return p1.name().compareTo(p2.name());
 
 			}).forEach(parameter -> {
 				final String protocolId = IdUtil.getId(parameter.protocol());
-				writer.println(
-						StringUtils.arrayToDelimitedString(parameterCsvConverter.convert(Pair.of(parameter, protocolIdsProcessed.contains(protocolId))), csvDelimiter));
+				writer.println(StringUtils.arrayToDelimitedString(parameterCsvConverter.convert(Pair.of(parameter, protocolIdsProcessed.contains(protocolId))), csvDelimiter));
 				protocolIdsProcessed.add(protocolId);
 			});
 		}
 
 	}
-
 
 }
