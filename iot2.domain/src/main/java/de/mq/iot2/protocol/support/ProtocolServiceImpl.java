@@ -1,22 +1,27 @@
 package de.mq.iot2.protocol.support;
 
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-
+import org.springframework.util.StringUtils;
 
 import de.mq.iot2.protocol.Protocol;
 import de.mq.iot2.protocol.ProtocolParameter;
@@ -38,11 +43,17 @@ class ProtocolServiceImpl implements ProtocolService {
 	private final ProtocolRepository protocolRepository;
 	private final ProtocolParameterRepository protocolParameterRepository;
 	private final ConversionService conversionService;
+	private final Converter<Pair<ProtocolParameter, Boolean>, String[]> parameterCsvConverter;
 
-	ProtocolServiceImpl(final ProtocolRepository protocolRepository, final ProtocolParameterRepository protocolParameterRepository, final ConversionService conversionService) {
+	private final String csvDelimiter;
+
+
+	ProtocolServiceImpl(final ProtocolRepository protocolRepository, final ProtocolParameterRepository protocolParameterRepository, final ConversionService conversionService, final Converter<Pair<ProtocolParameter, Boolean>, String[]> parameterCsvConverter, @Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
 		this.protocolRepository = protocolRepository;
 		this.conversionService = conversionService;
 		this.protocolParameterRepository = protocolParameterRepository;
+		this.parameterCsvConverter=parameterCsvConverter;
+		this.csvDelimiter=csvDelimiter;
 	}
 
 	@Override
@@ -173,5 +184,29 @@ class ProtocolServiceImpl implements ProtocolService {
 	public Collection<ProtocolParameter> protocolParameters(final String protocolId) {
 		return protocolParameterRepository.findByProtocolOrderByTypeAscNameAsc(protocolById(protocolId));
 	}
+	
+	@Override
+	@Transactional
+	public void export(final OutputStream os) {
+		try (final PrintWriter writer = new PrintWriter(os)) {
+			final Collection<String> protocolIdsProcessed = new HashSet<>();
+			protocolParameterRepository.findAll().stream().sorted((p1, p2) -> {		
+				final int compareProtocolNames = p1.protocol().name().compareTo(p2.protocol().name());
+				if (compareProtocolNames != 0) {
+					return compareProtocolNames;
+				}
+				
+				return IdUtil.getId(p1.protocol()).compareTo(IdUtil.getId(p2.protocol()));
+
+			}).forEach(parameter -> {
+				final String protocolId = IdUtil.getId(parameter.protocol());
+				writer.println(
+						StringUtils.arrayToDelimitedString(parameterCsvConverter.convert(Pair.of(parameter, protocolIdsProcessed.contains(protocolId))), csvDelimiter));
+				protocolIdsProcessed.add(protocolId);
+			});
+		}
+
+	}
+
 
 }

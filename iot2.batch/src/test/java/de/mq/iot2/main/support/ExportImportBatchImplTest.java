@@ -23,12 +23,14 @@ import org.springframework.util.FileCopyUtils;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.configuration.ConfigurationService;
+import de.mq.iot2.protocol.ProtocolService;
 
 class ExportImportBatchImplTest {
 
 	private final CalendarService calendarService = mock(CalendarService.class);
 	private final ConfigurationService configurationService = mock(ConfigurationService.class);
-	private final ExportImportBatchImpl exportImportBatch = new ExportImportBatchImpl(calendarService, configurationService);
+	private final ProtocolService protocolService = mock(ProtocolService.class);
+	private final ExportImportBatchImpl exportImportBatch = new ExportImportBatchImpl(calendarService, configurationService,protocolService);
 	private final String csvContent = "spalte1;...;spalte10";
 
 	@Test
@@ -62,6 +64,24 @@ class ExportImportBatchImplTest {
 		try (final MockedStatic<FileCopyUtils> util = mockStatic(FileCopyUtils.class)) {
 
 			exportImportBatch.exportConfiguration(file);
+
+			util.verify(() -> FileCopyUtils.copy((byte[]) argThat(arg -> csvContent.equals(new String((byte[]) arg))), (File) argThat(arg -> arg.equals(file))));
+		}
+	}
+	
+	@Test
+	void exportProtocol() throws IOException {
+
+		final File file = Mockito.mock(File.class);
+		when(file.getAbsolutePath()).thenReturn("path");
+		doAnswer(answer -> {
+			answer.getArgument(0, OutputStream.class).write(csvContent.getBytes());
+			return null;
+		}).when(protocolService).export(any());
+
+		try (final MockedStatic<FileCopyUtils> util = mockStatic(FileCopyUtils.class)) {
+
+			exportImportBatch.exportProtocol(file);
 
 			util.verify(() -> FileCopyUtils.copy((byte[]) argThat(arg -> csvContent.equals(new String((byte[]) arg))), (File) argThat(arg -> arg.equals(file))));
 		}

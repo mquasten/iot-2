@@ -14,6 +14,8 @@ import jakarta.validation.Valid;
 @RepositoryDefinition(domainClass = ProtocolParameterImpl.class, idClass = ProtocolParameterPrimaryKeyImpl.class)
 interface ProtocolParameterRepository {
 	
+	Collection<ProtocolParameter> findAll();
+	
 	ProtocolParameter save(@Valid final ProtocolParameter protocolParameter);
 	
 	@Query("select p  from SystemvariableProtocolParameter p where p.protocol.id= ?1 and p.name in ?2")

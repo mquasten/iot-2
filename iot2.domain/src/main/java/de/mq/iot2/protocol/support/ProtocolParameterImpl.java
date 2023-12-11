@@ -24,10 +24,11 @@ import jakarta.validation.constraints.Size;
 @Entity(name = ProtocolParameterImpl.ENTITY_NAME)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "PROTOCOL_PARAMETER_TYPE", length = 15)
-@DiscriminatorValue("Parameter")
+@DiscriminatorValue(ProtocolParameterImpl.DISCRIMINATOR_VALUE)
 @IdClass(ProtocolParameterPrimaryKeyImpl.class)
 class ProtocolParameterImpl implements ProtocolParameter {
 
+	static final String DISCRIMINATOR_VALUE = "Parameter";
 	static final String MESSAGE_TYPE_IST_REQUIRED = "ProtocolParameterType ist required.";
 	static final String MESSAGE_VALUE_IS_REQUIRED = "Value is required.";
 	static final String MESSAGE_PROTOCOL_IS_REQUIRED = "Protocol is required.";

@@ -59,7 +59,7 @@ class ProtocolServiceImplTest {
 	private final ProtocolRepository protocolRepository = mock(ProtocolRepository.class);
 	private final ProtocolParameterRepository protocolParameterRepository = mock(ProtocolParameterRepository.class);
 	private final ConversionService conversionService = mock(ConversionService.class);
-	private final ProtocolService protocolService = new ProtocolServiceImpl(protocolRepository, protocolParameterRepository, conversionService);
+	private final ProtocolService protocolService = new ProtocolServiceImpl(protocolRepository, protocolParameterRepository, conversionService, null, null);
 
 	private final Protocol protocol =  new ProtocolImpl(RandomTestUtil.randomString());
 	private static final LocalDate MAXWEELS_BIRTHDATE = LocalDate.of(1831, 6, 18);

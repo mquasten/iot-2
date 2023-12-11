@@ -1,6 +1,7 @@
 package de.mq.iot2.protocol;
 
 
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 
@@ -38,6 +39,8 @@ public interface ProtocolService {
 	Protocol protocolById(final String id);
 
 	Collection<ProtocolParameter> protocolParameters(final String protocolId);
+
+	void export(final OutputStream os);
 	
 
 
