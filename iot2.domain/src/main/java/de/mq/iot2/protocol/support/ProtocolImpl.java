@@ -53,6 +53,19 @@ class ProtocolImpl implements Protocol {
 	private ProtocolImpl() {
 
 	}
+	
+	
+	ProtocolImpl(final String id, final String name, LocalDateTime executionTime, final  Status status, final  String logMessage) {
+		nameRequiredGuard(name);
+		Assert.notNull(id, "Id required.");
+		Assert.notNull(executionTime, "ExecutionTime required.");
+		Assert.notNull(status, MESSAGE_STATUS_REQUIRED);
+		this.id=id;
+		this.name=name;
+		this.executionTime=executionTime;
+		this.status=status;
+		this.logMessage=logMessage;
+	}
 
 	ProtocolImpl(final String name) {
 		nameRequiredGuard(name);

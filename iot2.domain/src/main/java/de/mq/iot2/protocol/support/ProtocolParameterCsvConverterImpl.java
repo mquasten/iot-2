@@ -15,6 +15,7 @@ import org.springframework.util.Assert;
 
 import de.mq.iot2.protocol.Protocol;
 import de.mq.iot2.protocol.ProtocolParameter;
+import de.mq.iot2.protocol.SystemvariableProtocolParameter;
 import de.mq.iot2.support.CsvUtil;
 import de.mq.iot2.support.IdUtil;
 import jakarta.persistence.DiscriminatorValue;
@@ -36,12 +37,22 @@ class ProtocolParameterCsvConverterImpl implements Converter<Pair<ProtocolParame
 		Assert.notNull(pair, "Value is required.");
 		final var parameter = pair.getFirst();
 		final var protocolProcessed = pair.getSecond();
+		
+		
 
-		final Stream<String> results = Stream.concat(Stream.of(parameter.getClass().getAnnotation(DiscriminatorValue.class).value(), CsvUtil.quote(parameter.name(), csvDelimiter), "" + parameter.type(), CsvUtil.quote(parameter.value(), csvDelimiter)
+		final Stream<String> results = Stream.concat(Stream.of(parameter.getClass().getAnnotation(DiscriminatorValue.class).value(), CsvUtil.quote(parameter.name(), csvDelimiter), type(parameter), CsvUtil.quote(parameter.value(), csvDelimiter)
 
 		), protocol(parameter.protocol(), protocolProcessed));
 
 		return results.toArray(size -> new String[size]);
+	}
+
+	private String  type(final ProtocolParameter parameter) {
+		if (parameter instanceof SystemvariableProtocolParameter) {
+			
+			return "" + ((SystemvariableProtocolParameter) parameter).status();
+		} 
+		return  ""+parameter.type();
 	}
 	
 	private Stream<String> protocol(final Protocol protocol, boolean processed) {

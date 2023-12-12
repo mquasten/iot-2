@@ -16,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 
 import de.mq.iot2.protocol.Protocol;
 import de.mq.iot2.protocol.SystemvariableProtocolParameter;
+import de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus;
 import de.mq.iot2.support.RandomTestUtil;
 
 class SystemvariableProtocolParameterImplTest {
@@ -56,6 +57,18 @@ class SystemvariableProtocolParameterImplTest {
 		final SystemvariableProtocolParameter systemvariableProtocolParameter = new SystemvariableProtocolParameterImpl(protocol, name, value);
 		
 		assertEquals(SystemvariableProtocolParameterImpl.EMPTY_VALUE_STRING, systemvariableProtocolParameter.value());
+	}
+	@Test
+	void createImport() {
+		final SystemvariableStatus status= SystemvariableStatus.Updated;
+		
+		final SystemvariableProtocolParameter systemvariableProtocolParameter=new SystemvariableProtocolParameterImpl(protocol,name, value, status );
+		
+		assertEquals(protocol, systemvariableProtocolParameter.protocol());
+		assertEquals(name, systemvariableProtocolParameter.name());
+		assertEquals(value, systemvariableProtocolParameter.value());
+		assertEquals(status, systemvariableProtocolParameter.status());
+		
 	}
 	
 	

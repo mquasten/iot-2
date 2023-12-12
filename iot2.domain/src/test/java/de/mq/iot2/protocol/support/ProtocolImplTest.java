@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,6 +44,22 @@ class ProtocolImplTest {
 		final var id = DataAccessUtils.requiredSingleResult(ids);
 		assertEquals(IdUtil.id(protocol.executionTime().atZone(ZoneId.systemDefault()).toEpochSecond(), name), id);
 		assertEquals(Optional.empty(), protocol.logMessage());
+	}
+	
+	@Test
+	void createImport() {
+		final var id = UUID.randomUUID().toString();
+		final var executionTime = LocalDateTime.now();
+		final var status = Protocol.Status.Error;
+		final var logMessage = RandomTestUtil.randomString();
+		
+		final Protocol protocol = new ProtocolImpl(id, name, executionTime,status,logMessage);
+		
+		assertEquals(name,protocol.name());
+		assertEquals(executionTime,protocol.executionTime());
+		assertEquals(status,protocol.status());
+		assertEquals(Optional.of(logMessage),protocol.logMessage());
+		assertEquals(id, IdUtil.getId(protocol));
 	}
 
 	@ParameterizedTest

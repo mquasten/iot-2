@@ -7,7 +7,6 @@ import static de.mq.iot2.protocol.SystemvariableProtocolParameter.Systemvariable
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
-
 import de.mq.iot2.protocol.Protocol;
 import de.mq.iot2.protocol.SystemvariableProtocolParameter;
 import jakarta.persistence.Column;
@@ -46,6 +45,11 @@ class SystemvariableProtocolParameterImpl extends ProtocolParameterImpl implemen
 	SystemvariableProtocolParameterImpl(final Protocol protocol, final String name, final String value) {
 		super(protocol, name, Result,StringUtils.defaultIfBlank(StringUtils.defaultIfEmpty(value, EMPTY_VALUE_STRING), EMPTY_VALUE_STRING));
 		this.status = Calculated;
+	}
+	
+	SystemvariableProtocolParameterImpl(final Protocol protocol, final String name, final String value, final SystemvariableStatus status) {
+		this(protocol, name, value);
+		this.status=status;
 	}
 
 	@Override
