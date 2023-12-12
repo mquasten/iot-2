@@ -47,6 +47,8 @@ Aufruf: -c export-calendar file
 file: Dateiname ggf. mit Pfad, mandatory 
 Aufruf: -c export-configuration file 
 file: Dateiname ggf. mit Pfad, mandatory
+Aufruf: -c export-protocol file 
+file: Dateiname ggf. mit Pfad, mandatory
 
 Import-Batch
 Importiert Calendar (Day, DayGroup,Cycle) und Configuration(Parameter, Configuration) als CSV-Datei.
