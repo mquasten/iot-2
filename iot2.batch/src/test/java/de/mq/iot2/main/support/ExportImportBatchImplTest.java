@@ -134,6 +134,24 @@ class ExportImportBatchImplTest {
 	}
 	
 	@Test
+	void importProtocol() throws IOException {
+		final File file = Mockito.mock(File.class);
+		when(file.getAbsolutePath()).thenReturn("path");
+		Mockito.doAnswer(x -> {
+			assertEquals(csvContent, inputStream(x.getArgument(0, InputStream.class)));
+			return null;
+		}).when(protocolService).importCsv(Mockito.any());
+		try (final MockedStatic<FileCopyUtils> util = mockStatic(FileCopyUtils.class)) {
+			util.when(() -> FileCopyUtils.copyToByteArray(file)).thenReturn(csvContent.getBytes());
+			
+			exportImportBatch.importProtocol(file);
+			
+			util.verify(() -> FileCopyUtils.copyToByteArray(file));
+		}
+		verify(protocolService).importCsv(Mockito.any());
+	}
+	
+	@Test
 	void deleteCalendarAndConfiguration() {
 		
 		final boolean removeConfigurationCalled[] = {false};

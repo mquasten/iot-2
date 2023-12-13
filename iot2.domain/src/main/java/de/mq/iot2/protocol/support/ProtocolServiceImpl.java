@@ -1,5 +1,9 @@
 package de.mq.iot2.protocol.support;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -7,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,16 +49,18 @@ class ProtocolServiceImpl implements ProtocolService {
 	private final ProtocolParameterRepository protocolParameterRepository;
 	private final ConversionService conversionService;
 	private final Converter<Pair<ProtocolParameter, Boolean>, String[]> parameterCsvConverter;
+	private final Converter<Pair<String[], Map<String, Protocol>>, ProtocolParameter> arrayCsvConverter;
 
 	private final String csvDelimiter;
 
 	ProtocolServiceImpl(final ProtocolRepository protocolRepository, final ProtocolParameterRepository protocolParameterRepository, final ConversionService conversionService,
-			final Converter<Pair<ProtocolParameter, Boolean>, String[]> parameterCsvConverter, @Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
+			final Converter<Pair<ProtocolParameter, Boolean>, String[]> parameterCsvConverter, final Converter<Pair<String[], Map<String, Protocol>>, ProtocolParameter> arrayCsvConverter, @Value("${iot2.csv.delimiter:;}") final String csvDelimiter) {
 		this.protocolRepository = protocolRepository;
 		this.conversionService = conversionService;
 		this.protocolParameterRepository = protocolParameterRepository;
 		this.parameterCsvConverter = parameterCsvConverter;
 		this.csvDelimiter = csvDelimiter;
+		this.arrayCsvConverter=arrayCsvConverter;
 	}
 
 	@Override
@@ -206,6 +213,34 @@ class ProtocolServiceImpl implements ProtocolService {
 			});
 		}
 
+	}
+	
+	@Override
+	@Transactional
+	public void importCsv(final InputStream is) throws IOException {
+		try (final InputStreamReader streamReader = new InputStreamReader(is); final BufferedReader reader = new BufferedReader(streamReader)) {
+			final Map<String, Protocol> protocols = new HashMap<>();
+
+			for (int i = 1; reader.ready(); i++) {
+				final String pattern = String.format("[%s](?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", csvDelimiter);
+				final String line = reader.readLine();
+
+				final String[] cols = List.of(line.split(pattern, -1)).stream()
+						.map(col -> StringUtils.trimTrailingCharacter(StringUtils.trimLeadingCharacter(col.strip(), '"'), '"').strip()).toArray(size -> new String[size]);
+
+				Assert.isTrue(cols.length == 9, String.format(Array2ProtocolParameterConverterImpl.WRONG_NUMBER_OF_COLUMNS_MESSAGE, i));
+
+				final ProtocolParameter parameter = arrayCsvConverter.convert(Pair.of(cols, protocols));
+
+				if (!protocols.containsKey(IdUtil.getId(parameter.protocol()))) {
+					protocols.put(IdUtil.getId(parameter.protocol()), parameter.protocol());
+					protocolRepository.save(parameter.protocol());
+				}
+
+				protocolParameterRepository.save(parameter);
+				i++;
+			}
+		}
 	}
 
 }

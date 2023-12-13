@@ -15,10 +15,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Duration;
@@ -58,6 +62,7 @@ import de.mq.iot2.protocol.ProtocolParameter;
 import de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType;
 import de.mq.iot2.protocol.ProtocolService;
 import de.mq.iot2.protocol.SystemvariableProtocolParameter;
+import de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus;
 import de.mq.iot2.support.IdUtil;
 import de.mq.iot2.support.RandomTestUtil;
 import de.mq.iot2.sysvars.SystemVariable;
@@ -69,7 +74,8 @@ class ProtocolServiceImplTest {
 	private final ProtocolParameterRepository protocolParameterRepository = mock(ProtocolParameterRepository.class);
 	private final ConversionService conversionService = mock(ConversionService.class);
 	private final Converter<Pair<ProtocolParameter, Boolean>, String[]> parameterCsvConverter = mock(ProtocolParameterCsvConverterImpl.class);
-	private final ProtocolService protocolService = new ProtocolServiceImpl(protocolRepository, protocolParameterRepository, conversionService, parameterCsvConverter, DELIMITER);
+	private final Converter<Pair<String[], Map<String, Protocol>>, ProtocolParameter> arrayCsvConverter = mock(Array2ProtocolParameterConverterImpl.class);
+	private final ProtocolService protocolService = new ProtocolServiceImpl(protocolRepository, protocolParameterRepository, conversionService, parameterCsvConverter, arrayCsvConverter, DELIMITER);
 
 	private final Protocol protocol = new ProtocolImpl(RandomTestUtil.randomString());
 	private static final LocalDate MAXWEELS_BIRTHDATE = LocalDate.of(1831, 6, 18);
@@ -450,7 +456,6 @@ class ProtocolServiceImplTest {
 
 		protocolService.export(byteArrayOutputStream);
 
-		
 		CollectionUtils.arrayToList(byteArrayOutputStream.toString().split("\n")).stream().forEach(x -> {
 
 			final String[] results = StringUtils.delimitedListToStringArray(((String) x).strip(), DELIMITER);
@@ -472,9 +477,55 @@ class ProtocolServiceImplTest {
 
 	}
 
+	@Test
+	void importCsv() throws IOException {
+
+		final Protocol endOfDayProtocol = mock(ProtocolImpl.class);
+		final Protocol cleanupProtocol = mock(ProtocolImpl.class);
+		final Protocol cleanupCalendar = mock(ProtocolImpl.class);
+		IdUtil.assignId(endOfDayProtocol, "7a2e8b57-84fe-d775-0000-00006560efe7");
+		IdUtil.assignId(cleanupProtocol, "9074fd2c-547e-47b7-0000-00006560f1c2");
+		IdUtil.assignId(cleanupCalendar, "a8031c07-ae02-1aa8-0000-00006578d2c4");
+		final List<ProtocolParameter> protocolParameters = List.of(new ProtocolParameterImpl(endOfDayProtocol, "Cycle", ProtocolParameterType.RulesEngineArgument, "Freizeit"),
+				new SystemvariableProtocolParameterImpl(endOfDayProtocol, "DailyEvents", "T0:7.0;T1:8.06;T6:17.15", SystemvariableStatus.Calculated),
+				new ProtocolParameterImpl(cleanupProtocol, "ProtocolBack", ProtocolParameterType.Configuration, "30"), new ProtocolParameterImpl(cleanupProtocol, "ProtocolsDeleted", ProtocolParameterType.Result, "0"),
+				new ProtocolParameterImpl(cleanupCalendar, "DaysBack", ProtocolParameterType.Configuration, "30"), new ProtocolParameterImpl(cleanupCalendar, "DaysDeleted", ProtocolParameterType.Result, "0"));
+
+		final int[] counters = { 0 };
+		Mockito.doAnswer(answer -> {
+			@SuppressWarnings("unchecked")
+			final Pair<String[], Map<String, Protocol>> pair = answer.getArgument(0, Pair.class);
+			assertEquals(9, pair.getFirst().length);
+			final ProtocolParameter result = protocolParameters.get(counters[0]);
+			assertTrue(protocolParameters.size() >= counters[0]);
+			assertTrue(3 >= pair.getSecond().size());
+			counters[0] = counters[0] + 1;
+			return result;
+
+		}).when(arrayCsvConverter).convert(Mockito.any());
+
+		try (final InputStream is = getClass().getClassLoader().getResourceAsStream("protocol.csv")) {
+			protocolService.importCsv(is);
+		}
+		protocolParameters.forEach(parameter -> verify(protocolParameterRepository, times(1)).save(parameter));
+		verify(protocolRepository, times(1)).save(endOfDayProtocol);
+		verify(protocolRepository, times(1)).save(cleanupProtocol);
+		verify(protocolRepository, times(1)).save(cleanupCalendar);
+
+	}
+
 	private String epochMilliSeconds(final LocalDateTime executionTime) {
 		return "" + ZonedDateTime.of(executionTime, ZoneId.systemDefault()).toInstant().toEpochMilli();
 	}
+	
+	@Test
+	void importCsvWrongNUmberOfColumns() throws IOException {
+		try (final InputStream is = new ByteArrayInputStream(";".getBytes());) {
+			assertEquals(String.format(Array2ProtocolParameterConverterImpl.WRONG_NUMBER_OF_COLUMNS_MESSAGE, 1),
+					assertThrows(IllegalArgumentException.class, () -> protocolService.importCsv(is)).getMessage());
+		}
+	}
+	
 
 }
 

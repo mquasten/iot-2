@@ -1,0 +1,6 @@
+Parameter;Cycle;RulesEngineArgument;Freizeit;7a2e8b57-84fe-d775-0000-00006560efe7;end-of-day;1700851687261;Success;
+Systemvariable;DailyEvents;Calculated;"T0:7.0;T1:8.06;T6:17.15";7a2e8b57-84fe-d775-0000-00006560efe7;;;;
+Parameter;ProtocolBack;Configuration;30;9074fd2c-547e-47b7-0000-00006560f1c2;cleanup-protocol;1700852162307;Success;
+Parameter;ProtocolsDeleted;Result;0;9074fd2c-547e-47b7-0000-00006560f1c2;;;;
+Parameter;DaysBack;Configuration;30;a8031c07-ae02-1aa8-0000-00006578d2c4;cleanup-calendar;1702417092638;Success;
+Parameter;DaysDeleted;Result;0;a8031c07-ae02-1aa8-0000-00006578d2c4;;;;

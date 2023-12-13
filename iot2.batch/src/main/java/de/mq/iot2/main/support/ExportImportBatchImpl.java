@@ -77,6 +77,16 @@ class ExportImportBatchImpl {
 		}
 		LOGGER.info("Import Configuration finished.");
 	}
+	
+	@BatchMethod(value = "import-protocol", converterClass = ExportImportBatchArgumentConverterImpl.class)
+	void importProtocol(final File file) throws IOException {
+		LOGGER.info("Start import protocol, file: {}.", file.getAbsolutePath());
+		final byte[] data = FileCopyUtils.copyToByteArray(file);
+		try (final InputStream is = new ByteArrayInputStream(data)) {
+			protocolService.importCsv(is);
+		}
+		LOGGER.info("Import Protocol finished.");
+	}
 
 	@BatchMethod(value = "delete-calendar-and-configurations", converterClass = NoArgumentConverterImpl.class)
 	void deleteCalendarAndConfigurations() {

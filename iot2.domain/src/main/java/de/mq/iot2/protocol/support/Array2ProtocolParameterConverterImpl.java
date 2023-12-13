@@ -9,6 +9,7 @@ import java.util.function.BiFunction;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -17,6 +18,7 @@ import de.mq.iot2.protocol.ProtocolParameter;
 import de.mq.iot2.protocol.ProtocolParameter.ProtocolParameterType;
 import de.mq.iot2.protocol.SystemvariableProtocolParameter.SystemvariableStatus;
 
+@Component
 class Array2ProtocolParameterConverterImpl implements Converter<Pair<String[], Map<String, Protocol>>, ProtocolParameter> {
 
 	static final String WRONG_NUMBER_OF_COLUMNS_MESSAGE = "9 columns expected.";

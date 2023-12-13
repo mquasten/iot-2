@@ -1,6 +1,8 @@
 package de.mq.iot2.protocol;
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
@@ -41,6 +43,8 @@ public interface ProtocolService {
 	Collection<ProtocolParameter> protocolParameters(final String protocolId);
 
 	void export(final OutputStream os);
+
+	void importCsv(final InputStream is) throws IOException;
 	
 
 
