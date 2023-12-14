@@ -3,6 +3,7 @@ package de.mq.iot2.protocol.support;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.RepositoryDefinition;
 
@@ -25,6 +26,10 @@ interface ProtocolParameterRepository {
 	
 	Collection<ProtocolParameter> findByProtocolOrderByTypeAscNameAsc(final Protocol protocol);
 	
+	
+	@Modifying
+	@Query("delete from ProtocolParameter")
+	void deleteAll();
 
 
 }

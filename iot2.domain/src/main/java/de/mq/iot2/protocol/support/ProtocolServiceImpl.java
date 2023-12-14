@@ -177,7 +177,7 @@ class ProtocolServiceImpl implements ProtocolService {
 	@Override
 	@Transactional
 	public Collection<Protocol> protocols(final String name) {
-		return protocolRepository.findByNameOrderByExecutionTime(name);
+		return protocolRepository.findByNameOrderByExecutionTimeDesc(name);
 	}
 
 	@Override
@@ -241,6 +241,13 @@ class ProtocolServiceImpl implements ProtocolService {
 				i++;
 			}
 		}
+	}
+	
+	@Override
+	@Transactional
+	public void removeProtocols() {
+		protocolParameterRepository.deleteAll();
+		protocolRepository.deleteAll();
 	}
 
 }

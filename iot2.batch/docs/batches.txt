@@ -65,7 +65,8 @@ Aufruf: -c delete-calendar-and-configurations
 Keine weiteren Argumente
 Aufruf: -c  delete-configurations
 Keine weiteren Argumente
-
+Aufruf: -c  delete-protocols
+Keine weiteren Argumente
 
 Profile aktivieren:
  -Dspring.profiles.active=oracle 

@@ -102,5 +102,13 @@ class ExportImportBatchImpl {
 		configurationService.removeConfigurations();
 		LOGGER.info("Delete configurations finished.");
 	}
+	
+	
+	@BatchMethod(value = "delete-protocols", converterClass = NoArgumentConverterImpl.class)
+	void deleteProtocols()  {
+		LOGGER.info("Delete protocols.");
+		protocolService.removeProtocols();
+		LOGGER.info("Delete protocols finished.");
+	}
 
 }

@@ -45,6 +45,8 @@ public interface ProtocolService {
 	void export(final OutputStream os);
 
 	void importCsv(final InputStream is) throws IOException;
+
+	void removeProtocols();
 	
 
 

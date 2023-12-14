@@ -330,11 +330,11 @@ class ProtocolServiceImplTest {
 	void protocols() {
 		final var protocolName = RandomTestUtil.randomString();
 		final Collection<Protocol> protocols = List.of(Mockito.mock(Protocol.class), Mockito.mock(Protocol.class));
-		when(protocolRepository.findByNameOrderByExecutionTime(protocolName)).thenReturn(protocols);
+		when(protocolRepository.findByNameOrderByExecutionTimeDesc(protocolName)).thenReturn(protocols);
 
 		assertEquals(protocols, protocolService.protocols(protocolName));
 
-		verify(protocolRepository).findByNameOrderByExecutionTime(protocolName);
+		verify(protocolRepository).findByNameOrderByExecutionTimeDesc(protocolName);
 	}
 
 	@Test
@@ -526,6 +526,13 @@ class ProtocolServiceImplTest {
 		}
 	}
 	
+	@Test
+	void remove() {
+		protocolService.removeProtocols();
+		
+		verify(protocolParameterRepository).deleteAll();
+		verify(protocolRepository).deleteAll();
+	}
 
 }
 

@@ -178,5 +178,13 @@ class ExportImportBatchImplTest {
 		
 		verify(configurationService, times(1)).removeConfigurations();
 	}
+	
+	
+	@Test
+	void deleteProtocols() {
+		exportImportBatch.deleteProtocols();;
+		
+		verify(protocolService, times(1)).removeProtocols();
+	}
 
 }
