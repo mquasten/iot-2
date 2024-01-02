@@ -56,6 +56,7 @@ class VariableControllerTest {
 	private final Model model = new ExtendedModelMap();
 	private VariableController variableController = new VariableController(calendarService, configurationService, weatherService, conversionService, systemVariableService);
 
+	@SuppressWarnings("unchecked")
 	@Test
 	void variable() {
 		final var date = LocalDate.now();
@@ -66,7 +67,7 @@ class VariableControllerTest {
 		when(calendarService.sunDownTime(date.plusDays(1), TwilightType.Civil)).thenReturn(Optional.of(SUN_DOWNTIME_NEXT));
 		when(weatherService.maxForecastTemperature(date)).thenReturn(Optional.of(TEMPERATURE));
 		when(weatherService.maxForecastTemperature(date.plusDays(1))).thenReturn(Optional.of(TEMPERATURE_NEXT));
-		doAnswer(a -> "" + a.getArgument(0)).when(conversionService).convert(anyDouble(), any());
+		doAnswer(a -> "" + a.getArgument(0)).when(conversionService).convert(any(), any(Class.class));
 
 		assertEquals(VARIABLE_MODEL_AND_VIEW_NAME, variableController.variable(model, false, Locale.ENGLISH));
 
@@ -91,6 +92,7 @@ class VariableControllerTest {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	void variableWithSystemVariables() {
 		final var date = LocalDate.now();
@@ -103,7 +105,7 @@ class VariableControllerTest {
 		when(weatherService.maxForecastTemperature(date.plusDays(1))).thenReturn(Optional.of(TEMPERATURE_NEXT));
 		final Collection<SystemVariable> systemVariables = List.of(mock(SystemVariable.class));
 		when(systemVariableService.read()).thenReturn(systemVariables);
-		doAnswer(a -> "" + a.getArgument(0)).when(conversionService).convert(anyDouble(), any());
+		doAnswer(a -> "" + a.getArgument(0)).when(conversionService).convert(anyDouble(), any(Class.class));
 
 		assertEquals(VARIABLE_MODEL_AND_VIEW_NAME, variableController.variable(model, true, Locale.ENGLISH));
 

@@ -182,9 +182,10 @@ class TimerControllerTest {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private void perpareConversionService() {
-		doAnswer(a -> time(a)).when(conversionService).convert(anyString(), any());
-		doAnswer(a -> "" + a.getArgument(0, Double.class)).when(conversionService).convert(anyDouble(), any());
+		doAnswer(a -> time(a)).when(conversionService).convert(anyString(), any(Class.class));
+		doAnswer(a -> "" + a.getArgument(0, Double.class)).when(conversionService).convert(anyDouble(), any(Class.class));
 	}
 
 	@Test

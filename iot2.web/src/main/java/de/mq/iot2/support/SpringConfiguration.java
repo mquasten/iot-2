@@ -36,10 +36,10 @@ public class SpringConfiguration implements WebMvcConfigurer {
 	static final String I18N_MESSAGE_PATH = "i18n/messages";
 
 	private final boolean loginRequired;
-	private final AuthenticationSuccessHandler authenticationSuccessHandler;
+	// private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
 	SpringConfiguration(final AuthenticationSuccessHandler authenticationSuccessHandler, @Value("${iot2.login.required:true}") final boolean loginRequired) {
-		this.authenticationSuccessHandler = authenticationSuccessHandler;
+		// this.authenticationSuccessHandler = authenticationSuccessHandler;
 		this.loginRequired = loginRequired;
 	}
 
@@ -105,11 +105,13 @@ public class SpringConfiguration implements WebMvcConfigurer {
 			AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests) throws Exception {
 		if (loginRequired) {
 			requests.requestMatchers(mvcMatcherBuilder.pattern("/css/**"), mvcMatcherBuilder.pattern("/css/**"), mvcMatcherBuilder.pattern("/index.html")).permitAll().anyRequest()
-					.authenticated().and().formLogin().loginPage(LOGIN_PAGE).successHandler(authenticationSuccessHandler).permitAll().and().logout().permitAll();
-		    return;
-		} 
-			http.authorizeHttpRequests().anyRequest().permitAll();
-		
+					.authenticated();
+			http.formLogin(formLogin -> formLogin.loginPage("/login").permitAll());
+			http.logout(logout -> logout.permitAll());
+			return;
+		}
+		http.authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.anyRequest().permitAll());
+
 	}
 
 	@Bean()
