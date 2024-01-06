@@ -1,3 +1,6 @@
 docker system prune -f  --all --volumes
 docker build -t iot2batch .
-docker run  -v C:/mq/h2:/db  iot2batch
+
+docker run  -v C:/h2:/db  iot2batch -c end-of-day
+docker run  -v C:/h2:/db  iot2batch ! "ls -ltr"
+docker run -it -v C:/h2:/db  iot2batch ! bash
