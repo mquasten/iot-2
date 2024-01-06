@@ -41,6 +41,7 @@ class HomematicCCU2RepositoryImpl implements SystemVariableRepository {
 
 	HomematicCCU2RepositoryImpl(final RestOperations restOperations, @Value("${iot2.ccu2.host}") final String host, @Value("${iot2.ccu2.port:80}") final Integer port) {
 		this.restOperations = restOperations;
+		
 		this.host = host;
 		this.port = port;
 	}

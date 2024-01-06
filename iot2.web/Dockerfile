@@ -1,28 +1,28 @@
-FROM ubuntu
+FROM openjdk:21
 
-RUN apt update
 
-RUN apt install openjdk-21-jdk -y
-RUN apt-get install -y iputils-ping
-RUN apt-get install -y curl
-RUN apt-get install -y unzip
 
-ENV DOWNLOAD https://github.com/h2database/h2database/releases/download/version-2.1.214/h2-2022-06-13.zip
 
-RUN mkdir /iot2
-RUN mkdir /db
-RUN mkdir -p /h2 \
-    && curl -L ${DOWNLOAD} -o h2.zip \
-    && unzip h2.zip -d /h2/ \
-    && rm h2.zip
+ENV DOWNLOAD https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
+ENV DATA_DIR /db
+ENV H2_DIR /h2
+ENV APP_DIR /iot2
 
-COPY target/iot2Web.jar /iot2
-RUN cp /h2/h2/bin/h2-2.1.214.jar /h2/
-RUN rm -rf /h2/h2
 
-RUN echo "java -jar /h2/h2-2.1.214.jar  -baseDir /db & java -jar iot2Web.jar" > /iot2/iot2.sh
-RUN chmod +x /iot2/iot2.sh
+RUN mkdir ${APP_DIR}
+RUN mkdir ${DATA_DIR}
 
-WORKDIR /iot2
+RUN mkdir -p ${H2_DIR}
 
-CMD ["sh", "-c" , "/iot2/iot2.sh"]
+COPY target/iot2Web.jar ${APP_DIR}/
+
+
+RUN curl -L ${DOWNLOAD} -o ${H2_DIR}/h2-2.1.214.jar
+
+RUN echo "java -jar ${H2_DIR}/h2-2.1.214.jar -webAllowOthers  -tcpAllowOthers -baseDir ${DATA_DIR} & java -jar ${APP_DIR}/iot2Web.jar" > ${APP_DIR}/iot2.sh
+
+RUN chmod +x ${APP_DIR}/iot2.sh
+
+WORKDIR ${APP_DIR}
+
+CMD ["sh", "-c" , "${APP_DIR}/iot2.sh"]
