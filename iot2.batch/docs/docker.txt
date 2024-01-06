@@ -1,3 +1,3 @@
 docker system prune -f  --all --volumes
 docker build -t iot2batch .
-docker run  -v C:/mq/h2:/db  -e CCU2_HOST=192.168.2.100  iot2batch
+docker run  -v C:/mq/h2:/db  iot2batch
