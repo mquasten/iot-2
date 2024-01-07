@@ -4,3 +4,5 @@ docker build -t iot2batch .
 docker run  -v C:/h2:/db  iot2batch -c end-of-day
 docker run  -v C:/h2:/db  iot2batch ! "ls -ltr"
 docker run -it -v C:/h2:/db  iot2batch ! bash
+
+docker  run -v C:/h2:/db  iot2batch ! "java -cp /h2/h2-2.1.214.jar  org.h2.tools.Script -url jdbc:h2:tcp://localhost/iot -user sa -password sa -script /db/backup/backup.sql"
