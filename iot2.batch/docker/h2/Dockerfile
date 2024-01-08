@@ -1,3 +1,4 @@
+# Testdatenbank 
 FROM openjdk:21
 
 ENV DOWNLOAD https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
