@@ -41,16 +41,28 @@ RUN echo '#!/bin/bash' > ${APP_DIR}/endOfDay.sh
 RUN echo 'DATE=`date`' >>  ${APP_DIR}/endOfDay.sh
 RUN echo 'echo start end-of-day at: $DATE' >>  ${APP_DIR}/endOfDay.sh
 RUN echo 'java -jar iot2Batch.jar -c end-of-day' >>  ${APP_DIR}/endOfDay.sh
+
+RUN echo 'DATE=`date`' >>  ${APP_DIR}/endOfDay.sh
 RUN echo 'echo start export-calendar at: $DATE' >>  ${APP_DIR}/endOfDay.sh 
 RUN echo 'java -jar iot2Batch.jar -c export-calendar' /backup/calendar.csv >>  ${APP_DIR}/endOfDay.sh
+
+RUN echo 'DATE=`date`' >>  ${APP_DIR}/endOfDay.sh
 RUN echo 'echo start export-configuration at: $DATE' >>  ${APP_DIR}/endOfDay.sh
 RUN echo 'java -jar iot2Batch.jar -c export-configuration /backup/configuration.csv' >>  ${APP_DIR}/endOfDay.sh
+
+RUN echo 'DATE=`date`' >>  ${APP_DIR}/endOfDay.sh
 RUN echo 'echo start export-protocol at: $DATE'  >>  ${APP_DIR}/endOfDay.sh 
 RUN echo 'java -jar iot2Batch.jar -c export-protocol /backup/protocol.csv'  >>  ${APP_DIR}/endOfDay.sh 
+
+RUN echo 'DATE=`date`' >>  ${APP_DIR}/endOfDay.sh
 RUN echo 'echo start cleanup-calendar at: $DATE' >>  ${APP_DIR}/endOfDay.sh 
 RUN echo 'java -jar iot2Batch.jar -c cleanup-calendar' >>  ${APP_DIR}/endOfDay.sh 
+
+RUN echo 'DATE=`date`' >>  ${APP_DIR}/endOfDay.sh
 RUN echo 'echo start cleanup-protocol at: $DATE' >>  ${APP_DIR}/endOfDay.sh
 RUN echo 'java -jar iot2Batch.jar -c cleanup-protocol' >>  ${APP_DIR}/endOfDay.sh
+
+RUN echo 'DATE=`date`' >>  ${APP_DIR}/endOfDay.sh
 RUN echo 'echo start db backup at: $DATE'  >>  ${APP_DIR}/endOfDay.sh
 RUN echo "java -cp ${H2_DIR}/h2-2.1.214.jar  org.h2.tools.Script -url jdbc:h2:tcp://localhost/iot -user sa -password sa -script /backup/backup.sql" >>  ${APP_DIR}/endOfDay.sh
 
