@@ -1,1 +1,0 @@
-C:/Users/Nutzer/git/iot-2/iot2.domain/docs/create-user.sql
