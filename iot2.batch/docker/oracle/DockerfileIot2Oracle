@@ -1,8 +1,14 @@
 FROM container-registry.oracle.com/database/express:latest
 
+USER root
+
+RUN  yum install -y dos2unix
+
+
 USER oracle
 
 ENV APP_DIR /home/oracle/iot2
+
 RUN mkdir ${APP_DIR}
 
 ENV DOWNLOAD https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
@@ -13,14 +19,23 @@ RUN rm ${APP_DIR}/jdk-21.tar.gz
 
 ENV TZ Europe/Berlin
 COPY --chown=oracle:oinstall target/iot2Batch.jar ${APP_DIR}/
-COPY --chown=oracle:oinstall docker/oracle/iot2.sh ${APP_DIR}/
-COPY --chown=oracle:oinstall docker/oracle/endOfDay.sh ${APP_DIR}/
-COPY --chown=oracle:oinstall docker/oracle/calendar.csv   /opt/oracle/scripts/setup
-COPY --chown=oracle:oinstall docker/oracle/configuration.csv /opt/oracle/scripts/setup
+
+COPY --chown=oracle:oinstall docker/scripts/iot2.sh ${APP_DIR}/
+COPY --chown=oracle:oinstall docker/scripts/endOfDay.sh ${APP_DIR}/
+COPY --chown=oracle:oinstall docker/scripts/calendar.csv   ${APP_DIR}/
+COPY --chown=oracle:oinstall docker/scripts/configuration.csv ${APP_DIR}/
 COPY --chown=oracle:oinstall docker/oracle/create-user.sql  /opt/oracle/scripts/setup/01-create-user.sql
 COPY --chown=oracle:oinstall docker/oracle/iot-2-oracle.sql /opt/oracle/scripts/setup/02-iot-2-oracle.sql
-COPY --chown=oracle:oinstall docker/oracle/loadData.sh /opt/oracle/scripts/setup/03-loadData.sh
+COPY --chown=oracle:oinstall docker/scripts/loadData.sh /opt/oracle/scripts/setup/03-loadData.sh
 
+
+RUN dos2unix ${APP_DIR}/iot2.sh;
+RUN dos2unix ${APP_DIR}/endOfDay.sh;
+RUN dos2unix ${APP_DIR}/calendar.csv;
+RUN dos2unix ${APP_DIR}/configuration.csv
+RUN dos2unix /opt/oracle/scripts/setup/03-loadData.sh;
+RUN dos2unix /opt/oracle/scripts/setup/01-create-user.sql
+RUN dos2unix /opt/oracle/scripts/setup/02-iot-2-oracle.sql
 
 RUN ln -s ${APP_DIR}/iot2.sh ${APP_DIR}/iot2
 RUN ln -s ${APP_DIR}/endOfDay.sh ${APP_DIR}/endOfDay
