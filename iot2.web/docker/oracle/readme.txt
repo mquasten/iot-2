@@ -12,3 +12,8 @@ docker run  -d --name iot2 -p 8080:8080 -p 1522:1521   -e ORACLE_PWD=oracle -v C
 docker logs -f iot2
 
 docker exec -it iot2 bash
+
+
+docker save -o iot2oracle.tar  iot2oracle
+gzip iot2oracle.tar
+docker load -i iot2oracle.tar.gz 

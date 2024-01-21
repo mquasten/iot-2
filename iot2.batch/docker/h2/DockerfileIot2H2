@@ -1,0 +1,23 @@
+FROM   container-registry.oracle.com/java/openjdk:21-oraclelinux8
+
+#container-registry.oracle.com/os/oraclelinux
+
+ENV DOWNLOAD https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
+ARG USER=iot2
+ARG HOME=/home/iot2
+ENV APP_DIR ${HOME}/${USER}
+ENV DATA_DIR /db
+RUN adduser iot2 -d ${HOME}
+
+USER ${USER}
+RUN mkdir -p ${APP_DIR}
+
+
+RUN curl -L ${DOWNLOAD} -o ${APP_DIR}/h2-2.1.214.jar
+
+WORKDIR ${HOME}
+
+CMD java -cp ${APP_DIR}/h2*.jar org.h2.tools.Server \
+    -web -webAllowOthers \
+    -tcp -tcpAllowOthers \
+    -baseDir ${DATA_DIR} 
