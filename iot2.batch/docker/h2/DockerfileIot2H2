@@ -1,23 +1,40 @@
-FROM   container-registry.oracle.com/java/openjdk:21-oraclelinux8
+FROM container-registry.oracle.com/java/openjdk:21-oraclelinux8
 
-#container-registry.oracle.com/os/oraclelinux
-
-ENV DOWNLOAD https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
+ARG DOWNLOAD=https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
 ARG USER=iot2
 ARG HOME=/home/iot2
 ENV APP_DIR ${HOME}/${USER}
 ENV DATA_DIR /db
-RUN adduser iot2 -d ${HOME}
+ENV TZ Europe/Berlin
+
+RUN yum install -y dos2unix
+
+
+
+RUN adduser ${USER}  -d ${HOME}
 
 USER ${USER}
 RUN mkdir -p ${APP_DIR}
+RUN chown -R ${USER} ${APP_DIR}   
 
 
 RUN curl -L ${DOWNLOAD} -o ${APP_DIR}/h2-2.1.214.jar
 
+COPY  --chown=${USER}:${USER} docker/scripts/iot2.sh ${APP_DIR}/
+COPY --chown=${USER}:${USER}  docker/scripts/endOfDay.sh ${APP_DIR}/
+COPY  --chown=${USER}:${USER} docker/h2/startH2.sh ${APP_DIR}/
+COPY  --chown=${USER}:${USER} target/iot2Batch.jar ${APP_DIR}/
+RUN dos2unix ${APP_DIR}/iot2.sh
+RUN dos2unix ${APP_DIR}/endOfDay.sh
+RUN dos2unix ${APP_DIR}/startH2.sh
+
+
+RUN ln -s ${APP_DIR}/iot2.sh ${APP_DIR}/iot2
+RUN ln -s ${APP_DIR}/endOfDay.sh ${APP_DIR}/endOfDay
+
+
+ENV PATH $PATH:$APP_DIR
+
 WORKDIR ${HOME}
 
-CMD java -cp ${APP_DIR}/h2*.jar org.h2.tools.Server \
-    -web -webAllowOthers \
-    -tcp -tcpAllowOthers \
-    -baseDir ${DATA_DIR} 
+ENTRYPOINT  startH2.sh && tail -f /dev/null

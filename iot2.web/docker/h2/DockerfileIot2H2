@@ -1,0 +1,14 @@
+FROM iot2batchh2 
+
+ARG USER=iot2
+USER ${USER}
+COPY --chown=${USER}:${USER} target/iot2Web.jar ${APP_DIR}/
+COPY --chown=${USER}:${USER} docker/iot2Web.sh ${APP_DIR}/
+
+
+
+
+RUN dos2unix ${APP_DIR}/iot2Web.sh
+
+
+ENTRYPOINT startH2.sh && iot2Web.sh && tail -f /dev/null
