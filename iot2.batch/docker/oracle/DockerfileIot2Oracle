@@ -12,8 +12,6 @@ ENV APP_DIR /home/oracle/iot2
 RUN mkdir ${APP_DIR}
 
 # https://jdk.java.net/
-https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
-
 ENV DOWNLOAD https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
 RUN curl -L ${DOWNLOAD} -o ${APP_DIR}/jdk-21.tar.gz
 RUN tar xf ${APP_DIR}/jdk-21.tar.gz -C ${APP_DIR}
