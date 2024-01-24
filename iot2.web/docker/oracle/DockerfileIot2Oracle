@@ -1,8 +1,0 @@
-FROM iot2batchoracle
-USER oracle
-
-COPY --chown=oracle:oinstall target/iot2Web.jar ${APP_DIR}/
-
-COPY --chown=oracle:oinstall docker/iot2Web.sh  /opt/oracle/scripts/startup/
-
-RUN dos2unix /opt/oracle/scripts/startup/iot2Web.sh

@@ -1,0 +1,21 @@
+DockerfileIot2H2
+# docker image für iot2
+docker system prune -f  --all --volumes
+docker build -t iot2  -f docker/DockerfileIot2 .
+
+start für oracle 
+docker run -d --name iot2 -p 8080:8080 -p 1522:1521  -e ORACLE_PWD=oracle -v C:\iot/oracle:/opt/oracle/oradata  -v C:\iot/backup:/backup  iot2
+
+start für H2
+docker run -d --name iot2 -p 8080:8080  -p 9092:9092 -p 8082:8082 -v C:\iot/h2:/db -v C:\iot/backup:/backup  iot2
+
+
+docker exec -it iot2 bash|sh
+docker exec -it iot2 endOfDay[.sh]
+docker exec -it iot2 backup[.sh] 
+docker exec -it iot2 iot2[.sh] -c end-of-day
+
+
+docker save -o iot2.tar iot2 
+docker load -i iot2.tar 
+

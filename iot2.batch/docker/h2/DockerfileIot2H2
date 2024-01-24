@@ -7,8 +7,8 @@ ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.
 # https://jdk.java.net/
 # wird nicht benutzt, weil riesig gross
 ARG DOWNLOAD_JAVA=https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
-ARG USER=iot2
-ARG HOME=/home/iot2
+ENV USER iot2
+ENV HOME=/home/iot2
 ENV APP_DIR ${HOME}/${USER}
 ENV JAVA_HOME ${HOME}/jdk-21
 
@@ -47,19 +47,23 @@ RUN curl -L ${DOWNLOAD_H2} -o ${APP_DIR}/h2-2.1.214.jar
 
 COPY  --chown=${USER}:${USER} docker/scripts/iot2.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/scripts/endOfDay.sh ${APP_DIR}/
-COPY  --chown=${USER}:${USER} docker/h2/startH2.sh ${APP_DIR}/
+COPY --chown=${USER}:${USER}  docker/h2/backup.sh ${APP_DIR}/
+COPY  --chown=${USER}:${USER} docker/scripts/autoload.sh ${HOME}/
+COPY  --chown=${USER}:${USER} docker/h2/startH2.sh ${HOME}/startup/01-startH2.sh
 COPY  --chown=${USER}:${USER} target/iot2Batch.jar ${APP_DIR}/
 RUN dos2unix ${APP_DIR}/iot2.sh
 RUN dos2unix ${APP_DIR}/endOfDay.sh
-RUN dos2unix ${APP_DIR}/startH2.sh
+RUN dos2unix ${APP_DIR}/backup.sh
+RUN dos2unix ${HOME}/startup/01-startH2.sh
 
 
 RUN ln -s ${APP_DIR}/iot2.sh ${APP_DIR}/iot2
 RUN ln -s ${APP_DIR}/endOfDay.sh ${APP_DIR}/endOfDay
+RUN ln -s ${APP_DIR}/backup.sh ${APP_DIR}/backup
 
 ENV PATH $PATH:$APP_DIR
 #ENV PATH $PATH:$APP_DIR:${JAVA_HOME}/bin
 
 WORKDIR ${HOME}
 
-ENTRYPOINT  startH2.sh && tail -f /dev/null
+ENTRYPOINT ${HOME}/autoload.sh && tail -f /dev/null

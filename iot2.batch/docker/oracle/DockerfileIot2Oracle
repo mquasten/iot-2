@@ -2,20 +2,26 @@ FROM container-registry.oracle.com/database/express:latest
 
 USER root
 
+
+
 RUN  yum install -y dos2unix
 
+ENV USER oracle
 
-USER oracle
-
-ENV APP_DIR /home/oracle/iot2
-
-RUN mkdir ${APP_DIR}
-
+USER ${USER}
+ENV HOME=/home/oracle
+ENV JAVA_HOME ${HOME}/jdk-21
+ENV APP_DIR ${HOME}/iot2
 # https://jdk.java.net/
 ENV DOWNLOAD https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
-RUN curl -L ${DOWNLOAD} -o ${APP_DIR}/jdk-21.tar.gz
-RUN tar xf ${APP_DIR}/jdk-21.tar.gz -C ${APP_DIR}
-RUN rm ${APP_DIR}/jdk-21.tar.gz
+
+RUN mkdir ${APP_DIR}
+RUN mkdir ${HOME}/startup
+
+
+RUN curl -L ${DOWNLOAD} -o ${HOME}/jdk.tar.gz
+RUN tar xf ${HOME}/jdk.tar.gz -C ${HOME}
+RUN rm ${HOME}/jdk.tar.gz
 
 
 ENV TZ Europe/Berlin
@@ -23,26 +29,36 @@ COPY --chown=oracle:oinstall target/iot2Batch.jar ${APP_DIR}/
 
 COPY --chown=oracle:oinstall docker/scripts/iot2.sh ${APP_DIR}/
 COPY --chown=oracle:oinstall docker/scripts/endOfDay.sh ${APP_DIR}/
+COPY --chown=oracle:oinstall docker/oracle/backup.sh ${APP_DIR}/
 COPY --chown=oracle:oinstall docker/scripts/calendar.csv   ${APP_DIR}/
 COPY --chown=oracle:oinstall docker/scripts/configuration.csv ${APP_DIR}/
 COPY --chown=oracle:oinstall docker/oracle/create-user.sql  /opt/oracle/scripts/setup/01-create-user.sql
 COPY --chown=oracle:oinstall docker/oracle/iot-2-oracle.sql /opt/oracle/scripts/setup/02-iot-2-oracle.sql
 COPY --chown=oracle:oinstall docker/scripts/loadData.sh /opt/oracle/scripts/setup/03-loadData.sh
+COPY --chown=oracle:oinstall docker/oracle/create-directory.sql /opt/oracle/scripts/setup/04-create-directory.sql
+COPY --chown=oracle:oinstall docker/scripts/autoload.sh  /opt/oracle/scripts/startup/
 
 
 RUN dos2unix ${APP_DIR}/iot2.sh;
 RUN dos2unix ${APP_DIR}/endOfDay.sh;
+RUN dos2unix ${APP_DIR}/backup.sh
 RUN dos2unix ${APP_DIR}/calendar.csv;
 RUN dos2unix ${APP_DIR}/configuration.csv
-RUN dos2unix /opt/oracle/scripts/setup/03-loadData.sh;
+
+
 RUN dos2unix /opt/oracle/scripts/setup/01-create-user.sql
 RUN dos2unix /opt/oracle/scripts/setup/02-iot-2-oracle.sql
+RUN dos2unix /opt/oracle/scripts/setup/03-loadData.sh;
+RUN dos2unix /opt/oracle/scripts/setup/04-create-directory.sql
+RUN dos2unix /opt/oracle/scripts/startup/autoload.sh
+
 
 RUN ln -s ${APP_DIR}/iot2.sh ${APP_DIR}/iot2
 RUN ln -s ${APP_DIR}/endOfDay.sh ${APP_DIR}/endOfDay
+RUN ln -s ${APP_DIR}/backup.sh ${APP_DIR}/backup
 
-ENV JAVA_HOME $APP_DIR/jdk-21
-ENV PATH $PATH:$APP_DIR:$JAVA_HOME/bin
+
+ENV PATH $PATH:${APP_DIR}:${JAVA_HOME}/bin
 
 
 

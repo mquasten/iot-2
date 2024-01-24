@@ -8,6 +8,6 @@ alter session set "_ORACLE_SCRIPT"=true;
 
 create user iot2 identified by iot2;
 grant unlimited tablespace to iot2;
-
 grant connect to iot2;
 GRANT RESOURCE TO iot2;
+
