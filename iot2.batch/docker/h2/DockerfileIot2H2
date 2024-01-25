@@ -55,7 +55,7 @@ RUN dos2unix ${APP_DIR}/iot2.sh
 RUN dos2unix ${APP_DIR}/endOfDay.sh
 RUN dos2unix ${APP_DIR}/backup.sh
 RUN dos2unix ${HOME}/startup/01-startH2.sh
-
+RUN dos2unix ${HOME}/autoload.sh
 
 RUN ln -s ${APP_DIR}/iot2.sh ${APP_DIR}/iot2
 RUN ln -s ${APP_DIR}/endOfDay.sh ${APP_DIR}/endOfDay
