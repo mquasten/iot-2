@@ -1,30 +1,51 @@
-FROM eclipse-temurin:21 as jre-build
+FROM ubuntu
 
 ENV USER iot2
-ENV HOME=/home/iot2
+ENV HOME=/home/${USER}
 ENV APP_DIR ${HOME}/${USER}
-ENV JAVA_HOME ${HOME}/jdk-21
-
+ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
 ENV DATA_DIR /db
 
+
+
+
+RUN apt update
+RUN apt-get install -y iputils-ping
+RUN apt-get install -y curl
+RUN apt-get install -y dos2unix
+RUN apt-get install -y  tzdata
+RUN apt-get install -y  openjdk-21-jre-headless
+
 RUN adduser --home ${HOME}  iot2  
+#RUN  chown -R ${USER}  ${HOME}
 
 ENV TZ Europe/Berlin
-RUN mkdir -p ${APP_DIR}
+USER ${USER}
 
-RUN chown -R ${USER} ${APP_DIR}   
+RUN mkdir  ${APP_DIR}
+  
+RUN curl -L ${DOWNLOAD_H2} -o ${APP_DIR}/h2-2.1.214.jar
+COPY  --chown=${USER}:${USER} docker/scripts/iot2.sh ${APP_DIR}/
+COPY --chown=${USER}:${USER}  docker/scripts/endOfDay.sh ${APP_DIR}/
+COPY --chown=${USER}:${USER}  docker/h2/backup.sh ${APP_DIR}/
+COPY  --chown=${USER}:${USER} docker/scripts/autoload.sh ${HOME}/
+COPY  --chown=${USER}:${USER} docker/h2/startH2.sh ${HOME}/startup/01-startH2.sh
+COPY  --chown=${USER}:${USER} target/iot2Batch.jar ${APP_DIR}/
+RUN dos2unix ${APP_DIR}/iot2.sh
+RUN dos2unix ${APP_DIR}/endOfDay.sh
+RUN dos2unix ${APP_DIR}/backup.sh
+RUN dos2unix ${HOME}/startup/01-startH2.sh
+RUN dos2unix ${HOME}/autoload.sh
 
 
 
-#USER ${USER}
 
 
+RUN ln -s ${APP_DIR}/iot2.sh ${APP_DIR}/iot2
+RUN ln -s ${APP_DIR}/endOfDay.sh ${APP_DIR}/endOfDay
+RUN ln -s ${APP_DIR}/backup.sh ${APP_DIR}/backup
+
+ENV PATH $PATH:$APP_DIR:${JAVA_HOME}/bin
 
 
-
-
-
-
-
-
-ENTRYPOINT tail -f /dev/null
+ENTRYPOINT ${HOME}/autoload.sh && tail -f /dev/null

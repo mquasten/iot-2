@@ -27,7 +27,7 @@ Dockerfile: Iot2H2JRE
 docker system prune -f  --all --volumes
 docker build -t iot2batch  -f docker/h2/DockerfileIot2H2JRE .
 
-docker run -d --name iot2batch iot2batch 
+docker run -d --name iot2batch  -p 9092:9092 -p 8082:8082 -v C:\iot/h2:/db -v C:\iot/backup:/backup  iot2batch 
 
 docker save -o iot2batch.tar  
 docker load -i iot2batch.tar 
