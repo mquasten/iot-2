@@ -13,5 +13,7 @@ docker stop iot2  >NUL 2>&1
 docker rm -f iot2  >NUL 2>&1
 docker system prune -f  >NUL 2>&1
 
+REM shutdown /s /f /t 00 >>  C:\iot/log/iot.log 2>>&1
+
 
 
