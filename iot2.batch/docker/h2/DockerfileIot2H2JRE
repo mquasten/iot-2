@@ -1,0 +1,30 @@
+FROM eclipse-temurin:21 as jre-build
+
+ENV USER iot2
+ENV HOME=/home/iot2
+ENV APP_DIR ${HOME}/${USER}
+ENV JAVA_HOME ${HOME}/jdk-21
+
+ENV DATA_DIR /db
+
+RUN adduser --home ${HOME}  iot2  
+
+ENV TZ Europe/Berlin
+RUN mkdir -p ${APP_DIR}
+
+RUN chown -R ${USER} ${APP_DIR}   
+
+
+
+#USER ${USER}
+
+
+
+
+
+
+
+
+
+
+ENTRYPOINT tail -f /dev/null
