@@ -13,7 +13,7 @@ ENV APP_DIR ${HOME}/${USER}
 ENV JAVA_HOME ${HOME}/jdk-21
 
 ENV DATA_DIR /db
-ENV TZ Europe/Berlin
+
 
 #RUN apt-get update
 #RUN apt-get install -y  iputils-ping
@@ -27,11 +27,11 @@ ENV TZ Europe/Berlin
 RUN apk add curl
 #RUN apk add flatpak
 RUN apk add openjdk21-jre
-
+RUN apk add --no-cache tzdata
 
 RUN adduser iot2  -D -h ${HOME}
 
-
+ENV TZ Europe/Berlin
 
 
 USER ${USER}
