@@ -1,3 +1,12 @@
+FROM openjdk:21 as builder
+RUN $JAVA_HOME/bin/jlink \
+         --verbose \
+        --add-modules ALL-MODULE-PATH \
+         --strip-debug \
+         --no-man-pages \
+         --no-header-files \
+        --compress=2 \
+         --output /customjre
 FROM ubuntu
 
 ENV USER iot2
@@ -5,21 +14,30 @@ ENV HOME=/home/${USER}
 ENV APP_DIR ${HOME}/${USER}
 ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
 ENV DATA_DIR /db
+ENV TZ Europe/Berlin
+ENV JAVA_HOME ${HOME}/jre-21
 
 
 
+RUN apt update --no-install-recommends 
+RUN apt-get install  --no-install-recommends  -y iputils-ping
+RUN apt-get install --no-install-recommends  -y curl
+RUN apt-get install --no-install-recommends  -y dos2unix
+RUN apt-get install --no-install-recommends  -y  tzdata
+RUN apt-get install --no-install-recommends -y ca-certificates
 
-RUN apt update
-RUN apt-get install -y iputils-ping
-RUN apt-get install -y curl
-RUN apt-get install -y dos2unix
-RUN apt-get install -y  tzdata
-RUN apt-get install -y  openjdk-21-jre-headless
+
 
 RUN adduser --home ${HOME}  iot2  
 #RUN  chown -R ${USER}  ${HOME}
 
-ENV TZ Europe/Berlin
+
+
+COPY --from=builder /customjre $JAVA_HOME
+
+
+
+
 USER ${USER}
 
 RUN mkdir  ${APP_DIR}
@@ -47,5 +65,6 @@ RUN ln -s ${APP_DIR}/backup.sh ${APP_DIR}/backup
 
 ENV PATH $PATH:$APP_DIR:${JAVA_HOME}/bin
 
+WORKDIR ${HOME}
 
 ENTRYPOINT ${HOME}/autoload.sh && tail -f /dev/null
