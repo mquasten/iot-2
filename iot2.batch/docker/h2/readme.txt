@@ -11,21 +11,21 @@ jdbc:h2:tcp://localhost/iot
 
 
 
-Dockerfile: Iot2H2
+Dockerfile: DockerfileIot2Alpine
 # docker image für iot2batch Alpine + Jave Runtime mit  musl libc  (without  glibc and friends)
 docker system prune -f  --all --volumes
-docker build -t iot2batch  -f docker/h2/DockerfileIot2H2 .
+docker build -t iot2batch  -f docker/h2/DockerfileIot2Alpine .
 docker run -d --name iot2batch -p 9092:9092 -p 8082:8082 -v C:\iot/h2:/db -v C:\iot/backup:/backup  iot2batch
 
 
-docker exec -it iot2batch sh
+docker exec -it iot2batch sh|bash
 docker exec -it iot2batch endOfDay[.sh]
 docker exec -it iot2batch iot2[.sh] -c end-of-day
 
 
 Dockerfile: Iot2H2JRE
 docker system prune -f  --all --volumes
-docker build -t iot2batch  -f docker/h2/DockerfileIot2H2JRE .
+docker build -t iot2batch  -f docker/h2/DockerfileIot2Ubuntu .
 
 docker run -d --name iot2batch  -p 9092:9092 -p 8082:8082 -v C:\iot/h2:/db -v C:\iot/backup:/backup  iot2batch 
 

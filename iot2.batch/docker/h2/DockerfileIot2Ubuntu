@@ -20,11 +20,12 @@ ENV JAVA_HOME ${HOME}/jre-21
 
 
 RUN apt update --no-install-recommends 
-RUN apt-get install  --no-install-recommends  -y iputils-ping
+#RUN apt-get install  --no-install-recommends  -y iputils-ping
 RUN apt-get install --no-install-recommends  -y curl
 RUN apt-get install --no-install-recommends  -y dos2unix
 RUN apt-get install --no-install-recommends  -y  tzdata
 RUN apt-get install --no-install-recommends -y ca-certificates
+RUN apt-get install --no-install-recommends -y dnsutils
 
 
 
