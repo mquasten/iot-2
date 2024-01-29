@@ -12,7 +12,7 @@ FROM ubuntu
 ENV USER iot2
 ENV HOME=/home/${USER}
 ENV APP_DIR ${HOME}/${USER}
-ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
+ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
 ENV DATA_DIR /db
 ENV TZ Europe/Berlin
 ENV JAVA_HOME ${HOME}/jre-21
@@ -43,7 +43,7 @@ USER ${USER}
 
 RUN mkdir  ${APP_DIR}
   
-RUN curl -L ${DOWNLOAD_H2} -o ${APP_DIR}/h2-2.1.214.jar
+RUN curl -L ${DOWNLOAD_H2} -o ${APP_DIR}/h2-2.2.224.jar
 COPY  --chown=${USER}:${USER} docker/scripts/iot2.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/scripts/endOfDay.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/h2/backup.sh ${APP_DIR}/

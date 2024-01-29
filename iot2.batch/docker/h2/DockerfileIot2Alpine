@@ -1,9 +1,6 @@
-
 FROM alpine
 
-# container-registry.oracle.com/java/openjdk:21-oraclelinux8
-
-ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
+ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
 
 ENV USER iot2
 ENV HOME=/home/iot2
@@ -39,7 +36,7 @@ RUN mkdir -p ${APP_DIR}
 RUN chown -R ${USER} ${APP_DIR}   
 
 
-RUN curl -L ${DOWNLOAD_H2} -o ${APP_DIR}/h2-2.1.214.jar
+RUN curl -L ${DOWNLOAD_H2} -o ${APP_DIR}/h2-2.2.224.jar
 
 COPY  --chown=${USER}:${USER} docker/scripts/iot2.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/scripts/endOfDay.sh ${APP_DIR}/
