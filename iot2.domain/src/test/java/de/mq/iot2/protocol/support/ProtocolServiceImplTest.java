@@ -81,10 +81,11 @@ class ProtocolServiceImplTest {
 	private static final LocalDate MAXWEELS_BIRTHDATE = LocalDate.of(1831, 6, 18);
 	private final Collection<ProtocolParameter> savedParameters = new ArrayList<>();
 
+	@SuppressWarnings("unchecked")
 	@BeforeEach
 	void beforeEach() {
 		Mockito.when(conversionService.canConvert(Mockito.any(Class.class), Mockito.any(Class.class))).thenReturn(true);
-		doAnswer(answer -> convert(answer.getArgument(0))).when(conversionService).convert(Mockito.any(), Mockito.any());
+		Mockito.doAnswer(answer -> convert(answer.getArgument(0))).when(conversionService).convert(Mockito.any(Object.class), Mockito.any(Class.class));
 		doAnswer(answer -> addParameter(savedParameters, answer.getArgument(0, ProtocolParameter.class))).when(protocolParameterRepository).save(Mockito.any(ProtocolParameter.class));
 
 	}

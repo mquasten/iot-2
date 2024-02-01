@@ -3,6 +3,8 @@ package de.mq.iot2.configuration.support;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -145,6 +147,7 @@ class ConfigurationServiceImplTest {
 				assertThrows(EntityNotFoundException.class, () -> configurationService.createDefaultConfigurationsAndParameters()).getMessage());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	void parameters() {
 		final var configuration = Mockito.mock(Configuration.class);
@@ -160,8 +163,8 @@ class ConfigurationServiceImplTest {
 
 		final var nonWorkingDayCycleParameterUpTime = new CycleParameterImpl(configuration, Key.UpTime, "07:30", nonWorkingDayCycle);
 
-		Mockito.doAnswer(answer -> convertParameterValue(answer.getArgument(0, String.class))).when(conversionService).convert(Mockito.any(), Mockito.any());
-		Mockito.when(parameterRepository.findByConfiguration(configuration)).thenReturn(List.of(minSunDown, maxSunDown, minSunUp, maxSunUp, parameterUpTime, parameterSunUpDownType,
+		doAnswer(answer -> convertParameterValue(answer.getArgument(0, String.class))).when(conversionService).convert(Mockito.any(Object.class), Mockito.any(Class.class));
+		when(parameterRepository.findByConfiguration(configuration)).thenReturn(List.of(minSunDown, maxSunDown, minSunUp, maxSunUp, parameterUpTime, parameterSunUpDownType,
 				nonWorkingDayCycleParameterUpTime, parameterShadowTemperature, parameterShadowTime));
 
 		Map<Key, ? extends Object> results = configurationService.parameters(RuleKey.EndOfDay, nonWorkingDayCycle);
@@ -204,9 +207,10 @@ class ConfigurationServiceImplTest {
 		assertEquals(Optional.of(value), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack, Integer.class));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	void parameterNotExists() {
-		Mockito.when(conversionService.convert(Mockito.any(), Mockito.any())).thenReturn(30);
+		when(conversionService.convert(Mockito.any(Object.class), Mockito.any(Class.class))).thenReturn(30);
 		assertEquals(Optional.empty(), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack, Integer.class));
 	}
 

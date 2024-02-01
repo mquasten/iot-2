@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.1</version>
+		<version>3.2.2</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<profiles>
@@ -22,12 +22,26 @@
 			<properties>
 				<spring.profiles.active>h2</spring.profiles.active>
 			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>com.h2database</groupId>
+					<artifactId>h2</artifactId>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
 		</profile>
 		<profile>
 			<id>oracle</id>
 			<properties>
 				<spring.profiles.active>oracle</spring.profiles.active>
 			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle.database.jdbc</groupId>
+					<artifactId>ojdbc8</artifactId>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
 		</profile>
 		<profile>
 			<id>postgres</id>
@@ -44,8 +58,6 @@
 		</profile>
 	</profiles>
 	<properties>
-		<!--maven.compiler.source>20</maven.compiler.source>
-		<maven.compiler.target>20</maven.compiler.target-->
 		<java.version>21</java.version>
 		<org.jeasy.version>4.1.0</org.jeasy.version>
 		<commons.cli.version>1.5.0</commons.cli.version>
@@ -68,16 +80,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.oracle.database.jdbc</groupId>
-			<artifactId>ojdbc8</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -132,12 +134,6 @@
 			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!--dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-inline</artifactId>
-             
-                <scope>test</scope>
-            </dependency-->
 	</dependencies>
 	<build>
 		<finalName>iot2Batch</finalName>
