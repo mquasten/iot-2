@@ -210,7 +210,7 @@ class ConfigurationServiceImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void parameterNotExists() {
-		when(conversionService.convert(Mockito.any(Object.class), Mockito.any(Class.class))).thenReturn(30);
+		Mockito.when(conversionService.convert(Mockito.any(Object.class), Mockito.any(Class.class))).thenReturn(30);
 		assertEquals(Optional.empty(), configurationService.parameter(RuleKey.CleanUp, Key.DaysBack, Integer.class));
 	}
 
