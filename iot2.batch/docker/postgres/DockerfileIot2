@@ -8,6 +8,7 @@ RUN $JAVA_HOME/bin/jlink \
         --compress=2 \
          --output /customjre
 from postgres
+ENV SPRING_PROFILES_ACTIVE=postgres
 ENV USER postgres
 ENV HOME  /home/${USER}
 ENV LANG de_DE.utf8
@@ -68,6 +69,8 @@ RUN chgrp -R ${USER} ${HOME}
 
 WORKDIR ${HOME}
 
+
+HEALTHCHECK CMD   pg_isready -U iot2 -d iot
 
 ENTRYPOINT (docker-entrypoint.sh postgres &) && $HOME/autoload.sh && tail -f /dev/null
 #ENTRYPOINT tail -f /dev/null

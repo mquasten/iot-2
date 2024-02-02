@@ -9,6 +9,7 @@ RUN $JAVA_HOME/bin/jlink \
          --output /customjre
 FROM ubuntu
 
+ENV SPRING_PROFILES_ACTIVE=h2
 ENV USER iot2
 ENV HOME=/home/${USER}
 ENV APP_DIR ${HOME}/${USER}
@@ -68,4 +69,5 @@ ENV PATH $PATH:$APP_DIR:${JAVA_HOME}/bin
 
 WORKDIR ${HOME}
 
+HEALTHCHECK CMD curl --http0.9  --fail --output /dev/null  http://localhost:9092 || exit 1 
 ENTRYPOINT ${HOME}/autoload.sh && tail -f /dev/null

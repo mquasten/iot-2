@@ -10,6 +10,9 @@ WORKDIR ${H2_DIR}
 RUN curl -L ${DOWNLOAD} -o h2-2.2.224.jar
     
 EXPOSE 8082 9092     
+
+HEALTHCHECK CMD curl --http0.9  --fail --output /dev/null  http://localhost:9092 || exit 1 
+
 CMD java -cp h2*.jar org.h2.tools.Server \
     -web -webAllowOthers \
     -tcp -tcpAllowOthers \
