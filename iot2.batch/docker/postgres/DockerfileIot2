@@ -15,6 +15,7 @@ ENV LANG de_DE.utf8
 ENV JAVA_HOME $HOME/jre-21
 ENV POSTGRES_PASSWORD postgres 
 ENV POSTGRES_DB=iot  
+ENV TZ Europe/Berlin
 
 ENV APP_DIR ${HOME}/iot2
 
@@ -45,7 +46,7 @@ COPY  --chown=${USER}:${USER} docker/scripts/iot2.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/scripts/endOfDay.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/postgres/backup.sh ${APP_DIR}/
 COPY  --chown=${USER}:${USER} target/iot2Batch.jar ${APP_DIR}/
-COPY  --chown=${USER}:${USER} docker/scripts/autoload.sh ${HOME}/
+COPY  --chown=${USER}:${USER} docker/postgres/autoload.sh ${HOME}/
 
 
 COPY --chown=${USER}:${USER} docker/scripts/calendar.csv   ${APP_DIR}/
@@ -70,7 +71,7 @@ RUN chgrp -R ${USER} ${HOME}
 WORKDIR ${HOME}
 
 
-HEALTHCHECK CMD   pg_isready -U iot2 -d iot
+HEALTHCHECK CMD  psql -d iot -U iot2   -h localhost -c "select now()" > /dev/null 2>&1 
 
 ENTRYPOINT (docker-entrypoint.sh postgres &) && $HOME/autoload.sh && tail -f /dev/null
 #ENTRYPOINT tail -f /dev/null

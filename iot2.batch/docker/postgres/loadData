@@ -1,9 +1,9 @@
 #/bin/sh
 COUNTER=1
 echo "Import is waiting for database startup ..."
-until [ $COUNTER -gt 100 ]
+until [ $COUNTER -gt 500 ]
 do
-        READY=`pg_isready -h localhost | grep -c  'Verbindungen werden angenommen'`
+        READY=`pg_isready -h localhost -U postgres | grep -c  'Verbindungen werden angenommen'`
     if [ $READY -gt 0 ]
     then
        echo "Database is online." 
@@ -19,6 +19,8 @@ do
        DATE=`date`
        echo start create-user: $DATE
        java -jar  $APP_DIR/iot2Batch.jar -c update-user mquasten manfred01 MD5
+       
+       rm  /tmp/spring.log 
        exit 0;
     fi;
     sleep 2;

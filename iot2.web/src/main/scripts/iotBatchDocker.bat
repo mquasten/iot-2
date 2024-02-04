@@ -1,4 +1,5 @@
-docker rm -f iot2  >NUL 2>&1
+docker stop iot2  >NUL 2>&1
+docker rm  iot2  >NUL 2>&1
 
 #docker run  -d --name iot2 -p 8080:8080   -p 1522:1521  -v C:\iot/oracle:/opt/oracle/oradata  -v C:\iot/backup:/backup    iot2
 #timeout 30 > NUL
