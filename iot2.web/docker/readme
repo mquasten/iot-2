@@ -3,14 +3,19 @@ DockerfileIot2
 docker system prune -f  --all --volumes
 docker build -t iot2  -f docker/DockerfileIot2 .
 
+start für H2
+docker run -d --name iot2 -p 8080:8080  -p 9092:9092 -p 8082:8082 -v C:\iot/h2:/db -v C:\iot/backup:/backup  iot2
+
 start für oracle 
 docker run -d --name iot2 -p 8080:8080 -p 1522:1521  -e ORACLE_PWD=oracle -v C:\iot/oracle:/opt/oracle/oradata  -v C:\iot/backup:/backup  iot2
 
 start für postgres 
 docker run -d --name iot2 -p 8080:8080  -p 5432:5432 -v C:\iot/postgres:/var/lib/postgresql/data -v C:\iot/backup:/backup iot2
 
-start für H2
-docker run -d --name iot2 -p 8080:8080  -p 9092:9092 -p 8082:8082 -v C:\iot/h2:/db -v C:\iot/backup:/backup  iot2
+start für mysql
+docker run --name iot2 -p 8080:8080 -p3306:3306   -v  C:\iot/mysql:/var/lib/mysql  -v C:\iot/backup:/backup    -d iot2
+
+
 
 
 docker exec -it iot2 bash|sh
