@@ -8,3 +8,5 @@ java -jar  $APP_DIR/iot2Batch.jar -c import-configuration ${APP_DIR}/configurati
 DATE=`date`
 echo start create-user: $DATE
 java -jar  $APP_DIR/iot2Batch.jar -c update-user mquasten manfred01 MD5
+
+rm /tmp/spring.log

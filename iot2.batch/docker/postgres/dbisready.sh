@@ -1,0 +1,1 @@
+ psql -d iot -U iot2   -h localhost -c "select now()" > /dev/null 2>&1 
