@@ -5,7 +5,7 @@
 docker system prune -f  --all --volumes
 
 # docker build im Projektverzeichnis aufrufen 
-docker build -t iot2batch  -f docker/oracle/DockerfileIot2Oracle .
+docker build -t iot2batch  -f docker/oracle/DockerfileIot2 .
 
 # container starten, wenn keine Datenbank existiert, wird eine neue erstellt.
 docker run  -d --name iot2batch  -p 1522:1521  -e ORACLE_PWD=oracle -v C:\iot/oracle:/opt/oracle/oradata  -v C:\iot/backup:/backup  iot2batch 

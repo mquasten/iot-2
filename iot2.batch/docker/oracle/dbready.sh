@@ -1,0 +1,1 @@
+ tnsping XE && echo 'select * from dual; exit' | sqlplus -l iot2/iot2@XE > /dev/null 2>&1 

@@ -34,14 +34,15 @@ COPY --chown=oracle:oinstall docker/oracle/create-user.sql  /opt/oracle/scripts/
 COPY --chown=oracle:oinstall docker/oracle/iot-2-oracle.sql /opt/oracle/scripts/setup/02-iot-2-oracle.sql
 COPY --chown=oracle:oinstall docker/scripts/loadData.sh /opt/oracle/scripts/setup/03-loadData.sh
 COPY --chown=oracle:oinstall docker/oracle/create-directory.sql /opt/oracle/scripts/setup/04-create-directory.sql
-COPY --chown=oracle:oinstall docker/scripts/autoload.sh  /opt/oracle/scripts/startup/
-
+COPY --chown=oracle:oinstall docker/scripts/autoloadWait.sh  /opt/oracle/scripts/startup/autoload.sh
+COPY --chown=oracle:oinstall docker/oracle/dbready.sh  ${APP_DIR}/
 
 RUN dos2unix ${APP_DIR}/iot2.sh;
 RUN dos2unix ${APP_DIR}/endOfDay.sh;
 RUN dos2unix ${APP_DIR}/backup.sh
 RUN dos2unix ${APP_DIR}/calendar.csv;
 RUN dos2unix ${APP_DIR}/configuration.csv
+RUN dos2unix ${APP_DIR}/dbready.sh
 
 
 RUN dos2unix /opt/oracle/scripts/setup/01-create-user.sql
@@ -56,7 +57,7 @@ RUN ln -s ${APP_DIR}/endOfDay.sh ${APP_DIR}/endOfDay
 RUN ln -s ${APP_DIR}/backup.sh ${APP_DIR}/backup
 
 
-HEALTHCHECK CMD tnsping XE && echo 'exit' | sqlplus -l iot2/iot2@XE 
+HEALTHCHECK CMD dbready.sh
 
 ENV PATH $PATH:${APP_DIR}:${JAVA_HOME}/bin
 
