@@ -40,6 +40,7 @@ COPY --chown=${USER}:${USER} docker/postgres/iot-2-postgres.sql  /docker-entrypo
 RUN echo "#/bin/sh" > /docker-entrypoint-initdb.d/02-loadData.sh
 RUN echo "/home/postgres/autoload.sh /home/postgres/initdb &"  >> /docker-entrypoint-initdb.d/02-loadData.sh
 RUN chown ${USER} /docker-entrypoint-initdb.d/02-loadData.sh
+
 RUN dos2unix /docker-entrypoint-initdb.d/iot-2-postgres
 RUN dos2unix /docker-entrypoint-initdb.d/01-createUserAndSchema.sh
 
@@ -48,8 +49,8 @@ COPY  --chown=${USER}:${USER} docker/scripts/iot2.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/scripts/endOfDay.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/postgres/backup.sh ${APP_DIR}/
 COPY  --chown=${USER}:${USER} target/iot2Batch.jar ${APP_DIR}/
-COPY  --chown=${USER}:${USER} docker/postgres/autoload.sh ${HOME}/
-COPY  --chown=${USER}:${USER} docker/postgres/dbisready.sh ${APP_DIR}/
+COPY  --chown=${USER}:${USER} docker/scripts/autoloadWait.sh ${HOME}/autoload.sh
+COPY  --chown=${USER}:${USER} docker/postgres/dbready.sh ${APP_DIR}/
 
 COPY  --chown=${USER}:${USER} docker/scripts/loadData.sh ${HOME}/initdb/
 
@@ -59,7 +60,7 @@ RUN dos2unix ${APP_DIR}/iot2.sh
 RUN dos2unix ${APP_DIR}/endOfDay.sh
 RUN dos2unix ${APP_DIR}/backup.sh
 RUN dos2unix ${HOME}/autoload.sh
-RUN dos2unix ${APP_DIR}/dbisready.sh
+RUN dos2unix ${APP_DIR}/dbready.sh
 RUN dos2unix ${HOME}/initdb/loadData.sh
 
 
@@ -76,9 +77,9 @@ RUN chgrp -R ${USER} ${HOME}
 WORKDIR ${HOME}
 
 
-HEALTHCHECK CMD dbisready.sh 
+HEALTHCHECK CMD dbready.sh 
 
 ENTRYPOINT (docker-entrypoint.sh postgres &) && $HOME/autoload.sh && tail -f /dev/null
-#ENTRYPOINT tail -f /dev/null
+
 
 

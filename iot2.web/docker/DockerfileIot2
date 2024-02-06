@@ -2,9 +2,9 @@ FROM iot2batch
 
 
 COPY --chown=${USER}:${USER} target/iot2Web.jar ${APP_DIR}/
-COPY --chown=${USER}:${USER} docker/iot2Web.sh ${HOME}/startup/02-iot2Web.sh
-RUN dos2unix ${HOME}/startup/02-iot2Web.sh
-RUN chown $USER ${HOME}/startup/02-iot2Web.sh
+COPY --chown=${USER}:${USER} docker/iot2Web.sh ${HOME}/startup/iot2Web.sh
+RUN dos2unix ${HOME}/startup/iot2Web.sh
+RUN chown $USER ${HOME}/startup/iot2Web.sh
 
 HEALTHCHECK CMD curl --fail http://localhost:8080 || exit 1  
 

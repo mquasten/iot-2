@@ -9,7 +9,7 @@ if [ $# -ge 1 ]
 until [ $COUNTER -gt 500 ]
 do
     #psql -d iot -U iot2   -h localhost -c "select now()" > /dev/null 2>&1 
-    dbisready.sh;
+    dbready.sh;
     if [ $? -eq 0 ]
     then
        echo "Connect to database iot as user iot2 successfull, execute scripts in $VERZEICHNIS."
