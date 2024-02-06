@@ -36,6 +36,7 @@ USER $USER
 
 
 RUN mkdir ${APP_DIR}
+RUN mkdir ${HOME}/initdb
 
 RUN chown $USER ${APP_DIR}
 
@@ -45,20 +46,23 @@ COPY --chown=${USER}:${USER} --from=builder /customjre $JAVA_HOME
 
 
 COPY --chown=${USER}:${USER}  docker/mysql/iot-2-mysql.sql  /docker-entrypoint-initdb.d/01-iot-2.sql
-COPY --chown=${USER}:${USER}  docker/mysql/loadData /docker-entrypoint-initdb.d/loadData
-COPY  --chown=${USER}:${USER} docker/mysql/loadData.sh /docker-entrypoint-initdb.d/02-loadData.sh
+
+RUN echo "#/bin/sh" > /docker-entrypoint-initdb.d/02-loadData.sh
+RUN echo "${HOME}/autoload.sh ${HOME}/initdb &"  >> /docker-entrypoint-initdb.d/02-loadData.sh
+RUN chown ${USER} /docker-entrypoint-initdb.d/02-loadData.sh
 
 
 RUN dos2unix /docker-entrypoint-initdb.d/01-iot-2.sql
-RUN dos2unix /docker-entrypoint-initdb.d/loadData
-RUN dos2unix /docker-entrypoint-initdb.d/02-loadData.sh
+
 
 
 COPY --chown=${USER}:${USER}  docker/scripts/iot2.sh ${APP_DIR}/
 COPY  --chown=${USER}:${USER}  docker/scripts/endOfDay.sh ${APP_DIR}/
 COPY  --chown=${USER}:${USER} target/iot2Batch.jar ${APP_DIR}/
-COPY --chown=${USER}:${USER} docker/mysql/autoload.sh ${HOME}/
+COPY --chown=${USER}:${USER} docker/scripts/autoloadWait.sh ${HOME}/autoload.sh
+COPY  --chown=${USER}:${USER} docker/mysql/dbready.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/mysql/backup.sh ${APP_DIR}/
+COPY  --chown=${USER}:${USER} docker/scripts/loadData.sh ${HOME}/initdb/
 COPY --chown=${USER}:${USER} docker/scripts/calendar.csv   ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/scripts/configuration.csv ${APP_DIR}/
 
@@ -67,7 +71,9 @@ COPY --chown=${USER}:${USER}  docker/scripts/configuration.csv ${APP_DIR}/
 RUN dos2unix ${APP_DIR}/iot2.sh
 RUN dos2unix ${APP_DIR}/endOfDay.sh
 RUN dos2unix ${HOME}/autoload.sh
+RUN dos2unix ${APP_DIR}/dbready.sh
 RUN dos2unix ${APP_DIR}/backup.sh
+RUN dos2unix ${HOME}/initdb/loadData.sh
 
 
 RUN ln -s ${APP_DIR}/iot2.sh ${APP_DIR}/iot2
@@ -83,5 +89,5 @@ ENV PATH $PATH:${JAVA_HOME}/bin:${APP_DIR}
 
 WORKDIR ${HOME}
 
-HEALTHCHECK CMD   mysql --protocol=TCP  --user=iot2 --password=iot2 iot  > /dev/null 2>&1 
+HEALTHCHECK CMD  dbready.sh
 ENTRYPOINT (docker-entrypoint.sh mysqld &) && $HOME/autoload.sh && tail -f /dev/null
