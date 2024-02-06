@@ -31,12 +31,14 @@ RUN apt-get install --no-install-recommends -y dnsutils
 
 
 RUN adduser --home ${HOME}  iot2  
-#RUN  chown -R ${USER}  ${HOME}
+
 
 
 
 COPY --from=builder /customjre $JAVA_HOME
 
+RUN  chown -R ${USER}  ${JAVA_HOME}
+RUN  chgrp -R ${USER}  ${JAVA_HOME}
 
 
 
@@ -48,16 +50,16 @@ RUN curl -L ${DOWNLOAD_H2} -o ${APP_DIR}/h2-2.2.224.jar
 COPY  --chown=${USER}:${USER} docker/scripts/iot2.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/scripts/endOfDay.sh ${APP_DIR}/
 COPY --chown=${USER}:${USER}  docker/h2/backup.sh ${APP_DIR}/
-COPY  --chown=${USER}:${USER} docker/scripts/autoload.sh ${HOME}/
-COPY  --chown=${USER}:${USER} docker/h2/startH2.sh ${HOME}/startup/01-startH2.sh
+COPY  --chown=${USER}:${USER} docker/scripts/autoloadWait.sh ${HOME}/autoload.sh
+COPY  --chown=${USER}:${USER} docker/h2/startH2.sh ${HOME}/startH2.sh
+COPY  --chown=${USER}:${USER} docker/h2/dbready.sh ${APP_DIR}/dbready.sh
 COPY  --chown=${USER}:${USER} target/iot2Batch.jar ${APP_DIR}/
 RUN dos2unix ${APP_DIR}/iot2.sh
 RUN dos2unix ${APP_DIR}/endOfDay.sh
 RUN dos2unix ${APP_DIR}/backup.sh
-RUN dos2unix ${HOME}/startup/01-startH2.sh
+RUN dos2unix ${HOME}/startH2.sh
 RUN dos2unix ${HOME}/autoload.sh
-
-
+RUN dos2unix ${APP_DIR}/dbready.sh
 
 
 
@@ -70,4 +72,5 @@ ENV PATH $PATH:$APP_DIR:${JAVA_HOME}/bin
 WORKDIR ${HOME}
 
 HEALTHCHECK CMD curl --http0.9  --fail --output /dev/null  http://localhost:9092 || exit 1 
-ENTRYPOINT ${HOME}/autoload.sh && tail -f /dev/null
+
+ENTRYPOINT (${HOME}/startH2.sh &) && ${HOME}/autoload.sh && tail -f /dev/null
