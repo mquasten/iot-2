@@ -1,4 +1,4 @@
-FROM openjdk:21 as builder
+FROM openjdk:22 as builder
 RUN $JAVA_HOME/bin/jlink \
          --verbose \
         --add-modules ALL-MODULE-PATH \
@@ -17,7 +17,7 @@ ENV MYSQL_USER=$USER
 ENV MYSQL_PASSWORD=iot2
 ENV MYSQL_ROOT_PASSWORD=mysql
 
-ENV JAVA_HOME $HOME/jre-21 
+ENV JAVA_HOME $HOME/jre-22 
 
 ENV TZ Europe/Berlin
 

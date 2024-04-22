@@ -3,10 +3,13 @@ FROM container-registry.oracle.com/database/express:latest
 ENV SPRING_PROFILES_ACTIVE=oracle
 ENV USER oracle
 ENV HOME=/home/oracle
-ENV JAVA_HOME ${HOME}/jdk-21
+ENV JAVA_HOME ${HOME}/jdk-22
 ENV APP_DIR ${HOME}/iot2
 # https://jdk.java.net/
-ENV DOWNLOAD https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz
+
+              	
+			
+ENV DOWNLOAD https://download.java.net/openjdk/jdk22/ri/openjdk-22+36_linux-x64_bin.tar.gz
 USER root
 
 RUN  yum install -y dos2unix

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.2</version>
+		<version>3.2.5</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>mq</groupId>
@@ -12,6 +12,16 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>iot-web</name>
 	<description>Rolladen GUI</description>
+	<properties>
+		<!--maven.compiler.source>20</maven.compiler.source>
+		<maven.compiler.target>20</maven.compiler.target-->
+		<java.version>22</java.version>
+		<maven.compiler.parameters>true</maven.compiler.parameters>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jacoco.maven.version>0.8.11</jacoco.maven.version>
+		<iot2.domain.version>0.0.1-SNAPSHOT</iot2.domain.version>
+		<jasypt.version>3.0.5</jasypt.version>
+	</properties>
 	<profiles>
 		<profile>
 			<id>h2</id>
@@ -70,16 +80,7 @@
 			</dependencies>
 		</profile>
 	</profiles>
-	<properties>
-		<!--maven.compiler.source>20</maven.compiler.source>
-		<maven.compiler.target>20</maven.compiler.target-->
-		<java.version>21</java.version>
-		<maven.compiler.parameters>true</maven.compiler.parameters>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jacoco.maven.version>0.8.11</jacoco.maven.version>
-		<iot2.domain.version>0.0.1-SNAPSHOT</iot2.domain.version>
-		<jasypt.version>3.0.5</jasypt.version>
-	</properties>
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>oss-sonatype</id>
