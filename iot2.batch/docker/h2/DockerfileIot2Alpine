@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine/java:22-jre
 
 ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
 
@@ -11,7 +11,7 @@ ENV DATA_DIR /db
 
 RUN apk add --no-cache curl
 #RUN apk add --no-cache flatpak
-RUN apk add --no-cache openjdk21-jre
+#RUN apk add --no-cache openjdk21-jre
 RUN apk add --no-cache tzdata
 RUN apk add --update bind-tools
 
