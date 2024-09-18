@@ -1,4 +1,4 @@
-FROM openjdk:22 as builder
+FROM openjdk:23 as builder
 RUN $JAVA_HOME/bin/jlink \
          --verbose \
         --add-modules ALL-MODULE-PATH \
@@ -12,7 +12,7 @@ ENV SPRING_PROFILES_ACTIVE=postgres
 ENV USER postgres
 ENV HOME  /home/${USER}
 ENV LANG de_DE.utf8
-ENV JAVA_HOME $HOME/jre-22
+ENV JAVA_HOME $HOME/jre-23
 ENV POSTGRES_PASSWORD postgres 
 ENV POSTGRES_DB=iot  
 ENV TZ Europe/Berlin

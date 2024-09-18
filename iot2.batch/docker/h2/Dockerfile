@@ -1,5 +1,5 @@
 # Testdatenbank 
-FROM openjdk:21
+FROM openjdk:23
 
 ENV DOWNLOAD https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
 ENV DATA_DIR /db
