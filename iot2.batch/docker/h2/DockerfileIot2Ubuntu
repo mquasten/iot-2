@@ -1,4 +1,4 @@
-FROM openjdk:22 as builder
+FROM openjdk:23 as builder
 RUN $JAVA_HOME/bin/jlink \
          --verbose \
         --add-modules ALL-MODULE-PATH \
@@ -16,7 +16,7 @@ ENV APP_DIR ${HOME}/${USER}
 ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
 ENV DATA_DIR /db
 ENV TZ Europe/Berlin
-ENV JAVA_HOME ${HOME}/jre-22
+ENV JAVA_HOME ${HOME}/jre-23
 
 
 
@@ -27,6 +27,7 @@ RUN apt-get install --no-install-recommends  -y dos2unix
 RUN apt-get install --no-install-recommends  -y  tzdata
 RUN apt-get install --no-install-recommends -y ca-certificates
 RUN apt-get install --no-install-recommends -y dnsutils
+RUN apt-get install --no-install-recommends -y adduser
 
 
 

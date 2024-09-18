@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.5</version>
+		<version>3.3.3</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<profiles>
@@ -74,10 +74,10 @@
 		
 	</profiles>
 	<properties>
-		<java.version>22</java.version>
+		<java.version>23</java.version>
 		<org.jeasy.version>4.1.0</org.jeasy.version>
 		<commons.cli.version>1.5.0</commons.cli.version>
-		<jacoco.maven.version>0.8.11</jacoco.maven.version>
+		<jacoco.maven.version>0.8.12</jacoco.maven.version>
 		<iot2.domain.version>0.0.1-SNAPSHOT</iot2.domain.version>
 		<jasypt.version>3.0.5</jasypt.version>
 	</properties>
