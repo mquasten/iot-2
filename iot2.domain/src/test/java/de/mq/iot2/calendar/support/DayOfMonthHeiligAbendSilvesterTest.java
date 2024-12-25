@@ -22,7 +22,7 @@ class DayOfMonthHeiligAbendSilvesterTest {
 		
         System.out.println( String.format("INSERT INTO DAY_GROUP(ID,NAME,READ_ONLY,CYCLE_ID) VALUES('%s','%s',1,'%s');",IdUtil.getId(dayGroup), dayGroup.name(), IdUtil.getId(dayGroup.cycle()) )) ;
 		
-        days.forEach(day ->  System.out.println(String.format("INSERT INTO SPECIAL_DAY(ID, DAY_TYPE, DAY_VALUE, DESCRIPTION, DAY_GROUP_ID) VALUES('%s', 'DayOfMonth', %s );", IdUtil.getId(day), ReflectionTestUtils.getField(day, "value"), day.description(), IdUtil.getId(day.dayGroup()) )));
+        days.forEach(day ->  System.out.println(String.format("INSERT INTO SPECIAL_DAY(ID, DAY_TYPE, DAY_VALUE, DESCRIPTION, DAY_GROUP_ID) VALUES('%s', 'DayOfMonth', %s, '%s', '%s' );", IdUtil.getId(day), ReflectionTestUtils.getField(day, "value"), day.description().get(), IdUtil.getId(day.dayGroup()) )));
 	    
 	}
 }
