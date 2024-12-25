@@ -1,0 +1,20 @@
+GaussDay;0;Ostersonntag;1;Feiertage;true;1;Freizeit;102;false
+GaussDay;1;Ostermontag;1;;;1;;;
+GaussDay;39;Christi Himmelfahrt;1;;;1;;;
+GaussDay;49;Pfingstsonntag;1;;;1;;;
+GaussDay;50;Pfingstmontag;1;;;1;;;
+GaussDay;60;Fronleichnam;1;;;1;;;
+GaussDay;-2;Karfreitag;1;;;1;;;
+DayOfMonth;01.01;Neujahr;1;;;1;;;
+DayOfMonth;01.05;Tag der Arbeit;1;;;1;;;
+DayOfMonth;03.10;Tag der Deutschen Einheit;1;;;1;;;
+DayOfMonth;01.11;Allerheiligen;1;;;1;;;
+DayOfMonth;25.12;1. Weihnachtsfeiertag;1;;;1;;;
+DayOfMonth;26.12;2. Weihnachtsfeiertag;1;;;1;;;
+DayOfMonth;24.12;Heiligabend;6;Urlaub Tarifvertrag;true;1;;;
+DayOfMonth;31.12;Silvester;6;;;1;;;
+DayOfWeekDay;6;Samstag;2;Wochenende;true;1;;;
+DayOfWeekDay;7;Sonntag;2;;;1;;;
+LocaldateDay;01.01.1900;;5;Arbeitszeit;false;2;Arbeitstage;100;true
+LocaldateDay;02.01.1900;;4;Sonderzeiten;false;3;abweichender Tagesbeginn;101;false
+LocaldateDay;03.01.1900;;3;Urlaub;false;1;;;
