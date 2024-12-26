@@ -24,6 +24,13 @@ docker exec -it iot2 backup[.sh]
 docker exec -it iot2 iot2[.sh] -c end-of-day
 
 
+Daten laden h2
+docker run -d --name iot2  -p 9092:9092 -p 8082:8082 -v C:\iot/h2:/db -v C:\iot/backup:/backup  iot2batch 
+docker exec -it iot2 sh|bash
+java -jar  $APP_DIR/iot2Batch.jar -c import-calendar /backup/calendar2.csv
+java -jar  $APP_DIR/iot2Batch.jar -c import-configuration /backup/configuration.csv
+java -jar  $APP_DIR/iot2Batch.jar -c update-user mquasten manfred01 MD5
+
 docker save -o iot2.tar iot2 
 docker load -i iot2.tar 
 

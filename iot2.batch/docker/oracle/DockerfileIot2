@@ -1,5 +1,6 @@
 FROM container-registry.oracle.com/database/express:latest
 
+ENV CALENDAR_FILE=calendar2.csv
 ENV SPRING_PROFILES_ACTIVE=oracle
 ENV USER oracle
 ENV HOME=/home/oracle
@@ -8,7 +9,8 @@ ENV APP_DIR ${HOME}/iot2
 # https://jdk.java.net/
 
 			
-ENV DOWNLOAD https://download.oracle.com/java/23/latest/jdk-23_linux-x64_bin.tar.gz  	
+ENV DOWNLOAD https://download.java.net/openjdk/jdk23/ri/openjdk-23+37_linux-x64_bin.tar.gz
+
 USER root
 
 RUN  yum install -y dos2unix
@@ -20,7 +22,7 @@ RUN mkdir ${HOME}/startup
 
 
 RUN curl -L ${DOWNLOAD} -o ${HOME}/jdk.tar.gz
-RUN tar xf ${HOME}/jdk.tar.gz -C ${HOME}
+RUN tar xf ${HOME}/jdk.tar.gz -C ${HOME}/
 RUN rm ${HOME}/jdk.tar.gz
 
 
@@ -30,7 +32,7 @@ COPY --chown=oracle:oinstall target/iot2Batch.jar ${APP_DIR}/
 COPY --chown=oracle:oinstall docker/scripts/iot2.sh ${APP_DIR}/
 COPY --chown=oracle:oinstall docker/scripts/endOfDay.sh ${APP_DIR}/
 COPY --chown=oracle:oinstall docker/oracle/backup.sh ${APP_DIR}/
-COPY --chown=oracle:oinstall docker/scripts/calendar.csv   ${APP_DIR}/
+COPY --chown=oracle:oinstall docker/scripts/${CALENDAR_FILE}  ${APP_DIR}/calendar.csv
 COPY --chown=oracle:oinstall docker/scripts/configuration.csv ${APP_DIR}/
 COPY --chown=oracle:oinstall docker/oracle/create-user.sql  /opt/oracle/scripts/setup/01-create-user.sql
 COPY --chown=oracle:oinstall docker/oracle/iot-2-oracle.sql /opt/oracle/scripts/setup/02-iot-2-oracle.sql

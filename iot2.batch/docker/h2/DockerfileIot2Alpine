@@ -1,4 +1,5 @@
-FROM alpine/java:22-jre
+#FROM alpine/java:23-jre
+FROM eclipse-temurin:23-jre-alpine
 
 ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
 
