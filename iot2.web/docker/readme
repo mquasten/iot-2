@@ -16,7 +16,7 @@ start für mysql
 docker run --name iot2 -p 8080:8080 -p3306:3306   -v  C:\iot/mysql:/var/lib/mysql  -v C:\iot/backup:/backup    -d iot2
 
 
-
+docker logs -f iot2
 
 docker exec -it iot2 bash|sh
 docker exec -it iot2 endOfDay[.sh]

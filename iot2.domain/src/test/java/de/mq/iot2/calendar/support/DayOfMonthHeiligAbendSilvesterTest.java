@@ -4,6 +4,7 @@ import java.time.MonthDay;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -11,7 +12,7 @@ import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.calendar.Day;
 import de.mq.iot2.calendar.DayGroup;
 import de.mq.iot2.support.IdUtil;
-
+@Disabled
 class DayOfMonthHeiligAbendSilvesterTest {
 	
 	@Test

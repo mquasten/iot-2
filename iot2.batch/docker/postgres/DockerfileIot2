@@ -8,6 +8,7 @@ RUN $JAVA_HOME/bin/jlink \
         --compress=2 \
          --output /customjre
 from postgres
+ENV CALENDAR_FILE=calendar2.csv
 ENV SPRING_PROFILES_ACTIVE=postgres
 ENV USER postgres
 ENV HOME  /home/${USER}
@@ -54,7 +55,7 @@ COPY  --chown=${USER}:${USER} docker/postgres/dbready.sh ${APP_DIR}/
 
 COPY  --chown=${USER}:${USER} docker/scripts/loadData.sh ${HOME}/initdb/
 
-COPY --chown=${USER}:${USER} docker/scripts/calendar.csv   ${APP_DIR}/
+COPY --chown=${USER}:${USER} docker/scripts/${CALENDAR_FILE}  ${APP_DIR}/calendar.csv
 COPY --chown=${USER}:${USER} docker/scripts/configuration.csv ${APP_DIR}/
 RUN dos2unix ${APP_DIR}/iot2.sh
 RUN dos2unix ${APP_DIR}/endOfDay.sh
