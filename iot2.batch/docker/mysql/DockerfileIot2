@@ -1,13 +1,15 @@
-FROM openjdk:23 as builder
-RUN $JAVA_HOME/bin/jlink \
-         --verbose \
-        --add-modules ALL-MODULE-PATH \
-         --strip-debug \
-         --no-man-pages \
-         --no-header-files \
-        --compress=2 \
-         --output /customjre
+#FROM openjdk:23 as builder
+#RUN $JAVA_HOME/bin/jlink \
+#         --verbose \
+#        --add-modules ALL-MODULE-PATH \
+#         --strip-debug \
+#         --no-man-pages \
+#         --no-header-files \
+#        --compress=2 \
+#         --output /customjre
 from mysql
+
+ENV DOWNLOAD https://download.java.net/openjdk/jdk24/ri/openjdk-24+36_linux-x64_bin.tar.gz
 ENV CALENDAR_FILE=calendar2.csv
 ENV SPRING_PROFILES_ACTIVE=mysql
 ENV USER iot2
@@ -18,7 +20,7 @@ ENV MYSQL_USER=$USER
 ENV MYSQL_PASSWORD=iot2
 ENV MYSQL_ROOT_PASSWORD=mysql
 
-ENV JAVA_HOME $HOME/jre-23 
+ENV JAVA_HOME $HOME/jdk-24 
 
 ENV TZ Europe/Berlin
 
@@ -33,8 +35,12 @@ RUN microdnf install dnsutils -y
 
 RUN useradd  --home-dir $HOME $USER
 RUN chmod   o+w /docker-entrypoint-initdb.d
+
 USER $USER 
 
+RUN curl -L ${DOWNLOAD} -o ${HOME}/jdk.tar.gz
+RUN tar xf ${HOME}/jdk.tar.gz -C ${HOME}/
+RUN rm ${HOME}/jdk.tar.gz
 
 RUN mkdir ${APP_DIR}
 RUN mkdir ${HOME}/initdb
@@ -43,7 +49,7 @@ RUN chown $USER ${APP_DIR}
 
 RUN mkdir ${HOME}/startup
 
-COPY --chown=${USER}:${USER} --from=builder /customjre $JAVA_HOME
+#COPY --chown=${USER}:${USER} --from=builder /customjre $JAVA_HOME
 
 
 COPY --chown=${USER}:${USER}  docker/mysql/iot-2-mysql.sql  /docker-entrypoint-initdb.d/01-iot-2.sql

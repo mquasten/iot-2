@@ -1,22 +1,25 @@
-FROM openjdk:23 as builder
-RUN $JAVA_HOME/bin/jlink \
-         --verbose \
-        --add-modules ALL-MODULE-PATH \
-         --strip-debug \
-         --no-man-pages \
-         --no-header-files \
-        --compress=2 \
-         --output /customjre
+#FROM openjdk:23 as builder
+#RUN $JAVA_HOME/bin/jlink \
+#         --verbose \
+#        --add-modules ALL-MODULE-PATH \
+#         --strip-debug \
+#         --no-man-pages \
+#         --no-header-files \
+#        --compress=2 \
+#         --output /customjre
 from postgres
+
+ENV DOWNLOAD https://download.java.net/openjdk/jdk24/ri/openjdk-24+36_linux-x64_bin.tar.gz
 ENV CALENDAR_FILE=calendar2.csv
 ENV SPRING_PROFILES_ACTIVE=postgres
 ENV USER postgres
 ENV HOME  /home/${USER}
 ENV LANG de_DE.utf8
-ENV JAVA_HOME $HOME/jre-23
+ENV JAVA_HOME $HOME/jdk-24
 ENV POSTGRES_PASSWORD postgres 
 ENV POSTGRES_DB=iot  
 ENV TZ Europe/Berlin
+
 
 ENV APP_DIR ${HOME}/iot2
 
@@ -26,14 +29,19 @@ RUN apt-get update -y
 RUN apt-get install dos2unix -y 
 RUN apt-get install --no-install-recommends -y dnsutils
 RUN apt-get install --no-install-recommends -y curl
+RUN apt-get install --no-install-recommends -y ca-certificates
 
 RUN mkdir ${HOME}
 RUN mkdir ${APP_DIR}
 RUN mkdir ${HOME}/initdb
 
+RUN curl -L ${DOWNLOAD} -o ${HOME}/jdk.tar.gz
+RUN tar xf ${HOME}/jdk.tar.gz -C ${HOME}/
+RUN rm ${HOME}/jdk.tar.gz
+
 RUN mkdir ${HOME}/startup
 
-COPY --from=builder /customjre $JAVA_HOME
+#COPY --from=builder /customjre $JAVA_HOME
 
 COPY --chown=${USER}:${USER} docker/postgres/createUserAndSchema.sh  /docker-entrypoint-initdb.d/01-createUserAndSchema.sh
 COPY --chown=${USER}:${USER} docker/postgres/iot-2-postgres.sql  /docker-entrypoint-initdb.d/iot-2-postgres
