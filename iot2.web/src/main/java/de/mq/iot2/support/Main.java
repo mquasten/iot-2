@@ -15,7 +15,7 @@ import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties
 @ComponentScan(basePackages = "de.mq.iot2")
 @EnableTransactionManagement()
 @EnableEncryptableProperties()
-public abstract class Main {
+class Main {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Main.class, args);

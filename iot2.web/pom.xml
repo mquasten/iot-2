@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.3</version>
+		<version>3.4.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>mq</groupId>
@@ -13,12 +13,12 @@
 	<name>iot-web</name>
 	<description>Rolladen GUI</description>
 	<properties>
-		<!--maven.compiler.source>20</maven.compiler.source>
-		<maven.compiler.target>20</maven.compiler.target-->
-		<java.version>23</java.version>
+		<!--maven.compiler.source>24</maven.compiler.source-->
+		<!--maven.compiler.target>20</maven.compiler.target-->
+		<java.version>24</java.version>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jacoco.maven.version>0.8.12</jacoco.maven.version>
+		<jacoco.maven.version>0.8.13-SNAPSHOT</jacoco.maven.version>
 		<iot2.domain.version>0.0.1-SNAPSHOT</iot2.domain.version>
 		<jasypt.version>3.0.5</jasypt.version>
 	</properties>

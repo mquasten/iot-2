@@ -37,6 +37,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.dao.TypeMismatchDataAccessException;
 import org.springframework.data.util.Pair;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.CollectionUtils;
@@ -472,7 +473,7 @@ class CalendarServiceImpTest {
 		ReflectionTestUtils.setField(day, "id", null);
 
 		final var required = "required.";
-		assertTrue(assertThrows(IllegalArgumentException.class, () -> calendarService.createDayIfNotExists(day)).getMessage().contains(required));
+		assertTrue(assertThrows(TypeMismatchDataAccessException.class, () -> calendarService.createDayIfNotExists(day)).getMessage().contains("value is null"));
 		assertTrue(assertThrows(IllegalArgumentException.class, () -> calendarService.createDayIfNotExists(null)).getMessage().contains(required));
 
 		final Day<?> day2 = new DayOfMonthImpl(Mockito.mock(DayGroup.class), MonthDay.of(12, 25));

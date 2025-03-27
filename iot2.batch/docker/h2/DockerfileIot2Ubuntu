@@ -1,13 +1,15 @@
 FROM openjdk:23 as builder
-RUN $JAVA_HOME/bin/jlink \
-         --verbose \
-        --add-modules ALL-MODULE-PATH \
-         --strip-debug \
-         --no-man-pages \
-         --no-header-files \
-        --compress=2 \
-         --output /customjre
+#RUN $JAVA_HOME/bin/jlink \
+#         --verbose \
+#        --add-modules ALL-MODULE-PATH \
+#         --strip-debug \
+#         --no-man-pages \
+#         --no-header-files \
+#        --compress=2 \
+#         --output /customjre
 FROM ubuntu
+
+ENV DOWNLOAD https://download.java.net/openjdk/jdk24/ri/openjdk-24+36_linux-x64_bin.tar.gz
 
 ENV SPRING_PROFILES_ACTIVE=h2
 ENV USER iot2
@@ -16,7 +18,7 @@ ENV APP_DIR ${HOME}/${USER}
 ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
 ENV DATA_DIR /db
 ENV TZ Europe/Berlin
-ENV JAVA_HOME ${HOME}/jre-23
+ENV JAVA_HOME ${HOME}/jdk-24
 
 
 
@@ -33,10 +35,14 @@ RUN apt-get install --no-install-recommends -y adduser
 
 RUN adduser --home ${HOME}  iot2  
 
+#RUN mkdir ${JAVA_HOME}
+RUN curl -L ${DOWNLOAD} -o ${HOME}/jdk.tar.gz
+RUN tar xf ${HOME}/jdk.tar.gz -C ${HOME}/
+RUN rm ${HOME}/jdk.tar.gz
 
 
 
-COPY --from=builder /customjre $JAVA_HOME
+#COPY --from=builder /customjre $JAVA_HOME
 
 RUN  chown -R ${USER}  ${JAVA_HOME}
 RUN  chgrp -R ${USER}  ${JAVA_HOME}
