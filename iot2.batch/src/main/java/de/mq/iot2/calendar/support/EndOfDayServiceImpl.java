@@ -62,16 +62,11 @@ class EndOfDayServiceImpl implements EndOfDayService {
 
 		final var parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);
 
-		final var twilightType = parameters.containsKey(Key.SunUpDownType) ? (TwilightType) parameters.get(Key.SunUpDownType) : TwilightType.Mathematical;
-
-		final var sunUpTime = calendarService.sunUpTime(date, twilightType);
-
-		final var sunDownTime = calendarService.sunDownTime(date, twilightType);
-
+		final var twilightType = Optional.ofNullable((TwilightType) parameters.get(Key.SunUpDownType));
+				
 		final var maxForecastTemperature = weatherService.maxForecastTemperature(date);
 
-		final var arguments = Map.of(EndOfDayArguments.Date, date, EndOfDayArguments.SunUpTime, sunUpTime, EndOfDayArguments.SunDownTime, sunDownTime, EndOfDayArguments.Cycle,
-				cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature, EndOfDayArguments.UpdateTime, uptateTime);
+		final var arguments = Map.of(EndOfDayArguments.Date, date, EndOfDayArguments.TwilightType,twilightType, EndOfDayArguments.Cycle, cycle, EndOfDayArguments.MaxForecastTemperature, maxForecastTemperature, EndOfDayArguments.UpdateTime, uptateTime);
 
 		protocolService.assignParameter(protocol, ProtocolParameterType.Configuration, parameters);
 		protocolService.assignParameter(protocol, ProtocolParameterType.RulesEngineArgument, arguments);

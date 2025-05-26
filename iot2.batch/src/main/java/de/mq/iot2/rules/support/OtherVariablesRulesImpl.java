@@ -84,8 +84,7 @@ public class OtherVariablesRulesImpl {
 	}
 
 	@Action(order = DEFAULT_PRIORITY)
-	public final void maxTemperature(@Fact("MaxForecastTemperature") final Optional<Double> maxForecastTemperature,
-			@Fact("SystemVariables") final Collection<SystemVariable> systemVariables) {
+	public final void maxTemperature(@Fact("MaxForecastTemperature") final Optional<Double> maxForecastTemperature, @Fact("SystemVariables") final Collection<SystemVariable> systemVariables) {
 		maxForecastTemperature.ifPresent(temperature -> addTemperatureSystemVariable(systemVariables, temperature));
 	}
 

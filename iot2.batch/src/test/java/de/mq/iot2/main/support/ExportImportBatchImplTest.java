@@ -155,11 +155,11 @@ class ExportImportBatchImplTest {
 	void deleteCalendarAndConfiguration() {
 		
 		final boolean removeConfigurationCalled[] = {false};
-		doAnswer(answer -> {
+		doAnswer(_ -> {
 			assertTrue(removeConfigurationCalled[0]);
 			return null;
 		}).when(calendarService).removeCalendar();
-		doAnswer(answer -> {
+		doAnswer(_ -> {
 			removeConfigurationCalled[0]=true;
 			return null;
 		}).when(configurationService).removeConfigurations();

@@ -17,7 +17,7 @@ class ProtocolParameterModelTest {
 
 
 	private String random() {
-		return RandomStringUtils.random(50);
+		return RandomStringUtils.secure().next(50);
 	}
 
 	@Test

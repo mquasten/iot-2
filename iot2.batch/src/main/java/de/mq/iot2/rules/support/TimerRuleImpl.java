@@ -22,7 +22,7 @@ import de.mq.iot2.configuration.Parameter.Key;
 import de.mq.iot2.rules.EndOfDayArguments;
 import de.mq.iot2.sysvars.SystemVariable;
 
-@Rule(name = "Timer-Rule", description = "Timer-Rule", priority = Integer.MIN_VALUE)
+@Rule(name = "Timer-Rule", description = "Timer-Rule", priority = SunUpDownTimeRuleImpl.PRIORTY+1)
 public class TimerRuleImpl {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(TimerRuleImpl.class);
@@ -134,8 +134,7 @@ public class TimerRuleImpl {
 	}
 
 	@Action(order = Integer.MAX_VALUE)
-	public final void addSystemVariable(@Fact("Timer") Collection<Entry<String, LocalTime>> timerList, @Fact("UpdateTime") final Optional<LocalTime> updateTime,
-			@Fact("SystemVariables") final Collection<SystemVariable> systemVariables) {
+	public final void addSystemVariable(@Fact("Timer") Collection<Entry<String, LocalTime>> timerList, @Fact("UpdateTime") final Optional<LocalTime> updateTime, @Fact("SystemVariables") final Collection<SystemVariable> systemVariables) {
 		final var variableName = updateTime.isEmpty() ? DAILY_EVENTS_SYSTEM_VARIABLE_NAME : EVENT_EXECUTION;
 		final var minTime = updateTime.orElse(LocalTime.of(0, 0));
 		final var stringBuilder = new StringBuilder();

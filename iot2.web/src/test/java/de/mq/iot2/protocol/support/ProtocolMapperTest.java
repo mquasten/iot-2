@@ -34,7 +34,8 @@ class ProtocolMapperTest {
 
 
 	private static String random() {
-		return RandomStringUtils.random(50);
+
+		return RandomStringUtils.secure().next(50);
 	}
 	
 
@@ -85,5 +86,6 @@ class ProtocolMapperTest {
 		when(protocol.executionTime()).thenReturn(DATETIME);
 		return protocol;
 	}
+	
 
 }

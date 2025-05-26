@@ -1,5 +1,4 @@
 package de.mq.iot2.sysvars.support;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.CalendarService.TwilightType;
+import de.mq.iot2.calendar.support.ZoneUtil;
 import de.mq.iot2.calendar.Cycle;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
@@ -77,18 +77,19 @@ class TimerController {
 		final var date = update ? now.get().toLocalDate() : now.get().toLocalDate().plusDays(1);
 		final Cycle cycle = calendarService.cycle(date);
 		final Map<Key, Object> parameters = configurationService.parameters(RuleKey.EndOfDay, cycle);
-		final var twilightType = value(parameters, Key.SunUpDownType, TwilightType.class).orElse(TwilightType.Mathematical);
+		final var twilightType = value(parameters, Key.SunUpDownType, TwilightType.class).orElse(ZoneUtil.isEuropeanSummertime(date)?TwilightType.Mathematical:TwilightType.Civil);
 		final var timerModel = new TimerModel();
 		timerModel.setUpdate(update);
 		final var temperatureLimit = value(parameters, Key.ShadowTemperature, Double.class).orElse(Double.MAX_VALUE);
 		value(parameters, Key.UpTime, LocalTime.class).ifPresent(time -> timerModel.setUpTime(format(time)));
 		value(parameters, Key.ShadowTime, LocalTime.class).ifPresent(time -> weatherService.maxForecastTemperature(date).filter(temperatur -> temperatur >= temperatureLimit)
-				.ifPresent(temperature -> timerModel.setShadowTime(format(time))));
+				.ifPresent(_ -> timerModel.setShadowTime(format(time))));
 		calendarService.sunUpTime(date, twilightType).ifPresent(time -> timerModel.setSunUpTime(format(time)));
 		calendarService.sunDownTime(date, twilightType).ifPresent(time -> timerModel.setSunDownTime(format(time)));
 		model.addAttribute(TIMER_MODEL_AND_VIEW_NAME, timerModel);
 		return TIMER_MODEL_AND_VIEW_NAME;
 	}
+
 
 	@SuppressWarnings("unchecked")
 	private <T> Optional<T> value(final Map<Key, Object> parameters, final Key key, final Class<T> clazz) {

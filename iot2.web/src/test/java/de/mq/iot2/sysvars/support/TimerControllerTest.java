@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.springframework.core.convert.ConversionService;
@@ -46,6 +47,7 @@ import org.springframework.validation.ObjectError;
 import de.mq.iot2.calendar.CalendarService;
 import de.mq.iot2.calendar.CalendarService.TwilightType;
 import de.mq.iot2.calendar.Cycle;
+import de.mq.iot2.calendar.support.ZoneUtil;
 import de.mq.iot2.configuration.Configuration.RuleKey;
 import de.mq.iot2.configuration.ConfigurationService;
 import de.mq.iot2.configuration.Parameter.Key;
@@ -90,6 +92,42 @@ class TimerControllerTest {
 	}
 
 	@Test
+	void variableWinterTime() {
+		try (MockedStatic<ZoneUtil> zoneUtil = Mockito.mockStatic(ZoneUtil.class)) {
+			zoneUtil.when(() -> ZoneUtil.isEuropeanSummertime(Mockito.any())).thenReturn(false);
+
+			prepareVariableWithoutSunUpDownType(TwilightType.Civil);
+
+			assertEquals(TIMER_MODEL_AND_VIEW_NAME, timerController.variable(model, false));
+
+			final TimerModel timerModel = (TimerModel) model.getAttribute(TIMER_MODEL_AND_VIEW_NAME);
+			assertEquals(format(UPTIME), timerModel.getUpTime());
+			assertEquals(format(SUN_UPTIME), timerModel.getSunUpTime());
+			assertEquals(format(SHADOW_TIME), timerModel.getShadowTime());
+			assertEquals(format(SUN_DOWNTIME), timerModel.getSunDownTime());
+			assertEquals(false, timerModel.isUpdate());
+		}
+	}
+
+	@Test
+	void variableSummerTime() {
+		try (MockedStatic<ZoneUtil> zoneUtil = Mockito.mockStatic(ZoneUtil.class)) {
+			zoneUtil.when(() -> ZoneUtil.isEuropeanSummertime(Mockito.any())).thenReturn(true);
+
+			prepareVariableWithoutSunUpDownType(TwilightType.Mathematical);
+
+			assertEquals(TIMER_MODEL_AND_VIEW_NAME, timerController.variable(model, false));
+
+			final TimerModel timerModel = (TimerModel) model.getAttribute(TIMER_MODEL_AND_VIEW_NAME);
+			assertEquals(format(UPTIME), timerModel.getUpTime());
+			assertEquals(format(SUN_UPTIME), timerModel.getSunUpTime());
+			assertEquals(format(SHADOW_TIME), timerModel.getShadowTime());
+			assertEquals(format(SUN_DOWNTIME), timerModel.getSunDownTime());
+			assertEquals(false, timerModel.isUpdate());
+		}
+	}
+
+	@Test
 	void variableTemperatureLessThanShadowTemperature() {
 		prepareVariable(false, 24.9);
 
@@ -114,6 +152,18 @@ class TimerControllerTest {
 		when(calendarService.sunUpTime(date, TwilightType.Civil)).thenReturn(Optional.of(SUN_UPTIME));
 		when(calendarService.sunDownTime(date, TwilightType.Civil)).thenReturn(Optional.of(SUN_DOWNTIME));
 		when(weatherService.maxForecastTemperature(date)).thenReturn(Optional.of(temperature));
+	}
+
+	private void prepareVariableWithoutSunUpDownType(TwilightType twilightType) {
+		parameters.put(Key.ShadowTemperature, 25d);
+		parameters.put(Key.UpTime, UPTIME);
+		parameters.put(Key.ShadowTime, SHADOW_TIME);
+		final var date = LocalDate.now().plusDays(1);
+		when(calendarService.cycle(date)).thenReturn(cycle);
+		when(configurationService.parameters(RuleKey.EndOfDay, cycle)).thenReturn(parameters);
+		when(calendarService.sunUpTime(date, twilightType)).thenReturn(Optional.of(SUN_UPTIME));
+		when(calendarService.sunDownTime(date, twilightType)).thenReturn(Optional.of(SUN_DOWNTIME));
+		when(weatherService.maxForecastTemperature(date)).thenReturn(Optional.of(26d));
 	}
 
 	private String format(final LocalTime time) {
@@ -231,7 +281,7 @@ class TimerControllerTest {
 	@Test
 	void timerBindingErrors() {
 		Mockito.when(bindingResults.hasErrors()).thenReturn(true);
-		assertEquals(TIMER_MODEL_AND_VIEW_NAME,timerController.timer(new TimerModel(), bindingResults));
+		assertEquals(TIMER_MODEL_AND_VIEW_NAME, timerController.timer(new TimerModel(), bindingResults));
 	}
 
 }

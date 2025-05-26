@@ -14,6 +14,10 @@ public interface ZoneUtil {
 	public static int zoneOffsetEuropeanSummertimeHours(final LocalDate date) {
 		return zoneOffsetEuropeanSummertimeHours(date, ZONE_ID_EUROPEAN_SUMMERTIME);
 	}
+	
+	public static boolean isEuropeanSummertime(final LocalDate date) {
+		return ZoneUtil.zoneOffsetEuropeanSummertimeHours(date) -1 > 0;
+	}
 
 	static int zoneOffsetEuropeanSummertimeHours(final LocalDate date, final ZoneId zoneId) {
 		final var zoneOffsetSeconds = zoneOffsetSeconds(date, zoneId);

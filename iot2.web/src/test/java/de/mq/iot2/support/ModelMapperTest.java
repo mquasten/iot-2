@@ -36,7 +36,7 @@ class ModelMapperTest {
 	@Test
 	void toWebById() {
 		final var id = UUID.randomUUID().toString();
-		Mockito.doAnswer(a -> domainList.get(0)).when(modelMapper).toDomain(id);
+		Mockito.doAnswer(_ -> domainList.get(0)).when(modelMapper).toDomain(id);
 		Mockito.when(modelMapper.toWeb(domainList.get(0))).thenReturn(resultMap.get(domainList.get(0)));
 		Mockito.when(modelMapper.toWeb(id)).thenCallRealMethod();
 

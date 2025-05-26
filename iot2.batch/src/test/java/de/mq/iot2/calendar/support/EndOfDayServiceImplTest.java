@@ -48,16 +48,13 @@ class EndOfDayServiceImplTest {
 
 	@Test
 	final void execute() {
-		final var sunUpTime = LocalTime.of(8, 0);
-		final var sunDownTime = LocalTime.of(17, 0);
 		final var maxForecastTemperature = Optional.of(11.11d);
 
 		Mockito.when(calendarService.cycle(date)).thenReturn(cycle);
 		final Map<Key, Object> parameters = Map.of(Key.SunUpDownType, TwilightType.Civil);
 
 		Mockito.when(configurationService.parameters(RuleKey.EndOfDay, cycle)).thenReturn(parameters);
-		Mockito.when(calendarService.sunUpTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunUpTime));
-		Mockito.when(calendarService.sunDownTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunDownTime));
+
 		Mockito.when(weatherService.maxForecastTemperature(date)).thenReturn(maxForecastTemperature);
 		@SuppressWarnings("unchecked")
 		ArgumentCaptor<Map<Key, Object>> parameterCapture = ArgumentCaptor.forClass(Map.class);
@@ -73,8 +70,7 @@ class EndOfDayServiceImplTest {
 
 		assertEquals(parameters, parameterCapture.getValue());
 		assertEquals(date, argumentCaptor.getValue().get(EndOfDayArguments.Date));
-		assertEquals(Optional.of(sunUpTime), argumentCaptor.getValue().get(EndOfDayArguments.SunUpTime));
-		assertEquals(Optional.of(sunDownTime), argumentCaptor.getValue().get(EndOfDayArguments.SunDownTime));
+		assertEquals(Optional.of(TwilightType.Civil), argumentCaptor.getValue().get(EndOfDayArguments.TwilightType));
 		assertEquals(cycle, argumentCaptor.getValue().get(EndOfDayArguments.Cycle));
 		assertEquals(maxForecastTemperature, argumentCaptor.getValue().get(EndOfDayArguments.MaxForecastTemperature));
 		assertEquals(Optional.empty(), argumentCaptor.getValue().get(EndOfDayArguments.UpdateTime));
@@ -90,19 +86,19 @@ class EndOfDayServiceImplTest {
 	}
 
 	@Test
-	final void executeDefaultTwilightType() {
-		final var sunUpTime = LocalTime.of(8, 0);
-		final var sunDownTime = LocalTime.of(17, 0);
+	final void executeWithoutTwilightType() {
+		@SuppressWarnings("unchecked")
+		ArgumentCaptor<Map<? extends Enum<?>, Object>> argumentCaptor = ArgumentCaptor.forClass(Map.class);
 		Mockito.when(calendarService.cycle(date)).thenReturn(cycle);
 		final Map<Key, Object> parameters = Map.of(Key.MaxSunDownTime, LocalTime.of(23, 30));
 		Mockito.when(configurationService.parameters(RuleKey.EndOfDay, cycle)).thenReturn(parameters);
-		Mockito.when(calendarService.sunUpTime(date, TwilightType.Mathematical)).thenReturn(Optional.of(sunUpTime));
-		Mockito.when(calendarService.sunDownTime(date, TwilightType.Mathematical)).thenReturn(Optional.of(sunDownTime));
+	
 		final var systemVariables = List.of(new SystemVariable());
-		Mockito.when(ruleService.process(Mockito.anyMap(), Mockito.anyMap())).thenReturn(Map.of(EndOfDayArguments.SystemVariables.name(), systemVariables));
+		Mockito.when(ruleService.process(Mockito.anyMap(), argumentCaptor.capture())).thenReturn(Map.of(EndOfDayArguments.SystemVariables.name(), systemVariables));
 
 		endOfDayService.execute(protocol, date, Optional.empty());
 
+		assertEquals(Optional.empty(),  argumentCaptor.getValue().get(EndOfDayArguments.TwilightType));
 		Mockito.verify(systemVariableService).update(systemVariables);
 	}
 
@@ -110,16 +106,12 @@ class EndOfDayServiceImplTest {
 	final void executeUpdate() {
 		final var date = LocalDate.now();
 		final var time = LocalTime.of(11, 11);
-		final var sunUpTime = LocalTime.of(8, 0);
-		final var sunDownTime = LocalTime.of(17, 0);
 		final var maxForecastTemperature = Optional.of(11.11d);
 
 		Mockito.when(calendarService.cycle(date)).thenReturn(cycle);
 		final Map<Key, Object> parameters = Map.of(Key.SunUpDownType, TwilightType.Civil);
 
 		Mockito.when(configurationService.parameters(RuleKey.EndOfDay, cycle)).thenReturn(parameters);
-		Mockito.when(calendarService.sunUpTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunUpTime));
-		Mockito.when(calendarService.sunDownTime(date, TwilightType.Civil)).thenReturn(Optional.of(sunDownTime));
 		Mockito.when(weatherService.maxForecastTemperature(date)).thenReturn(maxForecastTemperature);
 
 		@SuppressWarnings("unchecked")
@@ -136,8 +128,7 @@ class EndOfDayServiceImplTest {
 
 		assertEquals(parameters, parameterCapture.getValue());
 		assertEquals(date, argumentCaptor.getValue().get(EndOfDayArguments.Date));
-		assertEquals(Optional.of(sunUpTime), argumentCaptor.getValue().get(EndOfDayArguments.SunUpTime));
-		assertEquals(Optional.of(sunDownTime), argumentCaptor.getValue().get(EndOfDayArguments.SunDownTime));
+		assertEquals(Optional.of(TwilightType.Civil), argumentCaptor.getValue().get(EndOfDayArguments.TwilightType));
 		assertEquals(cycle, argumentCaptor.getValue().get(EndOfDayArguments.Cycle));
 		assertEquals(maxForecastTemperature, argumentCaptor.getValue().get(EndOfDayArguments.MaxForecastTemperature));
 		assertEquals(Optional.of(time), argumentCaptor.getValue().get(EndOfDayArguments.UpdateTime));
