@@ -80,6 +80,7 @@
 		<jacoco.maven.version>0.8.13-SNAPSHOT</jacoco.maven.version>
 		<iot2.domain.version>0.0.1-SNAPSHOT</iot2.domain.version>
 		<jasypt.version>3.0.5</jasypt.version>
+		<spring.velocity>2.4.1</spring.velocity>
 	</properties>
 	<pluginRepositories>
 		<pluginRepository>
@@ -160,9 +161,12 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
+		<!--
+		https://mvnrepository.com/artifact/org.apache.velocity/spring-velocity-support -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>spring-velocity-support</artifactId>
+			<version>${spring.velocity}</version>
 		</dependency>
 	</dependencies>
 	<build>
