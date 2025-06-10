@@ -3,20 +3,20 @@ package de.mq.iot2.sysvars.support;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mockStatic;
+
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.spring.VelocityEngineUtils;
 import org.aspectj.lang.JoinPoint;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -53,30 +53,27 @@ class UpdateSystemVariablesAspectImplTest {
 		Mockito.when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 		Mockito.when(messageHelper.getMimeMessage()).thenReturn(mimeMessage);
 
-		final ArgumentCaptor<VelocityEngine> velocityEngineCaptor = ArgumentCaptor.forClass(VelocityEngine.class);
+		Mockito.doAnswer(answer -> {
+			answer.getArgument(3, StringWriter.class).write(MAIL_TEXT);
+			return 	true;}
+		).when(velocityEngine).mergeTemplate(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+		
 		final ArgumentCaptor<String> pathCaptor = ArgumentCaptor.forClass(String.class);
 		final ArgumentCaptor<String> encodingCaptor = ArgumentCaptor.forClass(String.class);
-		@SuppressWarnings("unchecked")
-		final ArgumentCaptor<Map<String, Object>> modelCaptor = ArgumentCaptor.forClass(Map.class);
+		final ArgumentCaptor<Writer> writerCaptor = ArgumentCaptor.forClass(Writer.class);
+		final ArgumentCaptor<VelocityContext> velocityContextCaptor = ArgumentCaptor.forClass(VelocityContext.class);
 
-		try (MockedStatic<VelocityEngineUtils> velocityEngineUtils = mockStatic(VelocityEngineUtils.class)) {
-
-			velocityEngineUtils.when(() -> VelocityEngineUtils.mergeTemplateIntoString(velocityEngineCaptor.capture(), pathCaptor.capture(), encodingCaptor.capture(), modelCaptor.capture())).thenReturn(MAIL_TEXT);
-
-			updateSystemVariablesAspect.serviceAroundAdvice(joinPoint, updatedSystemVariables);
-		}
-
-		assertEquals(velocityEngine, velocityEngineCaptor.getValue());
-
+		updateSystemVariablesAspect.serviceAroundAdvice(joinPoint, updatedSystemVariables);
+		
+		Mockito.verify(velocityEngine).mergeTemplate( pathCaptor.capture(), encodingCaptor.capture(), velocityContextCaptor.capture(), writerCaptor.capture());
 		assertEquals(UpdateSystemVariablesAspectImpl.TEMPLATE_PATH, pathCaptor.getValue());
 		assertEquals(UpdateSystemVariablesAspectImpl.ENCODING, encodingCaptor.getValue());
-		assertEquals(1, modelCaptor.getValue().size());
-		assertEquals(UpdateSystemVariablesAspectImpl.VARIABLE_NAME, modelCaptor.getValue().keySet().iterator().next());
+		assertEquals(1, velocityContextCaptor.getValue().getKeys().length);
+		assertEquals(UpdateSystemVariablesAspectImpl.VARIABLE_NAME, velocityContextCaptor.getValue().getKeys()[0]);
 
 		@SuppressWarnings("unchecked")
-		final Collection<Entry<SystemVariable, Boolean>> entries = (Collection<Entry<SystemVariable, Boolean>>) modelCaptor.getValue().get(UpdateSystemVariablesAspectImpl.VARIABLE_NAME);
+		final Collection<Entry<SystemVariable, Boolean>> entries = (Collection<Entry<SystemVariable, Boolean>>) velocityContextCaptor.getValue().get(UpdateSystemVariablesAspectImpl.VARIABLE_NAME);
 		final var results = entries.stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-
 		assertEquals(2, results.size());
 		assertTrue(results.containsKey(systemVariable01));
 		assertTrue(results.containsKey(systemVariable01));
@@ -84,7 +81,6 @@ class UpdateSystemVariablesAspectImplTest {
 		assertFalse(results.get(systemVariable02));
 
 		Mockito.verify(javaMailSender).send(mimeMessage);
-
 		Mockito.verify(messageHelper).setTo(mailTo);
 		Mockito.verify(messageHelper).setSubject(UpdateSystemVariablesAspectImpl.MAIL_SUBJECT);
 		Mockito.verify(messageHelper).setText(MAIL_TEXT, true);
@@ -97,6 +93,7 @@ class UpdateSystemVariablesAspectImplTest {
 		updateSystemVariablesAspect.serviceAroundAdvice(joinPoint, updatedSystemVariables);
 		Mockito.verifyNoInteractions(joinPoint);
 		Mockito.verifyNoInteractions(javaMailSender);
+		Mockito.verifyNoInteractions(velocityEngine);
 	}
 
 }

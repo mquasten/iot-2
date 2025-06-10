@@ -1,6 +1,8 @@
 package de.mq.iot2.sysvars.support;
 
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,8 +12,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.spring.VelocityEngineUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -74,9 +76,11 @@ public class UpdateSystemVariablesAspectImpl {
 
 		final Map<String, Object> model = new HashMap<>();
 		model.put(VARIABLE_NAME, entries);
-		final String text = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, TEMPLATE_PATH, ENCODING, model);
-
-		javaMailSender.send(mimeMessage(StringUtils.trim(mailTo.get()), text));
+		try (final Writer writer = new StringWriter()) {
+			velocityEngine.mergeTemplate(TEMPLATE_PATH, ENCODING, new VelocityContext(model), writer);
+			final String text = writer.toString();
+			javaMailSender.send(mimeMessage(StringUtils.trim(mailTo.get()), text));
+		}
 
 		LOGGER.info("Write systemvariables status mail to '{}'", mailTo.get());
 	}
