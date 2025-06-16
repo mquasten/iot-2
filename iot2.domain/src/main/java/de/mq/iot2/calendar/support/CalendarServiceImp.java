@@ -295,7 +295,7 @@ class CalendarServiceImp implements CalendarService {
 				cycleIdsProcessed.add(cycleId);
 			});
 
-			final List<DayGroup> dayGroupsList = dayGroups.values().stream().sorted((group1, group2) -> group1.name().compareTo(group1.name())).collect(Collectors.toList());
+			final List<DayGroup> dayGroupsList = dayGroups.values().stream().sorted((group1, _) -> group1.name().compareTo(group1.name())).collect(Collectors.toList());
 			IntStream
 					.range(0,
 							dayGroupsList.size())

@@ -347,11 +347,11 @@ class ConfigurationServiceImplTest {
 	@Test
 	void removeConfigurations() {
 		boolean[] parameterDeleted= {false};
-		Mockito.doAnswer(answer -> {
+		Mockito.doAnswer(_ -> {
 			parameterDeleted[0]=true;
 			return null;
 		}).when(parameterRepository).deleteAll();
-		Mockito.doAnswer(answer -> {
+		Mockito.doAnswer(_ -> {
 			assertTrue(parameterDeleted[0]);
 			return null;
 		}).when(configurationRepository).deleteAll();

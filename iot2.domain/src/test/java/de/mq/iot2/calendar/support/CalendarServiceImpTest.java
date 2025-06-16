@@ -612,16 +612,16 @@ class CalendarServiceImpTest {
 	void removeCalendar() {
 		boolean[] daysDeleted = { false };
 		boolean[] dayGroupsDeleted = { false };
-		Mockito.doAnswer(answer -> {
+		Mockito.doAnswer(_ -> {
 			daysDeleted[0] = true;
 			return null;
 		}).when(dayRepository).deleteAll();
-		Mockito.doAnswer(answer -> {
+		Mockito.doAnswer(_ -> {
 			dayGroupsDeleted[0] = true;
 			assertTrue(daysDeleted[0]);
 			return null;
 		}).when(dayGroupRepository).deleteAll();
-		Mockito.doAnswer(answer -> {
+		Mockito.doAnswer(_ -> {
 
 			assertTrue(daysDeleted[0] && dayGroupsDeleted[0]);
 			return null;

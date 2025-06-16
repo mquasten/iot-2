@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -21,7 +22,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -74,19 +74,19 @@ public class SpringConfigurationTest {
 	void daoAuthenticationProvider() {
 		final var userDetailsService = mock(UserDetailsService.class);
 		final AuthenticationProvider authenticationProvider = springConfiguration.daoAuthenticationProvider(userDetailsService);
+
 		assertEquals(userDetailsService, requiredField(authenticationProvider, UserDetailsService.class));
-		assertTrue(requiredField(authenticationProvider, PasswordEncoder.class) instanceof SimpleMessageDigestPasswordEncoderImpl);
+		assertTrue(((Supplier<?>) requiredField(authenticationProvider, Supplier.class)).get() instanceof SimpleMessageDigestPasswordEncoderImpl);
 	}
 
 	private Object requiredField(final Object authenticationProvider, Class<?> clazz) {
-		return DataAccessUtils.requiredUniqueResult(List.of(DaoAuthenticationProvider.class.getDeclaredFields()).stream().filter(field -> field.getType().equals(clazz))
-				.map(field -> ReflectionTestUtils.getField(authenticationProvider, field.getName())).collect(Collectors.toList()));
+		return DataAccessUtils.requiredUniqueResult(
+				List.of(DaoAuthenticationProvider.class.getDeclaredFields()).stream().filter(field -> field.getType().equals(clazz)).map(field -> ReflectionTestUtils.getField(authenticationProvider, field.getName())).collect(Collectors.toList()));
 	}
 
 	@Test
 	void securityContext() {
 		assertEquals(SECURITY_CONTEXT, springConfiguration.securityContext());
 	}
-	
 
 }

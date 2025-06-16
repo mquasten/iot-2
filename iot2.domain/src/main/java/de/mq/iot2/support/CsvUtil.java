@@ -17,7 +17,7 @@ public interface CsvUtil {
 	}
 
 	public static Stream<String> emptyColumns(final int count) {
-		return IntStream.range(0, count).mapToObj(i -> "");
+		return IntStream.range(0, count).mapToObj(_ -> "");
 	}
 
 	public static String id(final Object entity) {
