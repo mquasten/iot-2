@@ -1,0 +1,1 @@
+insert into day_group( ID, name, read_only, cycle_id) values( '00000000-0000-0007-0000-000000000007' , 'Krankheit',0, '00000000-0000-0001-0000-000000000001') 
