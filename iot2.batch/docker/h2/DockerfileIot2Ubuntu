@@ -1,4 +1,4 @@
-FROM openjdk:23 as builder
+#FROM openjdk:23 as builder
 #RUN $JAVA_HOME/bin/jlink \
 #         --verbose \
 #        --add-modules ALL-MODULE-PATH \
@@ -9,7 +9,8 @@ FROM openjdk:23 as builder
 #         --output /customjre
 FROM ubuntu
 
-ENV DOWNLOAD https://download.java.net/openjdk/jdk24/ri/openjdk-24+36_linux-x64_bin.tar.gz
+ENV DOWNLOAD https://download.java.net/java/GA/jdk25/bd75d5f9689641da8e1daabeccb5528b/36/GPL/openjdk-25_linux-x64_bin.tar.gz
+
 
 ENV SPRING_PROFILES_ACTIVE=h2
 ENV USER iot2
@@ -18,7 +19,7 @@ ENV APP_DIR ${HOME}/${USER}
 ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
 ENV DATA_DIR /db
 ENV TZ Europe/Berlin
-ENV JAVA_HOME ${HOME}/jdk-24
+ENV JAVA_HOME ${HOME}/jdk-25
 
 
 

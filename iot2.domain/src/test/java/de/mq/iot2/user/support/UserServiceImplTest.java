@@ -137,7 +137,7 @@ class UserServiceImplTest {
 	void algorithms() {
 		final Collection<String> results = userService.algorithms();
 
-		assertEquals(13, results.size());
+		assertEquals(15, results.size());
 		assertTrue(results.contains("MD5"));
 	}
 }

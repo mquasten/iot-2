@@ -4,12 +4,12 @@ ENV CALENDAR_FILE=calendar2.csv
 ENV SPRING_PROFILES_ACTIVE=oracle
 ENV USER oracle
 ENV HOME=/home/oracle
-ENV JAVA_HOME ${HOME}/jdk-24
+ENV JAVA_HOME ${HOME}/jdk-25
 ENV APP_DIR ${HOME}/iot2
 # https://jdk.java.net/
 
 			
-ENV DOWNLOAD https://download.java.net/openjdk/jdk24/ri/openjdk-24+36_linux-x64_bin.tar.gz
+ENV DOWNLOAD https://download.java.net/java/GA/jdk25/bd75d5f9689641da8e1daabeccb5528b/36/GPL/openjdk-25_linux-x64_bin.tar.gz
 
 USER root
 

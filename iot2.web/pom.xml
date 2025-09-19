@@ -15,7 +15,7 @@
 	<properties>
 		<!--maven.compiler.source>24</maven.compiler.source-->
 		<!--maven.compiler.target>20</maven.compiler.target-->
-		<java.version>24</java.version>
+		<java.version>25</java.version>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jacoco.maven.version>0.8.13-SNAPSHOT</jacoco.maven.version>
