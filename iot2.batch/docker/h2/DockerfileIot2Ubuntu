@@ -9,7 +9,13 @@
 #         --output /customjre
 FROM ubuntu
 
-ENV DOWNLOAD https://download.java.net/java/GA/jdk25/bd75d5f9689641da8e1daabeccb5528b/36/GPL/openjdk-25_linux-x64_bin.tar.gz
+#ENV DOWNLOAD https://download.java.net/java/GA/jdk25/bd75d5f9689641da8e1daabeccb5528b/36/GPL/openjdk-25_linux-x64_bin.tar.gz
+
+ 	
+ENV DOWNLOAD https://download.java.net/java/27/latest/jdk-27_linux-x64_bin.tar.gz 
+
+ 	
+
 
 
 ENV SPRING_PROFILES_ACTIVE=h2
@@ -19,7 +25,7 @@ ENV APP_DIR ${HOME}/${USER}
 ARG DOWNLOAD_H2=https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
 ENV DATA_DIR /db
 ENV TZ Europe/Berlin
-ENV JAVA_HOME ${HOME}/jdk-25
+ENV JAVA_HOME ${HOME}/jdk-27.0.1.0.3
 
 
 
